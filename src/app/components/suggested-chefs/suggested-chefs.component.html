@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Suggested Chefs</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="close()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="chef-list">
+    <div class="chef-row" *ngFor="let chef of chefs">
+      <img [src]="getChefImage(chef.profilePicture)" alt="{{ chef.username }}" />
+      <div class="chef-info">
+        <div class="chef-name">@{{ chef.username }}</div>
+        <div class="chef-meta">{{ chef.dishCount }} dishes · {{ chef.followersCount }} followers</div>
+      </div>
+      <button class="chef-follow-btn" [class.is-following]="isFollowing(chef._id)" (click)="toggleFollow(chef._id)">
+        <ion-icon *ngIf="!isFollowing(chef._id)" name="add-circle-outline"></ion-icon>
+        {{ isFollowing(chef._id) ? 'Unfollow' : 'Follow' }}
+      </button>
+    </div>
+  </div>
+  <div class="dont-show">
+    <ion-checkbox (ionChange)="toggleDontShow($event)"></ion-checkbox>
+    <span>Don't show me this page again</span>
+  </div>
+  <ion-button expand="block" class="close-btn" (click)="close()">Close</ion-button>
+</ion-content>

@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/components/dispatch" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Dispatch Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="dispatch-profile-page ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="loadProfile($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="hero-card">
+    <div class="hero-copy">
+      <span class="eyebrow">Fleet setup</span>
+      <h2>{{ profile?.dispatchProfile?.companyName || profile?.username || 'Dispatch rider' }}</h2>
+      <p>Update the business, vehicle and availability details used for delivery matching.</p>
+    </div>
+    <div class="hero-pill" [class.offline]="!form.isAvailable">
+      {{ form.isAvailable ? 'Available' : 'Offline' }}
+    </div>
+  </div>
+
+  <div class="status-strip" *ngIf="profile?.dispatchProfile">
+    <div class="status-block">
+      <span>Verification</span>
+      <strong>{{ profile?.dispatchProfile?.verificationStatus || 'pending' }}</strong>
+    </div>
+    <div class="status-block">
+      <span>Vehicles</span>
+      <strong>{{ profile?.dispatchProfile?.vehicleTypes?.length || 0 }}</strong>
+    </div>
+    <div class="status-block">
+      <span>Coverage</span>
+      <strong>{{ profile?.dispatchProfile?.operatingAreas?.length || 0 }}</strong>
+    </div>
+  </div>
+
+  <div class="form-shell" *ngIf="!loading; else loadingState">
+    <section class="form-card">
+      <div class="section-head">
+        <h3>Business</h3>
+        <p>How riders and chefs should see your dispatch identity.</p>
+      </div>
+
+      <label class="toggle-row">
+        <span>Registered as a company</span>
+        <ion-toggle [(ngModel)]="form.isCompany"></ion-toggle>
+      </label>
+
+      <label class="field">
+        <span>Company name</span>
+        <input type="text" [(ngModel)]="form.companyName" placeholder="Enter dispatch company name" />
+      </label>
+    </section>
+
+    <section class="form-card">
+      <div class="section-head">
+        <h3>Vehicle</h3>
+        <p>Used for route matching and delivery presentation.</p>
+      </div>
+
+      <label class="field">
+        <span>Vehicle types</span>
+        <input type="text" [(ngModel)]="form.vehicleTypes" placeholder="Bike, car, van" />
+      </label>
+
+      <label class="field">
+        <span>Plate number</span>
+        <input type="text" [(ngModel)]="form.plateNumber" placeholder="Vehicle plate number" />
+      </label>
+
+      <label class="field">
+        <span>License number</span>
+        <input type="text" [(ngModel)]="form.licenseNumber" placeholder="License or permit number" />
+      </label>
+    </section>
+
+    <section class="form-card">
+      <div class="section-head">
+        <h3>Coverage</h3>
+        <p>Set the areas where you actively receive delivery requests.</p>
+      </div>
+
+      <label class="field">
+        <span>Operating areas</span>
+        <textarea rows="4" [(ngModel)]="form.operatingAreas" placeholder="Lagos Island, Yaba, Lekki"></textarea>
+      </label>
+
+      <label class="toggle-row availability">
+        <div>
+          <strong>Receive new jobs</strong>
+          <p>Turn this off if you do not want new delivery assignments.</p>
+        </div>
+        <ion-toggle [(ngModel)]="form.isAvailable"></ion-toggle>
+      </label>
+    </section>
+  </div>
+
+  <ng-template #loadingState>
+    <div class="loading-card" *ngFor="let item of [1,2,3]"></div>
+  </ng-template>
+</ion-content>

@@ -1,0 +1,147 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="components/explore" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="topContainer">
+    <div class="welcomeHeading">
+      <h2>Hi, {{ userProfile?.username }}</h2>
+      <p>Quick Actions</p>
+    </div>
+
+    <div id="prof-btn">
+      <button (click)="newOrder()" class="profile-btn glass" title="Explore">
+        <div class="roundIcon"><ion-icon name="home-outline" class="btn-icon"></ion-icon></div>
+        <span>Explore</span>
+      </button>
+      <button (click)="openOrdersHistory()" class="profile-btn glass" title="Order History">
+        <div class="roundIcon"><ion-icon name="receipt-outline" class="btn-icon"></ion-icon></div>
+        <span>Orders</span>
+      </button>
+      <button (click)="openNotifications()" class="profile-btn glass" title="Notifications">
+        <div class="roundIcon"><ion-icon name="notifications-outline" class="btn-icon"></ion-icon></div>
+        <span>Notifications</span>
+      </button>
+      <button (click)="logout()" class="profile-btn glass" title="Logout">
+        <div class="roundIcon"><ion-icon name="log-out-outline" class="btn-icon"></ion-icon></div>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <app-profile-completeness-card [profile]="profileDetails" role="consumer"></app-profile-completeness-card>
+
+  <div class="section-divider"></div>
+
+  <div class="control">
+    <button class="control-btn" (click)="openSettings()">
+      <div class="roundIcon"><ion-icon name="settings" class="btn-icon"></ion-icon></div>
+      <span>Settings</span>
+    </button>
+    <button class="control-btn" (click)="openWallet()">
+      <div class="roundIcon"><ion-icon name="wallet" class="btn-icon"></ion-icon></div>
+      <span>Wallet</span>
+    </button>
+    <button class="control-btn" (click)="openRewards()">
+      <div class="roundIcon"><ion-icon name="sparkles-outline" class="btn-icon"></ion-icon></div>
+      <span>Rewards</span>
+    </button>
+    <button class="control-btn" (click)="updateProfile()">
+      <div class="roundIcon"><ion-icon name="create-outline" class="btn-icon"></ion-icon></div>
+      <span>Edit Account</span>
+    </button>
+  </div>
+
+  <div class="activitiesHeading">
+    <p>My Orders</p>
+  </div>
+
+  <div class="tabs">
+    <ion-segment (ionChange)="segmentChanged($event)" [value]="selectedSegment">
+      <ion-segment-button value="liveOrder">
+        <ion-label>Live Orders</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completedOrders">
+        <ion-label>Completed</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <div [ngSwitch]="selectedSegment">
+      <div *ngSwitchCase="'liveOrder'">
+        <div *ngIf="isLoadingOrders || !isOnline" class="skeleton-list">
+          <div class="skeleton-row" *ngFor="let s of [1,2,3]">
+            <ion-skeleton-text animated style="width:90%;height:14px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width:60%;height:12px;margin-top:6px;"></ion-skeleton-text>
+          </div>
+        </div>
+
+        <div class="orders-list">
+          <button
+            type="button"
+            class="order-card"
+            *ngFor="let order of liveOrders; trackBy: trackByOrder"
+            (click)="viewOrderDetails(order)"
+          >
+            <div class="order-card-top">
+              <h4>{{ order.dishName | titlecase }}</h4>
+              <span class="price">&#8358;{{ order.price }}</span>
+            </div>
+            <div class="order-card-meta">
+              <span class="liveOrderTime"><ion-icon name="timer-outline"></ion-icon> {{ order.preparationTime }} - {{ timeAgo(order.orderTime) }}</span>
+              <span
+                [ngClass]="{
+                  'status-delivered': order.status === 'delivered',
+                  'status-confirmed': order.status === 'confirmed',
+                  'status-placed': order.status === 'placed',
+                  'status-declined': order.status === 'declined',
+                  'status-processing': order.status === 'processing',
+                  'status-completed': order.status === 'completed'
+                }"
+              >{{ getOrderStatusLabel(order) }}</span>
+            </div>
+
+            <div class="delivery-confirmation" *ngIf="order.status === 'delivered'">
+              <button type="button" class="confirm-btn yes" (click)="confirmReceipt(order, true); $event.stopPropagation()">Received</button>
+              <button type="button" class="confirm-btn no" (click)="confirmReceipt(order, false); $event.stopPropagation()">Not Received</button>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="'completedOrders'">
+        <div *ngIf="isLoadingOrders || !isOnline" class="skeleton-list">
+          <div class="skeleton-row" *ngFor="let s of [1,2,3]">
+            <ion-skeleton-text animated style="width:80%;height:14px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width:40%;height:12px;margin-top:6px;"></ion-skeleton-text>
+          </div>
+        </div>
+
+        <div class="orders-list">
+          <button
+            type="button"
+            class="order-card order-card-completed"
+            *ngFor="let order of completedOrders; trackBy: trackByOrder"
+            (click)="viewOrderDetails(order)"
+          >
+            <div class="order-card-top">
+              <h4>{{ order.dishName | titlecase }}</h4>
+              <span class="price">&#8358;{{ order.price }}</span>
+            </div>
+            <div class="order-card-meta">
+              <span class="liveOrderTime"><ion-icon name="calendar-outline"></ion-icon> {{ timeAgo(order.orderTime) }}</span>
+              <span class="status-completed">{{ getOrderStatusLabel(order) }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

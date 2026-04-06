@@ -1,0 +1,100 @@
+.search-page {
+  padding: 16px;
+}
+
+.search-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primary-heading {
+  color: var(--ion-color-primary);
+  margin: 0;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--suga-input-bg);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+}
+
+.search-box input:focus {
+  outline: none;
+}
+
+.section-title {
+  font-weight: 700;
+  margin: 18px 0 8px;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chips button {
+  border: none;
+  background: var(--suga-surface-muted);
+  color: var(--ion-text-color);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.result-section {
+  margin-top: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.result-card {
+  background: var(--suga-surface);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: var(--suga-muted);
+}
+
+.tag-row span {
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 12px;
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
+
+.state, .empty {
+  font-size: 12px;
+  color: var(--suga-muted);
+}

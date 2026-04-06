@@ -1,0 +1,180 @@
+@import "/src/theme/variables.scss";
+
+.cameraArea,
+.reviewArea,
+.detailsArea {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 56px);
+}
+
+.liveVideo {
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  object-fit: cover;
+  background: var(--suga-surface-alt);
+}
+
+.controls {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.recordControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recordBtn {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: #fff;
+  border: 6px solid rgba(0, 0, 0, 0.2);
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recordBtn.recording {
+  background: #ef4444;
+  border-color: #991b1b;
+  color: #fff;
+}
+
+.controlBtn {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+}
+
+.timer {
+  color: #fff;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.status {
+  color: var(--ion-color-primary-food);
+  margin: 8px 4px;
+  font-size: 12px;
+}
+
+.status-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+
+.reviewArea,
+.detailsArea {
+  padding: 12px;
+}
+
+.previewWrap,
+.previewMini {
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.previewMedia,
+.previewMini video,
+.previewMini img {
+  width: 100%;
+  max-height: 58vh;
+  object-fit: cover;
+  display: block;
+}
+
+.filterRow {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filterChip {
+  border: 1px solid var(--suga-border);
+  background: var(--suga-input-bg);
+  color: var(--ion-text-color);
+  padding: 8px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.filterChip.active {
+  border-color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
+}
+
+.reviewActions,
+.detailActions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.bottomPanel {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.descInput {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--suga-border);
+  background: var(--suga-input-bg);
+  color: var(--ion-text-color);
+}
+
+.uploadBtn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--ion-color-primary);
+  color: #fff;
+  border: none;
+}
+
+.order-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #1f2937;
+  font-size: 13px;
+}
+
+.order-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+body.suga-dark-theme .controlBtn {
+  background: rgba(15, 23, 42, 0.75);
+  color: var(--ion-text-color);
+}
+
+body.suga-dark-theme .order-toggle {
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--ion-text-color);
+}

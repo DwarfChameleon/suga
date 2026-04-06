@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/registration"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Dispatch Registration</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="registrationForm" (ngSubmit)="submit()" class="dispatch-form">
+    <ion-item>
+      <ion-label position="stacked">Username</ion-label>
+      <ion-input formControlName="username"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input type="email" formControlName="email"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Phone Number</ion-label>
+      <ion-input type="tel" formControlName="phoneNumber"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">PIN / Password</ion-label>
+      <ion-input type="password" formControlName="pin"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Country</ion-label>
+      <ion-input formControlName="country"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">City</ion-label>
+      <ion-input formControlName="city"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>Registering as a company</ion-label>
+      <ion-toggle formControlName="isCompany"></ion-toggle>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Company Name (optional)</ion-label>
+      <ion-input formControlName="companyName"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Vehicle Types (comma separated)</ion-label>
+      <ion-input formControlName="vehicleTypes" placeholder="bike, car, van"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Vehicle Plate Number (optional)</ion-label>
+      <ion-input formControlName="plateNumber"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Operating Areas (comma separated)</ion-label>
+      <ion-input formControlName="operatingAreas" placeholder="Ikeja, Surulere"></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" [disabled]="isSubmitting">
+      Create Dispatch Account
+    </ion-button>
+  </form>
+</ion-content>

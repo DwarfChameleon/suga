@@ -1,0 +1,207 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <app-back-button></app-back-button>
+    </ion-buttons>
+    <ion-title>Edit Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="edit-profile-page">
+    <div class="profile-card" *ngIf="!isLoading; else loadingBlock">
+      <div class="card-head">
+        <div>
+          <h2>Edit Profile</h2>
+          <p class="muted">Existing values are prefilled from your account.</p>
+        </div>
+        <button class="reload-btn" (click)="loadProfile()" [disabled]="isLoading || isSaving">Reload</button>
+      </div>
+
+      <div class="profile-summary" *ngIf="isLoaded">
+        <div class="media-preview">
+          <img *ngIf="profile.profilePicture; else avatarFallback" class="avatar-preview" [src]="profile.profilePicture" alt="Profile" />
+          <ng-template #avatarFallback>
+            <div class="avatar-preview avatar-fallback">{{ (profile.username || 'U').charAt(0).toUpperCase() }}</div>
+          </ng-template>
+          <img *ngIf="profile.coverPicture; else coverFallback" class="cover-preview" [src]="profile.coverPicture" alt="Cover" />
+          <ng-template #coverFallback>
+            <div class="cover-preview cover-fallback">No cover image</div>
+          </ng-template>
+        </div>
+        <div class="summary-text">
+          <h3>{{ profile.fullName || profile.username || 'No name set' }}</h3>
+          <p>{{ profile.email || 'No email set' }}</p>
+          <div class="roles">
+            <span class="role-chip" *ngFor="let role of profile.roles">{{ role }}</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>Personal Info</h2>
+
+      <div class="row two">
+        <div>
+          <label>Username</label>
+          <input [(ngModel)]="profile.username" (blur)="markTouched('username')" [class.input-invalid]="isFieldInvalid('username')" />
+          <small class="field-error" *ngIf="isFieldInvalid('username')">{{ getFieldError('username') }}</small>
+        </div>
+        <div>
+          <label>Full Name</label>
+          <input [(ngModel)]="profile.fullName" (blur)="markTouched('fullName')" [class.input-invalid]="isFieldInvalid('fullName')" />
+          <small class="field-error" *ngIf="isFieldInvalid('fullName')">{{ getFieldError('fullName') }}</small>
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label>Email</label>
+          <input type="email" [(ngModel)]="profile.email" (blur)="markTouched('email')" [class.input-invalid]="isFieldInvalid('email')" />
+          <small class="field-error" *ngIf="isFieldInvalid('email')">{{ getFieldError('email') }}</small>
+        </div>
+        <div>
+          <label>Phone Number</label>
+          <input [(ngModel)]="profile.phoneNumber" (blur)="markTouched('phoneNumber')" [class.input-invalid]="isFieldInvalid('phoneNumber')" />
+          <small class="field-error" *ngIf="isFieldInvalid('phoneNumber')">{{ getFieldError('phoneNumber') }}</small>
+        </div>
+      </div>
+
+      <h2>Country & Location</h2>
+      <div class="row">
+        <label>Country</label>
+        <select [(ngModel)]="profile.country" (ngModelChange)="onCountryChanged()" (blur)="markTouched('country')" [class.input-invalid]="isFieldInvalid('country')">
+          <option value="" disabled>Select country</option>
+          <option *ngFor="let country of countryOptions" [value]="country">{{ country }}</option>
+        </select>
+        <small class="field-error" *ngIf="isFieldInvalid('country')">{{ getFieldError('country') }}</small>
+      </div>
+
+      <div class="row two" *ngIf="isAddressFieldActive('region')">
+        <div>
+          <label>{{ addressFieldLabel('region', 'Region') }}</label>
+          <select *ngIf="isAddressFieldSelect('region')" [(ngModel)]="profile.region" (ngModelChange)="onRegionOrStateChanged()">
+            <option value="" disabled>Select {{ addressFieldLabel('region', 'Region') }}</option>
+            <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('region')" [(ngModel)]="profile.region" />
+        </div>
+      </div>
+
+      <div class="row two" *ngIf="isAddressFieldActive('state')">
+        <div>
+          <label>{{ addressFieldLabel('state', 'State') }}</label>
+          <select *ngIf="isAddressFieldSelect('state')" [(ngModel)]="profile.state" (ngModelChange)="onRegionOrStateChanged()">
+            <option value="" disabled>Select {{ addressFieldLabel('state', 'State') }}</option>
+            <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('state')" [(ngModel)]="profile.state" />
+        </div>
+      </div>
+
+      <div class="row two" *ngIf="isAddressFieldActive('city')">
+        <div>
+          <label>{{ addressFieldLabel('city', 'City') }}</label>
+          <select *ngIf="isAddressFieldSelect('city')" [(ngModel)]="profile.city">
+            <option value="" disabled>Select {{ addressFieldLabel('city', 'City') }}</option>
+            <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('city')" [(ngModel)]="profile.city" />
+        </div>
+      </div>
+
+      <div class="row two" *ngIf="isAddressFieldActive('localGovernment')">
+        <div>
+          <label>{{ addressFieldLabel('localGovernment', 'Local Government') }}</label>
+          <input [(ngModel)]="profile.localGovernment" />
+        </div>
+      </div>
+
+      <div class="row two" *ngIf="isAddressFieldActive('suburb')">
+        <div>
+          <label>{{ addressFieldLabel('suburb', 'Suburb') }}</label>
+          <input [(ngModel)]="profile.suburb" />
+        </div>
+      </div>
+
+      <div class="row two" *ngIf="isAddressFieldActive('street')">
+        <div>
+          <label>{{ addressFieldLabel('street', 'Street') }}</label>
+          <input [(ngModel)]="profile.street" (input)="onStreetInput($event)" />
+          <div class="street-suggestions" *ngIf="streetSuggestions.length > 0">
+            <button type="button" *ngFor="let item of streetSuggestions" (click)="applyStreetSuggestion(item)">
+              {{ item.displayName }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>Location Info</label>
+        <input [(ngModel)]="profile.locationInfo" (blur)="markTouched('locationInfo')" [class.input-invalid]="isFieldInvalid('locationInfo')" placeholder="Landmark / Area / Extra details" />
+        <small class="field-error" *ngIf="isFieldInvalid('locationInfo')">{{ getFieldError('locationInfo') }}</small>
+      </div>
+
+      <div class="row">
+        <label>Home Address</label>
+        <textarea rows="2" [(ngModel)]="profile.homeAddress" (blur)="markTouched('homeAddress')" [class.input-invalid]="isFieldInvalid('homeAddress')"></textarea>
+        <small class="field-error" *ngIf="isFieldInvalid('homeAddress')">{{ getFieldError('homeAddress') }}</small>
+      </div>
+
+      <div class="row" *ngIf="isChef">
+        <label>Work Address</label>
+        <textarea rows="2" [(ngModel)]="profile.workAddress" (blur)="markTouched('workAddress')" [class.input-invalid]="isFieldInvalid('workAddress')"></textarea>
+        <small class="field-error" *ngIf="isFieldInvalid('workAddress')">{{ getFieldError('workAddress') }}</small>
+      </div>
+
+      <div class="row" *ngIf="isChef">
+        <label>Restaurant Address</label>
+        <textarea rows="2" [(ngModel)]="profile.restaurantAddress" (blur)="markTouched('restaurantAddress')" [class.input-invalid]="isFieldInvalid('restaurantAddress')"></textarea>
+        <small class="field-error" *ngIf="isFieldInvalid('restaurantAddress')">{{ getFieldError('restaurantAddress') }}</small>
+      </div>
+
+      <h2>Appearance</h2>
+      <div class="row two">
+        <div>
+          <label>Theme</label>
+          <select [(ngModel)]="profile.uiTheme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div>
+          <label>Theme Color</label>
+          <input type="color" [(ngModel)]="profile.themeColor" (blur)="markTouched('themeColor')" [class.input-invalid]="isFieldInvalid('themeColor')" />
+          <small class="field-error" *ngIf="isFieldInvalid('themeColor')">{{ getFieldError('themeColor') }}</small>
+        </div>
+      </div>
+
+      <h2>Profile Media</h2>
+      <div class="row two">
+        <div>
+          <label>Profile Picture</label>
+          <input #profileImageInput type="file" accept="image/*" (change)="onProfileImageChange($event)" class="file-input-hidden" />
+          <button type="button" class="upload-trigger" (click)="pickProfileImage()">Choose Profile Image</button>
+          <small class="muted" *ngIf="selectedProfileImage">{{ selectedProfileImage.name }}</small>
+        </div>
+        <div>
+          <label>Cover Picture</label>
+          <input #coverImageInput type="file" accept="image/*" (change)="onCoverImageChange($event)" class="file-input-hidden" />
+          <button type="button" class="upload-trigger" (click)="pickCoverImage()">Choose Cover Image</button>
+          <small class="muted" *ngIf="selectedCoverImage">{{ selectedCoverImage.name }}</small>
+        </div>
+      </div>
+
+      <button class="save-btn" (click)="save()" [disabled]="isSaving || isLoading || !hasChanges || !isFormValid">
+        {{ isSaving ? 'Saving...' : 'Save Profile' }}
+      </button>
+    </div>
+
+    <ng-template #loadingBlock>
+      <div class="profile-card">
+        <ion-skeleton-text animated style="width:100%;height:16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:100%;height:16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:100%;height:16px;"></ion-skeleton-text>
+      </div>
+    </ng-template>
+  </div>
+</ion-content>

@@ -1,0 +1,50 @@
+.history-wrap {
+  padding: 12px;
+}
+
+.history-card {
+  width: 100%;
+  margin: 10px 0 0;
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  background: var(--suga-surface);
+  padding: 12px;
+  text-align: left;
+}
+
+.history-card.is-completed {
+  opacity: 0.62;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.line h4 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.line.muted {
+  margin-top: 8px;
+  color: var(--ion-color-medium);
+  font-size: 12px;
+}
+
+.price {
+  font-weight: 700;
+}
+
+.skeleton-list {
+  padding-top: 10px;
+}
+
+.skeleton-row {
+  background: var(--suga-surface-muted);
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 8px;
+}

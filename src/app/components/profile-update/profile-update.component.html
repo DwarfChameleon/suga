@@ -1,0 +1,102 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <app-back-button></app-back-button>
+    </ion-buttons>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="settings-page">
+    <div class="settings-card">
+      <h2>Account Preferences</h2>
+      <p class="subtitle">@{{ settings.username }} | {{ settings.email }}</p>
+
+      <div class="row toggle-row">
+        <div class="label-block">
+          <h3>Online Status</h3>
+          <p>Show your availability to users.</p>
+        </div>
+        <ion-toggle [(ngModel)]="settings.isOnline"></ion-toggle>
+      </div>
+
+      <div class="row">
+        <label>UI Theme</label>
+        <ion-segment [(ngModel)]="settings.uiTheme" (ionChange)="onThemeChanged()">
+          <ion-segment-button value="light">Light</ion-segment-button>
+          <ion-segment-button value="dark">Dark</ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <div class="row">
+        <label>Country</label>
+        <ion-select [(ngModel)]="settings.country" interface="action-sheet">
+          <ion-select-option *ngFor="let country of countries" [value]="country">{{ country }}</ion-select-option>
+        </ion-select>
+      </div>
+
+      <div class="row">
+        <label>Currency</label>
+        <ion-select [(ngModel)]="settings.preferredCurrency" interface="popover">
+          <ion-select-option *ngFor="let currency of currencies" [value]="currency">{{ currency }}</ion-select-option>
+        </ion-select>
+      </div>
+
+      <div class="row toggle-row" *ngIf="isChef">
+        <div class="label-block">
+          <h3>Private Chef Profile</h3>
+          <p>Require approval before consumers can follow you.</p>
+        </div>
+        <ion-toggle [(ngModel)]="settings.isPrivateChef"></ion-toggle>
+      </div>
+
+      <button class="primary-btn" (click)="saveSettings()" [disabled]="isSaving">Save Preferences</button>
+    </div>
+
+    <div class="settings-card">
+      <h2>Change Password</h2>
+      <div class="row">
+        <label>Current Password</label>
+        <input type="password" [(ngModel)]="oldPassword" placeholder="Enter current password" />
+      </div>
+      <div class="row">
+        <label>New Password</label>
+        <input type="password" [(ngModel)]="newPassword" placeholder="Enter new password" />
+      </div>
+      <button class="primary-btn" (click)="updatePassword()">Update Password</button>
+    </div>
+
+    <div class="settings-card">
+      <h2>Transaction PIN</h2>
+      <p class="subtitle">Use this 4-digit PIN for transfers and withdrawals.</p>
+      <div class="row" *ngIf="hasExistingPin">
+        <label>Old PIN</label>
+        <input type="password" maxlength="4" inputmode="numeric" [(ngModel)]="oldPin" placeholder="Old PIN" />
+      </div>
+      <div class="row">
+        <label>New PIN</label>
+        <input type="password" maxlength="4" inputmode="numeric" [(ngModel)]="newPin" placeholder="4-digit PIN" />
+      </div>
+      <button class="primary-btn" (click)="savePin()">Save PIN</button>
+    </div>
+
+    <div class="settings-card" *ngIf="isChef && settings.isPrivateChef">
+      <h2>Follow Requests</h2>
+      <div *ngIf="followRequests.length === 0" class="empty">No pending follow requests.</div>
+      <div class="request-list" *ngIf="followRequests.length > 0">
+        <div class="request-item" *ngFor="let request of followRequests">
+          <img [src]="getRequesterImage(request.profilePicture)" alt="{{ request.username }}" />
+          <div class="request-meta">
+            <div class="username">@{{ request.username }}</div>
+            <div class="date">{{ request.requestedAt | date:'medium' }}</div>
+          </div>
+          <div class="actions">
+            <button class="approve" (click)="approveFollow(request.requesterId)">Approve</button>
+            <button class="reject" (click)="rejectFollow(request.requesterId)">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

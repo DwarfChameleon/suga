@@ -1,0 +1,229 @@
+<ion-header>
+  <ion-toolbar>
+    <div class="explore-toolbar-row">
+      <div class="explore-toolbar-left">
+        <ion-menu-button></ion-menu-button>
+        <span class="explore-brand">SUGA</span>
+      </div>
+      <div class="explore-toolbar-right">
+        <ion-button fill="clear" (click)="openStoryPage()" aria-label="Story page">
+          <ion-icon slot="icon-only" name="play-circle-outline"></ion-icon>
+          <span *ngIf="missedStoriesCount > 0" class="icon-badge">{{ missedStoriesCount }}</span>
+        </ion-button>
+        <ion-button fill="clear" (click)="openNotifications()" aria-label="Notifications">
+          <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+          <span *ngIf="unreadNotifications > 0" class="icon-badge">{{ unreadNotifications }}</span>
+        </ion-button>
+        <ion-button fill="clear" (click)="goToSearch()" aria-label="Search">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" (click)="openAccount()" aria-label="Account">
+          <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="mainContainer">
+    <div class="container">
+      <div class="title color">
+        <h2>Explore Suga</h2>
+      </div>
+
+      <div class="section-text color">
+        <span>Food Categories</span>
+      </div>
+
+      <div class="topCategory">
+        <div *ngFor="let category of categories">
+          <div class="foodCategory" (click)="openCategoryModal(category)">
+            <img [src]="getCategoryImage(category.image)" [alt]="category.name" />
+            <div class="foodCategoryTitle">{{ category.name }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-text color">
+        <span>Chefs</span>
+      </div>
+      <div class="chef-scroll">
+        <div class="chef-card" *ngFor="let chef of chefs">
+          <img [src]="getChefImage(chef.profilePicture)" alt="{{ chef.username }}" (click)="openChefProfile(chef.username)" />
+          <div class="chef-meta">
+            <div class="chef-name">@{{ chef.username }}</div>
+            <div class="chef-count">{{ chef.dishCount }} dishes · {{ chef.followersCount }} followers</div>
+          </div>
+          <button *ngIf="canFollowChefs" class="chef-follow-btn" [class.is-following]="isFollowing(chef._id)" (click)="toggleFollow(chef._id, $event)">
+            <ion-icon *ngIf="!isFollowing(chef._id)" name="add-circle-outline"></ion-icon>
+            {{ isFollowing(chef._id) ? 'Unfollow' : 'Follow' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <div class="section-text color">
+      <span>Food Story</span>
+    </div>
+    <div class="foodStory">
+      <div *ngIf="storyGroups.length === 0" class="story-empty">No story yet from followed chefs.</div>
+      <div *ngFor="let group of storyGroups" class="story-chef-card" (click)="openStoryViewer(group)">
+        <video class="story-thumb" [src]="getStoryVideoUrl(group.latestThumb)" muted playsinline preload="metadata"></video>
+        <div class="story-chef-overlay">
+          <div class="story-ring">
+            <span
+              *ngFor="let video of group.videos; let i = index"
+              class="story-segment"
+              [style.transform]="'rotate(' + ((360 / group.videos.length) * i) + 'deg)'"
+              [class.unwatched]="!isStorySegmentWatched(video._id)"
+              [class.watched]="isStorySegmentWatched(video._id)"
+            ></span>
+            <img [src]="getChefImage(group.profilePicture)" alt="{{ group.username }}" />
+          </div>
+          <div class="story-chef-meta">
+            <div class="story-chef-name">@{{ group.username }}</div>
+            <div class="story-counter">{{ group.unseenCount }} new</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section-text color">
+      <p>Available Dishes</p>
+    </div>
+    <div *ngIf="isLoading || !isOnline" class="skeleton-grid">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3]">
+        <ion-skeleton-text animated style="width:100%;height:240px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:60%;height:14px;margin-top:8px;"></ion-skeleton-text>
+      </div>
+    </div>
+    <p *ngIf="emptyFollowMessage" class="empty-follow">{{ emptyFollowMessage }}</p>
+    <div class="explore-container" *ngIf="!isLoading && isOnline">
+      <div *ngFor="let food of allFoods" class="all_dishes_class">
+        <div class="foods">
+          <div class="food-Details-Top">
+            <h3 class="author" (click)="openChefProfile(food.chef)">@{{ food.chef | titlecase }}</h3>
+       <div  (click)="openModalFood(food._id)" class="food-top-details color">
+                   <span>{{ food.dishName | titlecase }}</span>
+            <div class="foodTimer-flex">
+             <span><ion-icon name="time-outline"></ion-icon></span> 
+             
+             <span class="foodTimer-flex-duration">{{ food.preparationTime }}</span> 
+             </div>
+       </div>
+</div>
+          <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" class="food-image"/>
+          <div class="food-info">
+            <button class="metric-pill metric-price" (click)="openModalFood(food._id)">
+              <ion-icon name="cash-outline"></ion-icon>
+              <span><span class="naira">&#8358;</span>{{ food.price }}</span>
+            </button>
+
+            <div class="metric-pill">
+              <ion-icon name="receipt-outline"></ion-icon>
+              <span>{{ foodCounts[food._id] || 0 }}</span>
+            </div>
+
+            <button class="metric-pill" (click)="openModalFood(food._id)">
+              <ion-icon name="open-outline"></ion-icon>
+              <span>View</span>
+            </button>
+
+            <button class="metric-pill" (click)="toggleComments(food._id)">
+              <ion-icon name="chatbubble-outline"></ion-icon>
+              <span>{{ food.comments?.length || 0 }}</span>
+            </button>
+
+            <button class="metric-pill like-pill" [class.liked]="isFoodLiked(food._id)" (click)="likeFood(food._id)">
+              <ion-icon [name]="isFoodLiked(food._id) ? 'heart' : 'heart-outline'"></ion-icon>
+              <span>{{ food.likes || 0 }}</span>
+              <span *ngFor="let burst of (foodHeartBursts[food._id] || [])" class="float-heart" [style.--i]="burst % 5">❤</span>
+            </button>
+          </div>
+            
+          <div class="commentBox" *ngIf="isCommentsOpen(food._id)">
+            <div class="comment-list" *ngIf="(food.comments?.length || 0) > 0">
+              <div class="comment-row" *ngFor="let c of food.comments">
+                <span class="comment-user">@{{ c.username }}</span>
+                <span class="comment-text">{{ c.text }}</span>
+              </div>
+            </div>
+            <div class="comment-empty" *ngIf="(food.comments?.length || 0) === 0">
+              Be the first to comment.
+            </div>
+            <form class="commentForm" (submit)="submitComment(food._id, $event)">
+              <input class="commentInput" placeholder="Add a comment..." />
+              <button class="sendComment" type="submit"><ion-icon name="paper-plane-outline"></ion-icon></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ion-modal [isOpen]="showStoryViewer" (didDismiss)="closeStoryViewer()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button fill="clear" (click)="closeStoryViewer()">Back</ion-button>
+          </ion-buttons>
+          <ion-title>@{{ activeStoryGroup?.username }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="nextStory()">Next</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="story-viewer-modal">
+        <div class="story-progress" *ngIf="activeStoryGroup">
+          <span
+            *ngFor="let video of activeStoryGroup.videos; let i = index"
+            class="progress-segment"
+            [class.active]="i === activeStoryIndex"
+            [class.unwatched]="!isStorySegmentWatched(video._id)"
+            [class.watched]="isStorySegmentWatched(video._id)"
+          >
+            <span class="progress-fill" [style.width.%]="getStorySegmentProgress(i, video._id)"></span>
+          </span>
+        </div>
+
+        <div
+          class="story-viewer-touch"
+          (touchstart)="onViewerTouchStart($event)"
+          (touchend)="onViewerTouchEnd($event)"
+        >
+          <video
+            #viewerVideo
+            *ngIf="currentStory"
+            [src]="getStoryVideoUrl(currentStory.path)"
+            autoplay
+            playsinline
+            controls
+            (play)="markStorySeen(currentStory._id)"
+            (loadedmetadata)="onViewerLoadedMetadata(viewerVideo)"
+            (timeupdate)="onViewerTimeUpdate(viewerVideo)"
+            (ended)="nextStory()"
+            (click)="toggleViewerPlayback(viewerVideo)"
+            class="story-viewer-video"
+          ></video>
+
+          <div class="viewer-playback-hint" *ngIf="viewerPlaybackHint">
+            <ion-icon [name]="viewerPlaybackHint === 'play' ? 'play' : 'pause'"></ion-icon>
+          </div>
+        </div>
+
+        <div class="story-viewer-footer" *ngIf="currentStory">
+          <div class="story-desc">{{ currentStory.description }}</div>
+          <div class="story-nav">
+            <button type="button" class="story-nav-btn" (click)="prevStory()">Prev</button>
+            <button type="button" class="story-nav-btn primary" (click)="nextStory()">Next</button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

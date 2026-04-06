@@ -1,0 +1,48 @@
+<ion-content>
+  <div class="category-modal">
+    <div class="modal-header">
+      <div>
+        <h2>{{ category | titlecase }}</h2>
+        <p *ngIf="country || state">Same category in {{ state || 'all states' }}, {{ country || 'all countries' }}</p>
+        <p *ngIf="!country && !state">Foods from all chefs in this category</p>
+      </div>
+      <ion-icon name="close-circle" (click)="close()"></ion-icon>
+    </div>
+
+    <div class="category-profile" *ngIf="profileImages.length">
+      <div class="profile-track" (scroll)="onProfileScroll($event)">
+        <div class="profile-slide" *ngFor="let image of profileImages">
+          <img [src]="getCategoryProfileImageUrl(image)" [alt]="category">
+          <div class="profile-overlay">
+            <span class="profile-kicker">Category Profile</span>
+            <strong>{{ category | titlecase }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-dots" *ngIf="profileImages.length > 1">
+        <span
+          *ngFor="let image of profileImages; let i = index"
+          class="dot"
+          [class.active]="i === activeProfileIndex">
+        </span>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="state">Loading...</div>
+    <div *ngIf="error" class="state error">{{ error }}</div>
+    <div *ngIf="!loading && !foods.length" class="state">No foods in this category yet.</div>
+
+    <div class="food-grid" *ngIf="!loading && foods.length">
+      <div class="food-card" *ngFor="let food of foods" (click)="openFoodProfile(food._id)">
+        <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}">
+        <div class="food-meta">
+          <h3>{{ food.dishName }}</h3>
+          <p class="chef">@{{ food.chef }}</p>
+          <p class="price"><span class="naira">&#8358;</span>{{ food.price }}</p>
+          <button class="view-btn" type="button">View & Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

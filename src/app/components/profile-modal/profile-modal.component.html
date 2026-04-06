@@ -1,0 +1,92 @@
+<ion-content>
+  <div class="profile">
+    <div class="chef-banner" [style.backgroundImage]="'url(' + getImageUrl(userDetails?.profilePicture || '') + ')'">
+      <div class="banner-overlay"></div>
+    </div>
+
+    <div class="modal-header">
+      <div class="chef-hero">
+        <img class="chef-avatar" [src]="getImageUrl(userDetails?.profilePicture || '')" alt="{{ userDetails?.username }}">
+        <div class="chef-hero-text">
+          <h2 class="modal-title">Chef @{{ userDetails?.username }}</h2>
+          <p class="chef-role" *ngIf="userDetails?.roles">Role: {{ userDetails?.roles }}</p>
+          <p class="chef-level" *ngIf="userDetails?.chefLevel">Level: {{ userDetails?.chefLevel }}</p>
+        </div>
+      </div>
+      <ion-icon name="close-circle" (click)="closeModal()"></ion-icon>
+    </div>
+
+    <div class="modal-body">
+      <p class="chef-tagline">Bringing flavor to your table.</p>
+    </div>
+
+    <div class="profile-stats">
+      <button class="stat clickable" (click)="selectStatTab('followers')">
+        <span class="stat-label">Followers</span>
+        <span class="stat-value">{{ followers }}</span>
+      </button>
+      <button class="stat clickable" (click)="selectStatTab('dishes')">
+        <span class="stat-label">Dishes</span>
+        <span class="stat-value">{{ dishes }}</span>
+      </button>
+      <button class="stat clickable" (click)="selectStatTab('stories')">
+        <span class="stat-label">Stories</span>
+        <span class="stat-value">{{ stories }}</span>
+      </button>
+      <div class="stat">
+        <span class="stat-label">Dish Likes</span>
+        <span class="stat-value">{{ dishLikes }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Story Likes</span>
+        <span class="stat-value">{{ storyLikes }}</span>
+      </div>
+    </div>
+
+    <div class="follow-row" *ngIf="userDetails?.roles?.includes('chef')">
+      <ion-button (click)="toggleFollow()" [color]="isFollowing ? 'medium' : 'primary'">
+        {{ isFollowing ? 'Following' : 'Follow' }}
+      </ion-button>
+    </div>
+
+    <div class="content-divider"></div>
+
+    <div *ngIf="selectedStatTab === 'followers'" class="list-shell">
+      <div *ngIf="followerList.length === 0" class="empty-list">No followers yet.</div>
+      <div *ngFor="let follower of pagedFollowers" class="list-row">
+        <img [src]="getImageUrl(follower.profilePicture || '')" alt="{{ follower.username }}">
+        <div class="list-meta">
+          <h4>@{{ follower.username }}</h4>
+        </div>
+      </div>
+      <button *ngIf="hasMoreFollowers" class="load-more-btn" (click)="loadMoreFollowers()">Load more followers</button>
+    </div>
+
+    <div *ngIf="selectedStatTab === 'dishes'" class="list-shell">
+      <div *ngIf="chefFoods.length > 0; else noFoods" class="videoModalChefFood-MotherBox">
+        <div *ngFor="let food of chefFoods" class="videoModalChefFood">
+          <img [src]="getFoodImageUrl(food.image)" alt="{{ food.dishName }}">
+          <div class="food-details">
+            <h3>{{ food.dishName }}</h3>
+            <p><ion-icon name="timer-outline"></ion-icon><br>{{ food.preparationTime }}<br><span class="naira">&#8358;</span> {{ food.price }}</p>
+          </div>
+        </div>
+      </div>
+      <ng-template #noFoods>
+        <p>No foods available.</p>
+      </ng-template>
+    </div>
+
+    <div *ngIf="selectedStatTab === 'stories'" class="list-shell">
+      <div *ngIf="storyList.length === 0" class="empty-list">No stories yet.</div>
+      <div *ngFor="let story of pagedStories" class="list-row story-row">
+        <video [src]="getStoryUrl(story.path)" muted controls preload="metadata"></video>
+        <div class="list-meta">
+          <h4>@{{ story.username }}</h4>
+          <p>{{ story.description || 'No description' }}</p>
+        </div>
+      </div>
+      <button *ngIf="hasMoreStories" class="load-more-btn" (click)="loadMoreStories()">Load more stories</button>
+    </div>
+  </div>
+</ion-content>

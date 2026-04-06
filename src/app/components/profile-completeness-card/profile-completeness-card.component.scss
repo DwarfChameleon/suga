@@ -1,0 +1,81 @@
+.profile-completeness-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  margin: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card-header p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.cta-btn {
+  border: none;
+  background: #f97316;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.cta-btn[disabled] {
+  background: rgba(15, 23, 42, 0.2);
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.progress-track {
+  height: 8px;
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fb923c, #f97316);
+}
+
+.missing-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.missing-chip {
+  background: rgba(248, 113, 113, 0.12);
+  color: #b91c1c;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.missing-chip.more {
+  background: rgba(148, 163, 184, 0.18);
+  color: #475569;
+}
+
+.done-message {
+  font-size: 12px;
+  color: rgba(15, 23, 42, 0.7);
+}

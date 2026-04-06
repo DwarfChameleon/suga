@@ -1,0 +1,255 @@
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="components/explore" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="newStory()" aria-label="Add new story">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="goHome()" aria-label="Explore home">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
+  </ion-refresher>
+  <div class="topContainer" [ngStyle]="{ 'background-image': 'url(' + getCoverImage(userProfile?.coverPicture, userProfile?.profilePicture) + ')' }">
+    <div class="cover-actions">
+      <button class="icon-btn" (click)="openImageSheet('cover')">
+        <ion-icon name="image-outline"></ion-icon>
+      </button>
+      <button class="icon-btn" (click)="openImageSheet('profile')">
+        <ion-icon name="camera-outline"></ion-icon>
+      </button>
+    </div>
+    <div class="chef-hero">
+      <img
+        class="chef-dashboard-avatar"
+        [src]="getProfileImage(userProfile?.profilePicture)"
+        alt="Chef profile"
+      />
+      <div class="chef-hero-text">
+        <div class="chef-name">@{{ userProfile?.username }}</div>
+        <div class="chef-role">Chef</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-divider"></div>
+   <div class="greetings-profile">
+      <span><b><i>@{{ userProfile?.username }}</i></b></span>
+    </div>
+  <app-profile-completeness-card [profile]="profileDetails" role="chef"></app-profile-completeness-card>
+  <div id="prof-btn">
+    <button (click)="logout()" class="profile-btn"><div class="roundIcon"><ion-icon name="log-out-outline" class="btn-icon"></ion-icon></div><br>Logout</button>
+    <button (click)="newDish()" class="profile-btn" title="New Order"><div class="roundIcon"><ion-icon name="fast-food-outline" class="btn-icon"></ion-icon></div><br> New Dish</button>
+    <button (click)="chefOrders()" class="profile-btn" title="Check Order"><div class="roundIcon"><ion-icon name="list-outline" class="btn-icon"></ion-icon></div><br>Orders</button>
+    <button (click)="openNotifications()" class="profile-btn" title="Notifications"><div class="roundIcon"><ion-icon name="notifications-outline" class="btn-icon"></ion-icon></div><br>Notifications</button>
+    <button (click)="openWallet()" class="profile-btn" title="Wallet"><div class="roundIcon"><ion-icon name="wallet-outline" class="btn-icon"></ion-icon></div><br>Wallet</button>
+    <button (click)="openRewards()" class="profile-btn" title="Rewards"><div class="roundIcon"><ion-icon name="sparkles-outline" class="btn-icon"></ion-icon></div><br>Rewards</button>
+    <button (click)="updateProfile()" class="profile-btn" title="Edit Profile"><div class="roundIcon"><ion-icon name="person-circle-outline" class="btn-icon"></ion-icon></div><br>Edit Profile</button>
+    <button (click)="openSettings()" class="profile-btn" title="Settings"><div class="roundIcon"><ion-icon name="settings-outline" class="btn-icon"></ion-icon></div><br>Settings</button>
+  </div>
+ <br>
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-value">{{ chefFoods.length }}</span>
+      <span class="stat-label">Dishes</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ liveOrders.length }}</span>
+      <span class="stat-label">Orders</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ followers.length }}</span>
+      <span class="stat-label">Followers</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ videos.length }}</span>
+      <span class="stat-label">Videos</span>
+    </div>
+  </div>
+
+  <ion-segment [(ngModel)]="selectedTab" class="chef-tabs">
+    <ion-segment-button value="orders">Orders</ion-segment-button>
+    <ion-segment-button value="dishes">Dishes</ion-segment-button>
+    <ion-segment-button value="videos">Videos</ion-segment-button>
+    <ion-segment-button value="followers">Followers</ion-segment-button>
+  </ion-segment>
+
+  <div [ngSwitch]="selectedTab">
+    <div *ngSwitchCase="'orders'">
+      <p>Live Orders</p>
+      <div *ngIf="isLoadingOrders || !isOnline" class="skeleton-list">
+        <div class="skeleton-row" *ngFor="let s of [1,2,3]">
+          <ion-skeleton-text animated style="width:80%;height:14px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:40%;height:12px;margin-top:6px;"></ion-skeleton-text>
+        </div>
+      </div>
+      <div *ngIf="!isLoadingOrders && liveOrders.length === 0" class="empty-tab">No live orders right now.</div>
+      <div *ngFor="let order of liveOrders" class="order-card" [class.new-order]="order.status === 'placed'">
+        <div class="order-card-head">
+          <p class="order-dish">{{ order.dishName | titlecase }}</p>
+          <span class="order-status-chip">{{ getChefStatusLabel(order) }}</span>
+        </div>
+        <div class="order-card-meta">
+          <span>@{{ order.username }}</span>
+          <span>{{ order.orderTime | date:'MMM d, h:mm a' }}</span>
+        </div>
+        <div class="order-card-foot">
+          <div class="order-price">&#8358;{{ order.price }}</div>
+        </div>
+        <div class="order-card-actions">
+          <button *ngIf="order.status === 'placed'" (click)="updateOrderStatus(order, 'confirmed')" class="orderAction accept">Accept</button>
+          <button *ngIf="order.status === 'placed'" (click)="updateOrderStatus(order, 'declined')" class="orderAction decline">Decline</button>
+          <button *ngIf="order.status !== 'placed' && order.status !== 'declined' && order.status !== 'completed'" (click)="openStatusSheet(order)" class="orderAction processing">Update Status</button>
+          <button class="orderAction details" (click)="openModalOrder(order._id)">Details</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'dishes'">
+      <p>My Dishes</p>
+      <div *ngIf="isLoadingDishes || !isOnline" class="skeleton-list">
+        <div class="skeleton-row" *ngFor="let s of [1,2,3]">
+          <ion-skeleton-text animated style="width:100%;height:60px;"></ion-skeleton-text>
+        </div>
+      </div>
+      <div *ngIf="chefFoods.length === 0 && errorMessage">
+        {{ errorMessage | titlecase}}
+        <a *ngIf="promptMessage" (click)="newDish()">{{ promptMessage | titlecase }}</a>
+      </div>
+      <div class="chef-myDish" *ngIf="chefFoods.length > 0">
+        <div *ngFor="let food of chefFoods" class="chef-my-food-item">
+          <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" (click)="openModalFood(food._id)" class="chef-my-food-image"/>
+          <div class="food-info">
+            <p><b>{{ food.dishName | titlecase }}</b>  <span class="naira"> &#8358;</span> {{ food.price }}</p>
+          </div>
+          <div class="edit-icon" (click)="openModalFood(food._id)">
+            <ion-icon name="create-outline"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'videos'">
+      <p>My Videos</p>
+      <div *ngIf="isLoadingVideos || !isOnline" class="skeleton-grid">
+        <div class="skeleton-card" *ngFor="let s of [1,2,3]">
+          <ion-skeleton-text animated style="width:100%;height:140px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:60%;height:12px;margin-top:6px;"></ion-skeleton-text>
+        </div>
+      </div>
+      <div *ngIf="videos.length === 0" class="empty-tab">No videos yet.</div>
+      <div class="video-grid" *ngIf="videos.length > 0">
+        <div *ngFor="let video of videos" class="video-card">
+          <button class="video-options-btn" (click)="openVideoActions(video); $event.stopPropagation()">
+            <ion-icon name="ellipsis-vertical"></ion-icon>
+          </button>
+          <div class="video-thumb-wrap" (click)="openVideoModal(video)">
+            <video [src]="getVideoUrl(video.path)" class="video-thumb" muted preload="metadata"></video>
+            <div class="video-overlay">
+              <ion-icon name="play-circle-outline"></ion-icon>
+            </div>
+          </div>
+          <div class="video-meta">
+            <span>@{{ video.username }}</span>
+            <small class="video-visibility">{{ (video.visibility || 'public') | titlecase }}</small>
+            <small>{{ video.description || 'No description yet' }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngSwitchCase="'followers'">
+      <p>Followers</p>
+      <div *ngIf="isLoadingFollowers || !isOnline" class="skeleton-grid">
+        <div class="skeleton-card" *ngFor="let s of [1,2,3]">
+          <ion-skeleton-text animated style="width:44px;height:44px;border-radius:50%;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:60%;height:12px;margin-top:6px;"></ion-skeleton-text>
+        </div>
+      </div>
+      <div *ngIf="followers.length === 0" class="empty-tab">No followers yet.</div>
+      <div class="followers-list" *ngIf="followers.length > 0">
+        <div *ngFor="let follower of followers" class="follower-item" (click)="openFollowerProfile(follower)">
+          <img [src]="getFollowerImage(follower.profilePicture)" alt="{{ follower.username }}" />
+          <div class="follower-meta">@{{ follower.username }}</div>
+          <div class="follower-actions">
+            <button type="button" class="follow-back-btn ghost" (click)="openFollowerProfile(follower, 'dishes'); $event.stopPropagation()">Dishes</button>
+            <button type="button" class="follow-back-btn ghost" (click)="openFollowerProfile(follower, 'stories'); $event.stopPropagation()">Stories</button>
+          </div>
+          <button
+            type="button"
+            *ngIf="canFollowBack(follower)"
+            class="follow-back-btn"
+            (click)="followBack(follower, $event)"
+          >
+            {{ isFollowingFollower(follower._id) ? 'Following' : 'Follow Back' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
+
+<ion-modal [isOpen]="isVideoModalOpen" (didDismiss)="closeVideoModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>My Video</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" (click)="selectedVideo && openVideoActions(selectedVideo)">
+            <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" (click)="closeVideoModal()">
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <div class="video-modal-body" *ngIf="selectedVideo">
+        <video class="video-player" [src]="getVideoUrl(selectedVideo.path)" controls autoplay></video>
+        <div class="video-player-meta">
+          <div class="author">@{{ selectedVideo.username }}</div>
+          <div class="desc">{{ selectedVideo.description }}</div>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  [isOpen]="showImageSheet"
+  [initialBreakpoint]="0.35"
+  [breakpoints]="[0, 0.35, 0.6]"
+  handle="true"
+  (didDismiss)="closeImageSheet()"
+>
+  <ng-template>
+    <div class="image-sheet">
+      <div class="sheet-handle"></div>
+      <h3>Update {{ imageTargetLabel }}</h3>
+      <p>Select a photo source.</p>
+      <div class="sheet-actions">
+        <button class="sheet-btn" (click)="selectFromGallery()">Choose from gallery</button>
+        <button class="sheet-btn outline" (click)="selectFromCamera()">Use camera</button>
+      </div>
+      <button class="sheet-cancel" (click)="closeImageSheet()">Cancel</button>
+      <input
+        #imageInput
+        type="file"
+        accept="image/*"
+        [attr.capture]="captureMode"
+        (change)="onImageSelected($event)"
+        style="display:none"
+      />
+    </div>
+  </ng-template>
+</ion-modal>

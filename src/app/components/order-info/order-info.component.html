@@ -1,0 +1,126 @@
+<div class="order-sheet">
+  <div class="sheet-header">
+    <div>
+      <div class="sheet-kicker">Order detail</div>
+      <h2>{{ order?.dishName || 'Order' }}</h2>
+    </div>
+    <button class="close-btn" (click)="closeModal()" aria-label="Close order">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+
+  <div class="receipt-actions">
+    <button type="button" class="receipt-btn" (click)="downloadReceiptImage()">Save image</button>
+    <button type="button" class="receipt-btn" (click)="printReceipt()">Print / Save PDF</button>
+  </div>
+
+  <div #receiptFrame class="receipt-frame">
+    <div class="hero-image">
+      <img [src]="foodImageUrl" alt="Dish image" />
+      <div class="hero-overlay">
+        <span class="status-badge">{{ orderStatusLabel }}</span>
+        <p *ngIf="isReadOnlyCompleted" class="readonly-note">Completed orders are view-only.</p>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-card">
+        <span>Ordered by</span>
+        <strong>{{ order?.username || '—' }}</strong>
+      </div>
+      <div class="detail-card">
+        <span>Chef</span>
+        <strong>@{{ order?.chefUsername || '—' }}</strong>
+      </div>
+      <div class="detail-card">
+        <span>Price</span>
+        <strong>{{ order?.price | number:'1.0-0' }}</strong>
+      </div>
+      <div class="detail-card">
+        <span>Order time</span>
+        <strong>{{ order?.orderTime | date:'short' }}</strong>
+      </div>
+    </div>
+
+    <div class="dispatch-actions" *ngIf="role === 'dispatch'">
+      <button *ngIf="canDispatchAccept()" class="primary" (click)="acceptDispatchOrder()" [disabled]="isDispatchUpdating">Accept</button>
+      <button *ngIf="canDispatchDecline()" class="danger" (click)="declineDispatchOrder()" [disabled]="isDispatchUpdating">Decline</button>
+      <button *ngIf="canDispatchPickUp()" class="ghost" (click)="updateDispatchStatus('picked_up')" [disabled]="isDispatchUpdating">Picked up</button>
+      <button *ngIf="canDispatchInTransit()" class="ghost" (click)="updateDispatchStatus('in_transit')" [disabled]="isDispatchUpdating">In transit</button>
+      <button *ngIf="canDispatchDeliver()" class="success" (click)="completeDispatchDelivery()" [disabled]="isDispatchUpdating">Scan QR</button>
+      <button *ngIf="canDispatchFail()" class="ghost" (click)="updateDispatchStatus('failed')" [disabled]="isDispatchUpdating">Not delivered</button>
+    </div>
+
+    <div class="verification-card" *ngIf="role === 'dispatch' && canDispatchDeliver()">
+      <div class="verification-head">
+        <div>
+          <h4>Confirm delivery</h4>
+          <p>Scan the consumer QR or enter the readable code below.</p>
+        </div>
+        <button class="ghost small" type="button" (click)="isScannerOpen ? closeDeliveryScanner() : completeDispatchDelivery()">
+          {{ isScannerOpen ? 'Hide scanner' : 'Open scanner' }}
+        </button>
+      </div>
+
+      <div class="verification-inputs">
+        <label>Readable code</label>
+        <div class="code-row">
+          <input type="text" [(ngModel)]="manualDispatchToken" placeholder="ab12345" />
+          <button class="verify-btn" type="button" (click)="verifyManualDispatchQr()" [disabled]="isDispatchUpdating || !manualDispatchToken.trim()">Verify</button>
+        </div>
+      </div>
+
+      <div class="scanner-frame" *ngIf="isScannerOpen">
+        <video #scanVideo autoplay playsinline muted></video>
+        <p class="scanner-note" *ngIf="scanError">{{ scanError }}</p>
+        <div class="scanner-actions">
+          <button class="ghost small" type="button" (click)="openDeliveryScanner()" [disabled]="isScannerActive">Start camera</button>
+          <button class="ghost small" type="button" (click)="closeDeliveryScanner()">Close camera</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-stack">
+      <div class="info-row">
+        <span>Order status</span>
+        <strong>{{ order?.status || 'pending' }}</strong>
+      </div>
+      <div class="info-row" *ngIf="order?.dispatchStatus">
+        <span>Dispatch status</span>
+        <strong>{{ order?.dispatchStatus?.replace('_', ' ') }}</strong>
+      </div>
+      <div class="info-row" *ngIf="order?.deliveryFee">
+        <span>Delivery fee</span>
+        <strong>{{ order?.deliveryFee | number:'1.0-0' }}</strong>
+      </div>
+      <div class="info-row" *ngIf="order?.deliveryDistanceKm">
+        <span>Distance</span>
+        <strong>{{ order?.deliveryDistanceKm | number:'1.1-1' }} km</strong>
+      </div>
+      <div class="info-row" *ngIf="role === 'dispatch' && order?.deliveryQrReadableCode">
+        <span>Delivery code</span>
+        <strong class="code-text">{{ order?.deliveryQrReadableCode }}</strong>
+      </div>
+    </div>
+
+    <div class="qr-section" *ngIf="shouldShowQr">
+      <h4>Delivery QR Code</h4>
+      <p>Show this to the dispatch rider to confirm delivery.</p>
+      <img *ngIf="qrDataUrl" [src]="qrDataUrl" alt="Delivery QR code" class="qr-image" />
+      <div class="readable-code" *ngIf="readableCode">
+        <span>Readable code</span>
+        <strong>{{ readableCode }}</strong>
+      </div>
+      <p class="qr-expiry" *ngIf="qrExpiresAt">Expires: {{ qrExpiresAt | date:'short' }}</p>
+      <button class="share-code-btn" *ngIf="canRevealCodeToRider" (click)="revealCodeToRider()" [disabled]="isRevealingCode">
+        {{ isRevealingCode ? 'Sharing...' : 'Confirm and show code to rider' }}
+      </button>
+      <p class="qr-shared-note" *ngIf="isCodeVisibleToRider">Rider can now see this code on their dashboard.</p>
+    </div>
+
+    <div class="map-section" *ngIf="order?.dispatchStatus && order?.dispatchStatus !== 'unassigned' && order?.status !== 'completed' && order?.status !== 'cancelled'">
+      <h4>Live Route</h4>
+      <app-live-order-map [order]="order" [mode]="role"></app-live-order-map>
+    </div>
+  </div>
+</div>

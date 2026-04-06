@@ -1,0 +1,192 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="components/explore" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Wallet</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="wallet-page">
+    <div class="wallet-card">
+      <div class="card-head">
+        <div>
+          <div class="label">Balance</div>
+          <div class="card-subtitle">Wallet balance available for checkout and transfers.</div>
+        </div>
+        <button class="collapse-toggle" type="button" (click)="toggleSection('balance')">
+          <ion-icon [name]="sections.balance ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+        </button>
+      </div>
+      <div class="card-body" *ngIf="sections.balance">
+        <div class="wallet-balance">
+          <div class="amount">
+            <span class="currency">{{ wallet.currency }}</span>
+            <span class="value">{{ wallet.isHidden ? '*****' : (wallet.balance | number:'1.2-2') }}</span>
+            <button class="eye" (click)="toggleBalance()">
+              <ion-icon [name]="wallet.isHidden ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+        </div>
+        <div class="wallet-actions">
+          <button class="action primary" (click)="openForm('deposit')">
+            <ion-icon name="add-circle-outline"></ion-icon>
+            Deposit
+          </button>
+          <button class="action" (click)="openForm('transfer')">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+            Transfer
+          </button>
+          <button class="action" *ngIf="canWithdraw" (click)="openForm('withdraw')">
+            <ion-icon name="cash-outline"></ion-icon>
+            Withdraw
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="wallet-card rewards-card">
+      <div class="card-head">
+        <div>
+          <div class="label">Rewards</div>
+          <div class="card-subtitle">Points convert to tokens automatically at 100 points.</div>
+        </div>
+        <button class="collapse-toggle" type="button" (click)="toggleSection('rewards')">
+          <ion-icon [name]="sections.rewards ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+        </button>
+      </div>
+      <div class="card-body" *ngIf="sections.rewards">
+        <div class="wallet-balance">
+          <div class="amount">
+            <span class="value">{{ rewards.pointsBalance }} pts</span>
+            <span class="value token">{{ rewards.tokenBalance }} tokens</span>
+          </div>
+        </div>
+        <div class="wallet-actions">
+          <button class="action" (click)="convertTokens()">
+            <ion-icon name="sparkles-outline"></ion-icon>
+            Convert Tokens
+          </button>
+          <button class="action" routerLink="/components/rewards">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+            Rewards Activity
+          </button>
+        </div>
+        <p class="rewards-note">100 points = 10 tokens. 10 tokens = ₦100.</p>
+      </div>
+    </div>
+
+    <div class="wallet-card payout-card" *ngIf="canWithdraw">
+      <div class="card-head">
+        <div>
+          <div class="label">Payout Account</div>
+          <div class="card-subtitle">Bank details for approved withdrawals.</div>
+        </div>
+        <button class="collapse-toggle" type="button" (click)="toggleSection('payout')">
+          <ion-icon [name]="sections.payout ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+        </button>
+      </div>
+      <div class="card-body" *ngIf="sections.payout">
+        <div class="wallet-form-grid">
+          <div class="wallet-form">
+            <div class="form-title">Bank</div>
+            <select [(ngModel)]="payoutAccount.bankCode">
+              <option value="">Select bank</option>
+              <option *ngFor="let bank of banks" [value]="bank.code">{{ bank.name }}</option>
+            </select>
+            <input type="text" [(ngModel)]="payoutAccount.accountNumber" placeholder="Account number" />
+            <div class="form-actions">
+              <button class="form-btn submit" (click)="resolveAccountName()">Resolve Account Name</button>
+            </div>
+            <input type="text" [(ngModel)]="payoutAccount.accountName" placeholder="Account name" />
+            <div class="form-actions">
+              <button class="form-btn submit" [disabled]="isSavingPayout" (click)="savePayoutAccount()">Save Account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wallet-form-grid" *ngIf="activeForm">
+      <div class="wallet-form" *ngIf="activeForm === 'deposit'">
+        <div class="form-title">Deposit to Wallet</div>
+        <input type="number" [(ngModel)]="depositAmount" placeholder="Amount" min="0" />
+        <div class="form-actions">
+          <button class="form-btn submit" (click)="requestDeposit()">Submit Deposit</button>
+          <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="wallet-form" *ngIf="activeForm === 'transfer'">
+        <div class="form-title">Transfer to Suga User</div>
+        <input type="text" [(ngModel)]="transferUsername" placeholder="Recipient username" />
+        <input type="number" [(ngModel)]="transferAmount" placeholder="Amount" min="0" />
+        <div class="form-actions">
+          <button class="form-btn submit" (click)="openPinPad('transfer')">Submit Transfer</button>
+          <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="wallet-form" *ngIf="activeForm === 'withdraw' && canWithdraw">
+        <div class="form-title">Withdraw</div>
+        <input type="number" [(ngModel)]="withdrawAmount" placeholder="Amount" min="0" />
+        <div class="form-actions">
+          <button class="form-btn submit" (click)="openPinPad('withdraw')">Submit Withdrawal</button>
+          <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="wallet-card tx-section">
+      <div class="card-head">
+        <div>
+          <div class="label">Recent Transactions</div>
+          <div class="card-subtitle">Tap a row to open the linked order where available.</div>
+        </div>
+        <button class="collapse-toggle" type="button" (click)="toggleSection('transactions')">
+          <ion-icon [name]="sections.transactions ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+        </button>
+      </div>
+      <div class="card-body" *ngIf="sections.transactions">
+        <div *ngIf="isLoading" class="tx-skeleton">
+          <ion-skeleton-text animated style="width:100%;height:50px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:100%;height:50px;margin-top:10px;"></ion-skeleton-text>
+        </div>
+        <div *ngIf="!isLoading && transactions.length === 0" class="empty">
+          No transactions yet.
+        </div>
+        <div class="tx-list" *ngIf="!isLoading && transactions.length > 0">
+          <button type="button" class="tx-row" *ngFor="let tx of transactions" (click)="openTransactionDetails(tx)">
+            <div class="tx-meta">
+              <div class="tx-type">{{ displayTransactionLabel(tx) }}</div>
+              <div class="tx-date">{{ tx.createdAt | date:'medium' }}</div>
+            </div>
+            <div class="tx-amount" [class.debit]="(tx.type || '').includes('debit') || (tx.type || '').includes('withdraw')">
+              {{ tx.amount | number:'1.2-2' }} {{ wallet.currency }}
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pin-pad-backdrop" *ngIf="showPinPad">
+    <div class="pin-pad-card">
+      <div class="pin-title">Enter Transaction PIN</div>
+      <div class="pin-dots">
+        <span [class.filled]="pin.length > 0"></span>
+        <span [class.filled]="pin.length > 1"></span>
+        <span [class.filled]="pin.length > 2"></span>
+        <span [class.filled]="pin.length > 3"></span>
+      </div>
+      <div class="pin-grid">
+        <button *ngFor="let d of ['1','2','3','4','5','6','7','8','9']" (click)="appendPin(d)">{{ d }}</button>
+        <button class="ghost" (click)="backspacePin()"><ion-icon name="backspace-outline"></ion-icon></button>
+        <button (click)="appendPin('0')">0</button>
+        <button class="confirm" (click)="confirmPin()"><ion-icon name="checkmark-outline"></ion-icon></button>
+      </div>
+      <button class="close-pin" (click)="closePinPad()">Cancel</button>
+    </div>
+  </div>
+</ion-content>

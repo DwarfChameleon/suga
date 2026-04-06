@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [class]="activeRole + '-bg'">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
+  </ion-refresher>
+  <div class="registration-hero">
+    <h2 class="hero-title">Create your Suga profile</h2>
+    <p class="hero-sub">Short videos, local flavors, real people. Pick a path and get started.</p>
+  </div>
+<br>
+  <div class="role-carousel" (scroll)="onCarouselScroll($event)">
+    <div class="role-card intro-card">
+      <h3>Welcome to Suga</h3>
+      <p>Discover chefs near you, watch food stories, and order dishes that match your vibe.</p>
+      <p class="hint">Swipe to choose a role.</p>
+    </div>
+
+    <div class="role-card consumer-card">
+      <h3>Consumer</h3>
+      <p>Browse dishes, follow chefs, watch food stories, and place orders in seconds.</p>
+      <ul class="role-list">
+        <li>Follow chefs</li>
+        <li>Order dishes</li>
+        <li>Like and comment</li>
+      </ul>
+      <button class="role-btn" (click)="selectRole('consumer')">Register as Consumer</button>
+    </div>
+
+    <div class="role-card chef-card">
+      <h3>Chef</h3>
+      <p>Post dishes, share food stories, manage orders, and grow your audience.</p>
+      <ul class="role-list">
+        <li>Post dishes</li>
+        <li>Share stories</li>
+        <li>Manage orders</li>
+      </ul>
+      <button class="role-btn" (click)="selectRole('chef')">Register as Chef</button>
+    </div>
+
+    <div class="role-card dispatch-card">
+      <h3>Dispatch Rider</h3>
+      <p>Deliver orders for chefs and consumers. Join as an independent rider or dispatch company.</p>
+      <ul class="role-list">
+        <li>Accept available jobs</li>
+        <li>Track delivery progress</li>
+        <li>Manage active routes</li>
+      </ul>
+      <button class="role-btn" (click)="selectRole('dispatch')">Register as Dispatch</button>
+    </div>
+  </div>
+
+</ion-content>

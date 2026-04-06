@@ -1,0 +1,70 @@
+<div class="modal">
+  <div class="modal-content">
+    <button class="close-btn" type="button" (click)="closeModal()">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+<br>
+    <div class="hero">
+      <img [src]="getImageUrl(food?.image)" alt="{{ food?.dishName }}" class="hero-image" />
+      <div class="hero-overlay">
+        <p class="dish-name">{{ food?.dishName | titlecase }}</p>
+        <p class="chef-handle">@{{ food?.chefName }}</p>
+      </div>
+    </div>
+
+    <div class="profile-data">
+      <div class="chips-row">
+        <div class="chip">
+          <ion-icon name="timer-outline"></ion-icon>
+          <span>{{ food?.preparationTime }}</span>
+        </div>
+        <div class="chip price">
+          <span class="naira">&#8358;</span>
+          <span>{{ food?.price }}</span>
+        </div>
+        <div class="chip">
+          <ion-icon name="list-outline"></ion-icon>
+          <span>{{ food?.category }}</span>
+        </div>
+        <div class="chip">
+          <ion-icon name="bag-check-outline"></ion-icon>
+          <span>{{ food?.availability }}</span>
+        </div>
+      </div>
+
+      <div class="meta-row">
+        <div class="created-by">Created by <strong>@{{ food?.chefName }}</strong></div>
+        <div class="order-count">{{ count || 0 }} orders</div>
+      </div>
+
+      <ion-button (click)="openOrderModal(food)" class="primary-order-btn">Place order</ion-button>
+      <ion-button fill="clear" (click)="addCurrentFoodToCart()" class="cart-link-btn">Add to cart</ion-button>
+    </div>
+
+    <div class="more-section">
+      <p class="more-title">More from @{{ food?.chefName }} menu</p>
+      <div class="moreFood">
+        <div class="chefMoreFoods" *ngFor="let dish of chefFoods" (click)="openModalFood(dish._id)">
+          <img [src]="getImageUrl(dish.image)" alt="{{ dish?.dishName }}" class="img-fluid" />
+          <div class="mini-meta">
+            <span class="mini-name">{{ dish?.dishName | titlecase }}</span>
+            <span class="mini-price"><span class="naira">&#8358;</span>{{ dish?.price }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="more-section" *ngIf="similarFoodsByRegion?.length">
+      <p class="more-title">Similar in same category and region</p>
+      <div class="moreFood">
+        <div class="chefMoreFoods" *ngFor="let dish of similarFoodsByRegion" (click)="openModalFood(dish._id)">
+          <img [src]="getImageUrl(dish.image)" alt="{{ dish?.dishName }}" class="img-fluid" />
+          <div class="mini-meta">
+            <span class="mini-name">{{ dish?.dishName | titlecase }}</span>
+            <span class="mini-price"><span class="naira">&#8358;</span>{{ dish?.price }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

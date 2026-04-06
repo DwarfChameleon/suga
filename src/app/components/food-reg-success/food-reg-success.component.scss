@@ -1,0 +1,36 @@
+.success-icon{
+    width:90%;
+    height:150px;
+    margin-left: 5%;
+}
+.success-icon img{
+    width: 80%;
+    height: 300px;
+    margin-left: 10%;
+}
+.greetings-profile{
+    margin-top: 125px;
+}
+
+.greetings-profile h2{
+    font-size: var(--font-strong-large);
+    text-align: center;
+    font-weight: normal;
+    padding: 15px;
+}
+.sucessAction{
+    margin-left: 4%;
+    width: 92%;
+    padding: 5px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background: var(--ion-color-primary-background);
+    color: var(--ion-color-primary-food);
+    height: 40px;
+    border-radius: 10px;
+}
+.sucessAction ion-icon{
+    color:var(--ion-color-primary-food);
+    font-size:var(--font-strong-large);
+}

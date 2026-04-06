@@ -1,0 +1,69 @@
+@import "/src/theme/variables.scss";
+.login-container{
+    height:100vh !important;
+    width: 100%;
+    background-image: url(/assets/img/fstorybg.gif);
+    background-size: 100% 22%;
+    background-repeat: no-repeat;
+    padding-top: 50%;
+}
+.modal{
+    height: 80% !important;
+    width: 100%;
+    background-color: var(--ion-color-primary-modal);
+    text-align: center;
+    position: absolute;
+    top: 20%;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    padding: 10px;
+    border-top: 5px solid var(--suga-border);
+    }
+
+    ion-item{
+        width:100%;
+        height:auto;
+        border:none;
+        padding: 5px;
+        background-color: transparent;
+    }
+   ion-input{
+    background: var(--suga-input-bg);
+    width: 100%;
+    margin-left: 0;
+    }
+    
+    .modalBTN{
+        min-height: 50px;
+        width: 100%;
+        margin-top: 60px;
+        margin-left: 0;
+
+        
+    }
+    .newAccount{
+        margin-top: 50px;
+    }
+    .signup-link-btn{
+        border: none;
+        background: transparent;
+        color: var(--ion-color-primary-food);
+        font: inherit;
+        padding: 0;
+        margin-left: 6px;
+        cursor: pointer;
+        font-weight: 700;
+    }
+    .google-login{
+        margin-top: 14px;
+    }
+ 
+    .small-text{
+        text-decoration:none;
+        color:var( --ion-color-dark-tint);
+        text-align:center;
+    }
+    .signIn{
+        text-align: center;
+    }
+   

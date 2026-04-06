@@ -1,0 +1,207 @@
+@import "/src/theme/variables.scss";
+.modal {
+
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 80vh;
+    border-radius:45px 45px 0px 0px;
+    overflow: auto;
+    background-color: var(--suga-surface);
+    border-top: 5px solid var(--ion-color-primary-food);
+
+  
+    .modal-content {
+      background-color: var(--suga-surface);
+      margin: 1% auto;
+      padding: 20px;
+      border:none;
+      width: 98%;
+      
+  
+      .modal-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+       
+      }
+  
+      .modal-body {
+        text-align: center;
+  
+        img {
+          max-width: 100%;
+          height: auto;
+          margin-bottom: 10px;
+        }
+      }
+      table{
+        width:100%;
+      }
+      td{
+        width:50%;
+      }
+    }
+
+      .foodDetailsBox{
+      width:96%;
+      margin-left:2%;
+      padding: 5px;
+    }
+    .primary-order-btn,
+    .cart-link-btn,
+    .subtle-action-btn{
+      width: 100%;
+      box-shadow: none;
+    }
+    .primary-order-btn{
+      --background: var(--ion-color-primary-food);
+      --background-hover: var(--ion-color-primary-food);
+      --background-activated: var(--ion-color-primary-food);
+      --border-radius: 14px;
+      --box-shadow: 0 10px 18px rgba(255, 112, 67, 0.2);
+      --padding-top: 0;
+      --padding-bottom: 0;
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .primary-order-btn::part(native){
+      min-height: 42px;
+      height: 42px;
+    }
+    .compact-order-btn{
+      margin-top: 8px;
+    }
+    .compact-order-btn::part(native){
+      min-height: 38px;
+      height: 38px;
+    }
+    .cart-link-btn{
+      --background: transparent;
+      --background-hover: transparent;
+      --background-activated: transparent;
+      --border-color: transparent;
+      --box-shadow: none;
+      --color: var(--ion-color-primary-food);
+      --padding-top: 0;
+      --padding-bottom: 0;
+      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .cart-link-btn::part(native){
+      min-height: 30px;
+      height: 30px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+    .subtle-action-btn{
+      --background: transparent;
+      --background-hover: transparent;
+      --background-activated: transparent;
+      --border-color: transparent;
+      --box-shadow: none;
+      --color: var(--ion-color-primary-food);
+      --padding-top: 0;
+      --padding-bottom: 0;
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .subtle-action-btn::part(native){
+      min-height: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+    .cart-summary{
+      margin-top: 10px;
+    }
+    .cart-summary p{
+      margin: 8px 0;
+      font-size: 13px;
+    }
+    .gift-box{
+      margin: 12px 0 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--suga-border);
+      text-align: left;
+    }
+    .gift-toggle{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .gift-fields{
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+    .gift-help{
+      margin: 0;
+      font-size: 12px;
+      color: var(--suga-muted);
+      line-height: 1.45;
+    }
+    .gift-suggestions{
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .gift-chip{
+      border: 1px solid rgba(255, 112, 67, 0.16);
+      background: rgba(255, 112, 67, 0.08);
+      color: var(--ion-color-primary-food);
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-width: 150px;
+      text-align: left;
+      display: grid;
+      gap: 2px;
+      flex: 0 0 auto;
+    }
+    .gift-chip.active{
+      background: var(--ion-color-primary-food);
+      color: #fff;
+    }
+    .gift-chip strong{
+      font-size: 13px;
+    }
+    .gift-chip small{
+      font-size: 11px;
+      opacity: 0.8;
+    }
+    .gift-suggestions-empty{
+      font-size: 12px;
+      color: var(--suga-muted);
+      padding: 6px 2px;
+    }
+    .gift-fields input{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--suga-input-border);
+      background: #fff;
+      font-size: 13px;
+    }
+    .gift-selected{
+      display: block;
+      margin-top: -2px;
+      color: var(--ion-color-primary-food);
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+  

@@ -1,0 +1,234 @@
+@import "/src/theme/variables.scss";
+
+.modal {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 92vh;
+  border-radius: 26px 26px 0 0;
+  background: linear-gradient(180deg, var(--suga-surface) 0%, var(--suga-surface-muted) 100%);
+  border-top: 4px solid var(--ion-color-primary-food);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.22);
+}
+
+.modal-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 14px 14px 22px;
+  position: relative;
+}
+
+.close-btn {
+  position: sticky;
+  top: 4px;
+  z-index: 6;
+  float: right;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: var(--ion-color-primary-food);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn ion-icon {
+  font-size: 20px;
+
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  border-radius:5px;
+  overflow: hidden;
+  margin-top:40px;
+  background: var(--suga-surface-alt);
+}
+
+.hero-image {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  background: var(--suga-surface-alt);
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.dish-name {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.chef-handle {
+  margin: 2px 0 0;
+  color: #d6dae3;
+  font-size: 13px;
+}
+
+.profile-data {
+  margin-top: 12px;
+  background: var(--suga-surface);
+  border: 1px solid var(--suga-border);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.chips-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--suga-surface-muted);
+  font-size: 12px;
+  color: var(--ion-text-color);
+  min-height: 34px;
+}
+
+.chip.price {
+  background: var(--suga-surface-alt);
+  color: var(--suga-accent-2);
+  font-weight: 700;
+}
+
+.meta-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--suga-muted);
+}
+
+.order-count {
+  font-weight: 700;
+  color: var(--ion-color-primary);
+}
+
+.primary-order-btn,
+.cart-link-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.primary-order-btn {
+  --background: var(--ion-color-primary-food);
+  --background-hover: var(--ion-color-primary-food);
+  --background-activated: var(--ion-color-primary-food);
+  --border-radius: 14px;
+  --box-shadow: 0 10px 18px rgba(255, 112, 67, 0.22);
+  --padding-top: 0;
+  --padding-bottom: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.primary-order-btn::part(native) {
+  min-height: 42px;
+  height: 42px;
+}
+
+.cart-link-btn {
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: transparent;
+  --border-color: transparent;
+  --box-shadow: none;
+  --color: var(--ion-color-primary-food);
+  --padding-top: 0;
+  --padding-bottom: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.cart-link-btn::part(native) {
+  min-height: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.more-section {
+  margin-top: 14px;
+}
+
+.more-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.moreFood {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 10px 2px;
+  scroll-snap-type: x mandatory;
+}
+
+.chefMoreFoods {
+  min-width: 170px;
+  max-width: 170px;
+  background: var(--suga-surface);
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  padding: 8px;
+  scroll-snap-align: start;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
+}
+
+.chefMoreFoods img {
+  width: 100%;
+  height: 110px;
+  border-radius: 9px;
+  object-fit: contain;
+  background: var(--suga-surface-alt);
+}
+
+.mini-meta {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mini-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.mini-price {
+  font-size: 12px;
+  color: var(--ion-color-primary);
+  font-weight: 700;
+}
+  

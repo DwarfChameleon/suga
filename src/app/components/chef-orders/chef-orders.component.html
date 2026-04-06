@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <app-back-button></app-back-button>
+    </ion-buttons>
+    <ion-title>Order History</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+ <div class="history-page">
+  <div *ngIf="isLoading" class="history-skeleton">
+    <ion-skeleton-text animated style="width:100%;height:58px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width:100%;height:58px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width:100%;height:58px;"></ion-skeleton-text>
+  </div>
+
+  <div *ngIf="!isLoading && historyOrders.length === 0 && errorMessage">{{ errorMessage }}</div>
+  <div *ngIf="!isLoading && historyOrders.length === 0 && !errorMessage">No historical orders yet.</div>
+
+  <div class="history-list" *ngIf="!isLoading && historyOrders.length > 0">
+    <div *ngFor="let order of historyOrders" class="history-item" (click)="openModalOrder(order._id)">
+      <div class="history-icon">
+        <ion-icon name="receipt-outline"></ion-icon>
+      </div>
+      <div class="history-body">
+        <div class="history-title">{{ order.dishName | titlecase }}</div>
+        <div class="history-sub">{{ order.orderTime | date:'MMM d, h:mm a' }}</div>
+      </div>
+      <div class="history-status">{{ order.status | titlecase }}</div>
+      <div class="history-next">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </div>
+    </div>
+  </div>
+</div>
+</ion-content>

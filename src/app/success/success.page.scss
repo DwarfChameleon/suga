@@ -1,0 +1,34 @@
+@import "/src/theme/variables.scss";
+.dbBtn{color:var(--ion-color-warning-contrast);}
+.successBTN{
+    border-radius:15px;
+    margin-top:50px;
+    border:none;
+    width:100%;
+    height:50px;
+    font-size: var(--font-strong-large);
+    background-color: var(--ion-color-primary-button);
+
+}
+.successinstructions{
+    height:auto;
+    width:90%;
+    margin-left:5%;
+    margin-top:150px;
+}
+.successinstructions h2{
+    font-size: var( --font-strong-heading);
+}
+.p{
+    font-size: var(  --font-strong-xlarge);
+} 
+.success-icon{
+    width:90%;
+    height:150px;
+    margin-left: 5%;
+}
+.success-icon img{
+    width: 80%;
+    height: 300px;
+    margin-left: 10%;
+}

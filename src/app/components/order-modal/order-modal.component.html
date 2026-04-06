@@ -1,0 +1,146 @@
+<ion-content>
+  <div class="modal">
+    <div class="modal-content">
+
+      <div class="close">
+        <ion-icon
+          name="close-circle-outline"
+          size="large"
+          (click)="closeModal()">
+        </ion-icon>
+      </div>
+
+      <div class="modal-header">
+        <h2>
+          {{ dishName | titlecase }}
+          <span class="naira">&#8358;</span>{{ price }}
+        </h2>
+      </div>
+
+      <div class="modal-body">
+
+        <div *ngIf="successMessage || errorMessage" class="messageBox">
+          <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+          <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+          <ion-button class="regSubmitBTN" (click)="closeModal()">OK</ion-button>
+        </div>
+
+        <div *ngIf="!successMessage && !errorMessage">
+          <div class="foodDetailsBox">
+            <table>
+              <tr>
+                <td>
+                  <p>
+                    <strong>
+                      <ion-icon name="timer-outline"></ion-icon>
+                      Preparation Time:
+                    </strong><br>
+                    {{ preparationTime }}
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    <strong>
+                      <span class="naira">&#8358;</span> Price:
+                    </strong><br>
+                    {{ price }}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p>
+                    <strong>Food By:</strong>
+                    {{ chefName | titlecase }}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="gift-box">
+            <label class="gift-toggle">
+              <input type="checkbox" [(ngModel)]="isGift" (ngModelChange)="onGiftToggleChange($event)" />
+              <span>Gift this order</span>
+            </label>
+            <div *ngIf="isGift" class="gift-fields">
+              <p class="gift-help">
+                Choose from your follow circle or enter the recipient's phone number.
+              </p>
+
+              <div class="gift-suggestions">
+                <div class="gift-suggestions-empty" *ngIf="isLoadingGiftSuggestions">
+                  Loading suggestions...
+                </div>
+
+                <button
+                  type="button"
+                  class="gift-chip"
+                  *ngFor="let suggestion of giftSuggestions"
+                  [class.active]="recipientPhoneNumber === suggestion.phoneNumber"
+                  (click)="selectGiftSuggestion(suggestion)">
+                  <strong>@{{ suggestion.username }}</strong>
+                  <small>{{ giftSuggestionLabel(suggestion) }}</small>
+                </button>
+
+                <div class="gift-suggestions-empty" *ngIf="!isLoadingGiftSuggestions && giftSuggestions.length === 0">
+                  Suggestions based on your follow list will appear here.
+                </div>
+              </div>
+
+              <input
+                type="tel"
+                placeholder="Recipient phone number"
+                [(ngModel)]="recipientPhoneNumber"
+              />
+
+              <small *ngIf="recipientUsername" class="gift-selected">
+                Selected recipient: @{{ recipientUsername }}
+              </small>
+            </div>
+          </div>
+
+          <ion-button
+            class="primary-order-btn"
+            expand="block"
+            [disabled]="isSubmitting"
+            (click)="placeOrder()">
+            Continue Order
+          </ion-button>
+
+          <ion-button
+            class="cart-link-btn"
+            expand="block"
+            fill="clear"
+            [disabled]="isSubmitting"
+            (click)="addCurrentItemToCart()">
+            Add To Cart
+          </ion-button>
+
+          <div class="cart-summary" *ngIf="cartCount > 0">
+            <p>{{ cartCount }} item(s) in cart &middot; <span class="naira">&#8358;</span>{{ cartSubtotal | number:'1.0-0' }}</p>
+
+            <ion-button
+              class="subtle-action-btn"
+              expand="block"
+              fill="clear"
+              [disabled]="isSubmitting"
+              (click)="goToCart()">
+              Open Cart Page
+            </ion-button>
+
+            <ion-button
+              class="primary-order-btn compact-order-btn"
+              expand="block"
+              color="success"
+              [disabled]="isSubmitting"
+              (click)="checkoutCart()">
+              Checkout Cart
+            </ion-button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</ion-content>

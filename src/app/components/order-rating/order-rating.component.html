@@ -1,0 +1,16 @@
+<div class="rating-modal">
+  <div class="rating-header">
+    <h3>Rate This Order</h3>
+    <button class="close-btn" (click)="close()">Close</button>
+  </div>
+  <p class="dish">{{ dishName }}</p>
+  <div class="stars">
+    <button type="button" *ngFor="let s of [1,2,3,4,5]" (click)="setStars(s)" [class.active]="stars >= s">
+      <ion-icon name="star"></ion-icon>
+    </button>
+  </div>
+  <textarea rows="3" [(ngModel)]="comment" placeholder="Share your experience (optional)"></textarea>
+  <button class="submit-btn" (click)="submit()" [disabled]="isSubmitting">
+    {{ isSubmitting ? 'Submitting...' : 'Submit Review' }}
+  </button>
+</div>

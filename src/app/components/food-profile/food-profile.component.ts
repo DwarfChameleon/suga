@@ -1,0 +1,214 @@
+import { Component, Input } from '@angular/core';
+import { FoodService } from 'src/app/services/food.service';
+import { OrderModalComponent } from '../order-modal/order-modal.component';
+import { Food } from 'src/app/interface/food';
+import { UserService } from '../../services/user.service';
+import { UserDetails } from '../../interface/user-details';
+import { OrderService } from 'src/app/services/order.service';
+import { ModalController } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { CartService } from 'src/app/services/cart.service';
+import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
+
+
+@Component({
+  selector: 'app-food-profile',
+  templateUrl: './food-profile.component.html',
+  styleUrls: ['./food-profile.component.scss']
+})
+export class FoodProfileComponent {
+  @Input() foodId!: string;
+  food: any;
+  chefFoods: Food[] = [];
+  similarFoodsByRegion: Food[] = [];
+  chefName:any;
+  count: number | undefined;
+ 
+  
+  constructor(
+    private modalController: ModalController,
+    private foodService: FoodService,
+    private userService: UserService,
+    private orderService:OrderService,
+    private tokenStorage: TokenStorageService,
+    private cartService: CartService,
+    private uiFeedback: UiFeedbackService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadFood();
+  }
+
+  countOrder(): void{
+    this.orderService.countOrders(this.foodId).subscribe(
+      response=>{
+        this.count = response.count;
+         });
+  }
+
+ moreFoodByChef(chefName: string): void {
+    this.foodService.getFoodsWithChefNames(chefName).subscribe(
+      (foods: Food[]) => {
+        if (foods.length === 0) {
+          this.chefFoods = [];
+        } else {
+          this.chefFoods = foods;
+        }
+      },
+      (error) => {
+        console.error('Error fetching foods:', error);
+              }
+    );
+  }
+  
+    async openModalFood(foodId: string) {
+      this.fetchFood(foodId);
+      try { await this.modalController.dismiss(); } catch (e) {}
+      const modal = await this.modalController.create({
+        component: FoodProfileComponent,
+        componentProps: { foodId }
+      });
+      await modal.present();
+    }
+      fetchFood(foodId: string) {
+    this.foodService.getFoodById(foodId).subscribe(
+      (food: Food) => {
+        console.log('Fetched food:', food);
+      },
+      (error: any) => {
+        console.error('Error fetching food:', error);
+      }
+    );
+  }
+async openOrderModal(food: Food) {
+  const chefID = (food as any).chefID || (food as any).chefId || (food as any).createdBy;
+  const storedUser = this.tokenStorage.getUser();
+
+  // If not logged in, open modal without user profile; order modal will prompt login
+  if (!storedUser?._id) {
+    const modal = await this.modalController.create({
+      component: OrderModalComponent,
+      componentProps: {
+        dishName: food.dishName,
+        price: food.price,
+        preparationTime: food.preparationTime,
+        chefName: food.chefName,
+        chefID,
+        food_id: food._id,
+        image: (food as any).image,
+        category: (food as any).category,
+        user: undefined,
+        food
+      }
+    });
+    await modal.present();
+    return;
+  }
+
+  this.userService.getUserDetails().subscribe(
+    async (userProfile: UserDetails) => {
+      const modal = await this.modalController.create({
+        component: OrderModalComponent,
+        componentProps: {
+          dishName: food.dishName,
+          price: food.price,
+          preparationTime: food.preparationTime,
+          chefName: food.chefName,
+          chefID,
+          food_id: food._id,
+          image: (food as any).image,
+          category: (food as any).category,
+          user: userProfile,
+          food
+        }
+      });
+      await modal.present();
+    },
+    async (error) => {
+      console.error('Error loading user profile:', error);
+      const modal = await this.modalController.create({
+        component: OrderModalComponent,
+        componentProps: {
+          dishName: food.dishName,
+          price: food.price,
+          preparationTime: food.preparationTime,
+          chefName: food.chefName,
+          chefID,
+          food_id: food._id,
+          image: (food as any).image,
+          category: (food as any).category,
+          user: undefined,
+          food
+        }
+      });
+      await modal.present();
+    }
+  );
+}
+
+    closeModal() {
+    this.modalController.dismiss();
+  }
+
+  loadFood() {
+    this.foodService.getFoodById(this.foodId).subscribe(
+      (response) => {
+        this.food = { ...response, chefName: response.chef };
+        this.chefName = this.food.chefName;
+        if (this.chefName) {
+          this.moreFoodByChef(this.chefName);
+        }
+        this.loadRecommendations();
+        this.countOrder();
+        console.log('Mapped Food response:', this.food);
+      },
+      (error) => {
+        console.error('Error fetching food:', error);
+      }
+    );
+  }
+
+
+
+  getImageUrl(image: string): string {
+    if (!image) {
+      return ''; // Handle case where image is not provided
+    }
+    return `${environment.uploadUrl}/${image}`;
+  }
+
+  addCurrentFoodToCart(): void {
+    const chefID = this.food?.chefID || this.food?.chefId || this.food?.createdBy;
+    if (!this.food?._id || !chefID || !this.food?.dishName || !this.food?.price || !this.food?.preparationTime || !this.food?.chefName) {
+      this.uiFeedback.error('Unable to add this item to cart.');
+      return;
+    }
+
+    this.cartService.addItem({
+      food_id: this.food._id,
+      dishName: this.food.dishName,
+      price: this.food.price,
+      preparationTime: this.food.preparationTime,
+      chefId: chefID,
+      chefUsername: this.food.chefName,
+      image: this.food.image,
+      category: this.food.category
+    });
+    this.uiFeedback.success('Added to cart.');
+  }
+
+  private loadRecommendations(): void {
+    if (!this.foodId) return;
+    this.foodService.getFoodRecommendations(this.foodId).subscribe({
+      next: (data) => {
+        this.similarFoodsByRegion = data?.sameCategoryRegion || [];
+      },
+      error: () => {
+        this.similarFoodsByRegion = [];
+      }
+    });
+  }
+
+
+}

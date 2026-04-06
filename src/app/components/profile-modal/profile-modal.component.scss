@@ -1,0 +1,214 @@
+.profile{
+    width:100%;
+    min-height:100vh;
+    background-color: var(--suga-surface);
+    position: fixed;
+    border-radius:0;
+    bottom:0px;
+    padding: 10px;
+    overflow: hidden;
+}
+.chef-banner{
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 30px 30px 18px 18px;
+    position: relative;
+}
+.banner-overlay{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.1));
+}
+.modal-header{
+    display:flex;
+    position: relative;
+    justify-content: space-between;
+    width: auto;
+    padding: 0 20px 8px 20px;
+    text-align: center;
+    margin-top: -40px;
+    align-items: flex-end;
+}
+.modal-header ion-icon{
+    font-size: 28px;
+    color: var(--ion-color-primary);
+    background: var(--suga-surface);
+    border-radius: 50%;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+.modal-header h2{
+font-size: var( --font-strong-xxlarge);
+}
+.modal-header h3,p{
+   text-align: center;
+    }
+.chef-hero{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: var(--suga-surface);
+    padding: 10px 12px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+.chef-avatar{
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--ion-color-primary);
+}
+.chef-hero-text{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.chef-role{
+    margin: 0;
+    font-size: var(--font-small);
+    opacity: 0.7;
+}
+.chef-level{
+    margin: 2px 0 0 0;
+    font-size: var(--font-small);
+    font-weight: 600;
+    color: var(--ion-color-primary);
+}
+.chef-tagline{
+    text-align: left;
+    padding: 0 12px;
+    color: var(--ion-color-primary-text);
+}
+.profile-stats{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px 12px 4px 12px;
+}
+.stat{
+    background: var(--suga-surface-muted);
+    border-radius: 10px;
+    padding: 8px;
+    text-align: center;
+    border: 0;
+}
+.stat.clickable{
+    cursor: pointer;
+}
+.stat-label{
+    display: block;
+    font-size: var(--font-small);
+    opacity: 0.7;
+}
+.stat-value{
+    display: block;
+    font-weight: 700;
+    font-size: var(--font-strong);
+}
+.follow-row{
+    display: flex;
+    justify-content: center;
+    margin: 6px 0 12px 0;
+}
+.follow-row ion-button{
+  width: 80%;
+}
+.content-divider{
+  width: calc(100% - 24px);
+  height: 1px;
+  margin: 6px 12px 10px;
+  background: linear-gradient(90deg, transparent, var(--ion-color-primary), transparent);
+  opacity: 0.45;
+}
+.list-shell{
+  width: 100%;
+  padding: 0 10px 12px;
+}
+.empty-list{
+  text-align: center;
+  color: var(--suga-muted);
+}
+.list-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--suga-surface-muted);
+  margin-bottom: 8px;
+}
+.list-row img{
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.list-meta h4{
+  margin: 0;
+  font-size: 13px;
+}
+.list-meta p{
+  margin: 2px 0 0;
+  text-align: left;
+  font-size: 12px;
+  color: var(--suga-muted);
+}
+.story-row video{
+  width: 72px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.load-more-btn{
+  width: 100%;
+  border: 1px solid var(--suga-border);
+  border-radius: 10px;
+  background: var(--suga-surface);
+  color: var(--ion-color-primary);
+  font-weight: 600;
+  padding: 10px;
+  margin-top: 6px;
+}
+.videoModalChefFood-MotherBox{
+    width:100%;
+    height:auto;
+    display: flex;
+    padding: 10px;
+    overflow-y: scroll;
+}
+.videoModalChefFood{
+   min-width:40%;
+    height:auto;
+    padding:10px;
+    display: grid;
+    position: relative;
+    margin-left: 15px;
+    box-shadow:0px 0px 5px 0px #80808063;
+    font-size: var(--font-small);
+    text-align: center;
+    background: var(--suga-surface);
+    border-radius: 12px;
+}
+.videoModalChefFood p,h3{
+    font-size: var(--font-small);
+}
+.videoModalChefFood ion-icon{
+    font-size: var(--font-small);
+}
+.videoModalChefFood img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    background: var(--suga-surface-alt);
+    margin-right: 20px;
+    border-radius: 50%;
+  }
+  
+  .food-details {
+    display: flex;
+    flex-direction: column;
+  }
+  ng-template p{
+    text-align: center;
+  }

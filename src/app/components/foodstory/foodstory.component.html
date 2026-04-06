@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="onHeaderBack()" *ngIf="canGoBack">Back</ion-button>
+      <app-back-button *ngIf="!canGoBack"></app-back-button>
+    </ion-buttons>
+    <ion-title>{{ headerTitle }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="onHeaderDone()" *ngIf="step === 'details'">Done</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div [ngSwitch]="step">
+    <section *ngSwitchCase="'capture'" class="cameraArea">
+      <video #liveVideo class="liveVideo" playsinline muted [style.filter]="selectedFilterCss"></video>
+
+      <div class="controls">
+        <div class="leftControls">
+          <button (click)="switchCamera()" class="controlBtn">Switch</button>
+          <button (click)="openGallery()" class="controlBtn">Gallery</button>
+        </div>
+
+        <div class="recordControls">
+          <div class="timer">{{ timer | number:'2.0-0' }}s</div>
+          <button class="recordBtn" [class.recording]="isRecording" (click)="toggleRecording()">
+            <span *ngIf="!isRecording">&#9679;</span>
+            <span *ngIf="isRecording">&#9632;</span>
+          </button>
+        </div>
+
+        <div class="rightControls">
+          <button (click)="captureVideo()" class="controlBtn">Native</button>
+        </div>
+      </div>
+      <p class="status status-overlay" *ngIf="uploadStatus">{{ uploadStatus }}</p>
+    </section>
+
+    <section *ngSwitchCase="'review'" class="reviewArea">
+      <div class="previewWrap" *ngIf="previewUrl">
+        <ng-container *ngIf="mediaType === 'image'">
+          <img [src]="previewUrl" alt="preview" class="previewMedia" [style.filter]="selectedFilterCss">
+        </ng-container>
+        <ng-container *ngIf="mediaType === 'video'">
+          <video [src]="previewUrl" controls class="previewMedia" [style.filter]="selectedFilterCss"></video>
+        </ng-container>
+      </div>
+
+      <div class="filterRow">
+        <button
+          type="button"
+          class="filterChip"
+          *ngFor="let f of filters"
+          [class.active]="selectedFilter === f.value"
+          (click)="selectedFilter = f.value"
+        >
+          {{ f.label }}
+        </button>
+      </div>
+
+      <div class="reviewActions">
+        <button class="controlBtn" (click)="deleteAndRerecord()">Delete & Re-record</button>
+        <button class="uploadBtn" (click)="keepAndContinue()">Proceed</button>
+      </div>
+      <p class="status" *ngIf="uploadStatus">{{ uploadStatus }}</p>
+    </section>
+
+    <section *ngSwitchCase="'details'" class="detailsArea">
+      <div class="previewMini" *ngIf="previewUrl">
+        <video *ngIf="mediaType === 'video'" [src]="previewUrl" controls [style.filter]="selectedFilterCss"></video>
+        <img *ngIf="mediaType === 'image'" [src]="previewUrl" [style.filter]="selectedFilterCss" alt="preview">
+      </div>
+
+      <div class="bottomPanel">
+        <select [(ngModel)]="contentCategory" class="descInput">
+          <option value="">Select category</option>
+          <option *ngFor="let c of contentCategories" [value]="c">{{ c | titlecase }}</option>
+        </select>
+
+        <label class="order-toggle">
+          <input type="checkbox" [(ngModel)]="orderEnabled">
+          <span>Allow Order From This Story</span>
+        </label>
+
+        <select *ngIf="orderEnabled" [(ngModel)]="linkedFoodId" class="descInput">
+          <option value="">Select dish for order</option>
+          <option *ngFor="let dish of myDishes" [value]="dish._id">{{ dish.dishName }} - NGN {{ dish.price }}</option>
+        </select>
+
+        <select [(ngModel)]="visibility" class="descInput">
+          <option value="public">Who can view: Public</option>
+          <option value="followers">Who can view: Followers only</option>
+          <option value="private">Who can view: Only me</option>
+        </select>
+
+        <input type="text" placeholder="Add a description..." [(ngModel)]="description" class="descInput">
+
+        <div class="detailActions">
+          <button class="controlBtn" (click)="setStep('review')">Back</button>
+          <button (click)="uploadMedia()" class="uploadBtn">Upload</button>
+        </div>
+      </div>
+      <p class="status" *ngIf="uploadStatus">{{ uploadStatus }}</p>
+    </section>
+  </div>
+
+  <input #fileInput type="file" (change)="handleFileInput($event)" accept="image/*,video/*" style="display:none">
+</ion-content>

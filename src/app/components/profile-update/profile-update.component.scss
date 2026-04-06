@@ -1,0 +1,138 @@
+@import "/src/theme/variables.scss";
+
+.settings-page {
+  padding: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.settings-card {
+  background: var(--suga-surface, #ffffff);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(14, 21, 47, 0.08);
+  border: 1px solid var(--suga-border, rgba(44, 106, 194, 0.08));
+}
+
+.settings-card h2 {
+  margin: 0;
+  color: var(--ion-color-primary-food);
+  font-size: 18px;
+}
+
+.subtitle {
+  margin: 6px 0 12px;
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
+.row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.row label {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  font-weight: 600;
+}
+
+.row input {
+  width: 100%;
+  border: 1px solid var(--suga-border, #d9deea);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--suga-surface-muted, #f8faff);
+  color: var(--ion-text-color);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label-block h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ion-text-color);
+}
+
+.label-block p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.primary-btn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: var(--ion-color-primary-food);
+  color: #fff;
+  font-weight: 700;
+  padding: 12px;
+}
+
+.request-list {
+  display: grid;
+  gap: 10px;
+}
+
+.request-item {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e1e6f2;
+  border-radius: 12px;
+}
+
+.request-item img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-weight: 700;
+  color: #263152;
+}
+
+.date {
+  font-size: 12px;
+  color: #7c86a5;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.actions .approve {
+  background: #2dd36f;
+  color: #07361a;
+}
+
+.actions .reject {
+  background: #ffe7ea;
+  color: #c42541;
+}
+
+.empty {
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}

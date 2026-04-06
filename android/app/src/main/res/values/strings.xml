@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">suga</string>
+    <string name="title_activity_main">suga</string>
+    <string name="package_name">com.suga.app</string>
+    <string name="custom_url_scheme">com.suga.app</string>
+</resources>

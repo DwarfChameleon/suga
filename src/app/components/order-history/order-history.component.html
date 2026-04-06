@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/components/consumer" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Order History</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="history-wrap">
+    <ion-button fill="outline" size="small" (click)="load()">Refresh</ion-button>
+
+    <div *ngIf="isLoading" class="skeleton-list">
+      <div class="skeleton-row" *ngFor="let s of [1,2,3]">
+        <ion-skeleton-text animated style="width:80%;height:14px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:40%;height:12px;margin-top:6px;"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="history-card"
+      *ngFor="let order of orders; trackBy: trackByOrder"
+      [class.is-completed]="order.status === 'completed'"
+      (click)="openOrder(order._id)"
+    >
+      <div class="line">
+        <h4>{{ order.dishName | titlecase }}</h4>
+        <span class="price">&#8358;{{ order.price }}</span>
+      </div>
+      <div class="line muted">
+        <span>{{ order.orderTime | date:'medium' }}</span>
+        <span>{{ order.status | titlecase }}</span>
+      </div>
+    </button>
+  </div>
+</ion-content>

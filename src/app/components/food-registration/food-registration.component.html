@@ -1,0 +1,148 @@
+<ion-content [fullscreen]="true">
+  <div class="page-backbar">
+    <app-back-button></app-back-button>
+  </div>
+
+  <div class="container">
+    <div class="hero">
+      <h2 class="headingWelcome">Add New Menu Item</h2>
+      <p class="hero-sub">Step-by-step dish creation for better listing quality</p>
+      <div class="step-track">
+        <div class="step-pill" [class.active]="currentStep === 1" [class.done]="categoryStepDone">1. Choose Category</div>
+        <div class="step-pill" [class.active]="currentStep === 2">2. Fill Details</div>
+      </div>
+    </div>
+
+    <div class="warning" *ngIf="invalidFormMessage">{{ invalidFormMessage }}</div>
+    <div *ngIf="errorMessage" class="error-message warning">{{ errorMessage }}</div>
+
+    <section *ngIf="currentStep === 1" class="card-section">
+      <h3>Select Category</h3>
+      <p class="section-sub">This selection drives the form style and required input guidance.</p>
+
+      <div class="category-grid" #categoryList>
+        <button
+          type="button"
+          class="category-card"
+          *ngFor="let c of categories"
+          (click)="selectCategory(c)"
+          [class.selected]="selectedCategoryName === c.name"
+          [attr.data-category-name]="c.name"
+        >
+          <img [src]="getCategoryImage(c.image)" [alt]="c.name" />
+          <span>{{ c.name }}</span>
+          <ion-icon *ngIf="selectedCategoryName === c.name" class="selected-check" name="checkmark-circle"></ion-icon>
+        </button>
+      </div>
+    </section>
+
+    <form *ngIf="currentStep === 2" (ngSubmit)="onSubmit()" [formGroup]="foodForm" class="card-section">
+      <div class="section-head">
+        <div>
+          <h3>{{ activeProfile.title }}</h3>
+          <p class="section-sub">Category: <strong>{{ selectedCategoryName }}</strong></p>
+        </div>
+        <button type="button" class="ghost-btn" (click)="goBackToCategoryStep()">Change Category</button>
+      </div>
+
+      <div class="hint-row" *ngIf="activeProfile.hints.length">
+        <span class="hint-chip" *ngFor="let hint of activeProfile.hints">{{ hint }}</span>
+      </div>
+
+      <div class="form-group">
+        <ion-label for="dishName">{{ activeProfile.itemLabel }}</ion-label>
+        <ion-input type="text" id="dishName" formControlName="dishName" [placeholder]="activeProfile.itemPlaceholder"></ion-input>
+      </div>
+
+      <div class="form-group">
+        <ion-label for="preparationTime">{{ activeProfile.prepLabel }}</ion-label>
+        <div class="prep-time-row">
+          <div class="prep-time-box">
+            <label class="prep-time-label" for="prepHours">Hours</label>
+            <select id="prepHours" class="form-control" [(ngModel)]="prepHours" [ngModelOptions]="{standalone: true}" (change)="onPrepTimeChange()">
+              <option *ngFor="let hour of prepHourOptions" [value]="hour">{{ hour }}</option>
+            </select>
+          </div>
+          <div class="prep-time-box">
+            <label class="prep-time-label" for="prepMinutes">Minutes</label>
+            <select id="prepMinutes" class="form-control" [(ngModel)]="prepMinutes" [ngModelOptions]="{standalone: true}" (change)="onPrepTimeChange()">
+              <option *ngFor="let minute of prepMinuteOptions" [value]="minute">{{ minute }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="prep-time-preview" *ngIf="foodForm.value.preparationTime">{{ foodForm.value.preparationTime }}</div>
+        <ion-input type="hidden" id="preparationTime" formControlName="preparationTime"></ion-input>
+      </div>
+
+      <div class="form-group" *ngFor="let field of activeProfile.dynamicFields">
+        <label [attr.for]="field.key">{{ field.label }}</label>
+        <ion-input
+          *ngIf="field.type === 'text'"
+          [id]="field.key"
+          type="text"
+          [placeholder]="field.placeholder || ''"
+          [formControlName]="field.key"
+        ></ion-input>
+        <select
+          *ngIf="field.type === 'select'"
+          class="form-control"
+          [id]="field.key"
+          [formControlName]="field.key"
+        >
+          <option value="">Select {{ field.label }}</option>
+          <option *ngFor="let option of field.options" [value]="option">{{ option }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <ion-label for="price">{{ priceLabel }}</ion-label>
+        <ion-input type="number" id="price" formControlName="price" placeholder="e.g., 2500"></ion-input>
+      </div>
+
+      <div class="form-group">
+        <ion-label for="availability">Availability</ion-label>
+        <select id="availability" class="form-control" formControlName="availability">
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <div class="upload-box">
+        <div>
+          <h4>Product Image</h4>
+          <p>Use a clear image that best represents this {{ selectedCategoryName.toLowerCase() }} item.</p>
+        </div>
+        <button type="button" class="upload-trigger" (click)="togglePopup()">
+          Upload / Add Image
+          <ion-icon name="arrow-forward-sharp"></ion-icon>
+        </button>
+      </div>
+
+      <div class="image-preview" *ngIf="selectedImage">
+        <img [src]="selectedImage" alt="Selected Image">
+      </div>
+
+      <button type="submit" class="btn btn-primary regSubmitBTN">Submit Item</button>
+    </form>
+
+    <div class="popup-container" [ngClass]="{ 'show-popup': showPopup }">
+      <div class="popup-content">
+        <p class="popINST">Choose where to select media</p>
+        <div class="popIMG">
+          <div class="iconBox">
+            <img src="/assets/img/photo.png" (click)="openFilePicker()">
+            <span class="imgTitle"><br>Photo</span><br>
+            <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelected($event)">
+          </div>
+          <div class="iconBox">
+            <img src="/assets/img/camera.png" (click)="openCamera()">
+            <span class="imgTitle"><br>Camera</span>
+          </div>
+        </div>
+        <button type="button" class="ghost-btn close-sheet" (click)="togglePopup()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <app-loader *ngIf="loaderService.loading"></app-loader>
+</ion-content>

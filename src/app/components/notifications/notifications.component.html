@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Notifications</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="markAllRead()">Mark all read</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-segment [value]="activeFilter" class="filterBar">
+    <ion-segment-button value="system" (click)="setFilter('system')">
+      <ion-label>System</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="my" (click)="setFilter('my')">
+      <ion-label>My Notification</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-list *ngIf="isLoading || !isOnline">
+    <ion-item *ngFor="let s of [1,2,3]">
+      <ion-label>
+        <ion-skeleton-text animated style="width:70%;height:14px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:90%;height:12px;margin-top:6px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:40%;height:10px;margin-top:6px;"></ion-skeleton-text>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="!isLoading">
+    <ion-item
+      *ngFor="let n of filtered; trackBy: trackById"
+      (click)="openNotification(n)"
+      [class.unread]="!n.read"
+    >
+      <ion-label>
+        <h2>{{ n.title }}</h2>
+        <p>{{ n.message }}</p>
+        <p class="time">{{ n.createdAt | date:'short' }}</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="filtered.length === 0">
+      <ion-label>No notifications yet.</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <div class="notification-detail" *ngIf="selectedNotification">
+    <div class="detail-card">
+      <div class="detail-header">
+        <h3>{{ selectedNotification.title }}</h3>
+        <ion-button fill="clear" size="small" (click)="closeNotification()">Close</ion-button>
+      </div>
+      <p class="detail-message">{{ selectedNotification.message }}</p>
+      <div class="detail-meta">
+        <span>{{ selectedNotification.createdAt | date:'fullDate' }}</span>
+        <span>{{ selectedNotification.createdAt | date:'shortTime' }}</span>
+      </div>
+      <div class="detail-actions" *ngIf="canOpenOrder(selectedNotification)">
+        <ion-button (click)="openOrder(selectedNotification)">Open order</ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

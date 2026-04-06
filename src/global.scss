@@ -1,0 +1,445 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import '@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+@import "/src/theme/variables.scss";
+
+body,div,span,input,button,p,h1,h2,h3{
+  font-family: system-ui, monospace, Arial, Helvetica, sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif , ui-sans-serif;
+  }
+//all pages title
+.pageTitle{
+    font-size: 24px;
+    padding-left: 15px;
+    font-weight: 600;
+}
+//all back buttons container div
+.backButton{
+    width: auto;
+    height: auto;
+    align-content: center;
+    justify-items: start;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+//ion-header
+ion-header{
+  padding: 0;
+  background: var(--ion-color-primary);
+  border-bottom: none;
+}
+
+ion-header ion-toolbar{
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+  --min-height: 56px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  min-height: 56px;
+}
+
+ion-header ion-back-button,
+ion-header ion-menu-button,
+ion-header ion-button,
+ion-header ion-icon,
+ion-header ion-title{
+  color: var(--ion-color-primary-contrast);
+}
+
+ion-header ion-title {
+  font-weight: 600;
+  font-size: 18px;
+  padding-inline: 8px;
+}
+
+ion-header ion-buttons[slot="start"] {
+  margin-inline-end: 6px;
+}
+
+ion-header ion-buttons[slot="end"] {
+  margin-inline-start: 6px;
+}
+
+app-back-button ion-button{
+  --color: var(--ion-color-primary-contrast);
+  --border-radius: 0;
+}
+
+//all input height
+ion-input{
+   height:50px; 
+}
+
+/* Notification toast styling */
+.suga-notification-toast {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+  --border-radius: 14px;
+  --box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --max-width: 92vw;
+}
+
+.suga-notification-toast .toast-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.suga-notification-toast .toast-header {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.suga-notification-toast .toast-message {
+  opacity: 0.95;
+}
+
+/* Error toast styling */
+.suga-error-toast {
+  --background: var(--ion-color-danger);
+  --color: var(--ion-color-danger-contrast);
+  --border-radius: 12px;
+  --box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --max-width: 92vw;
+}
+
+.suga-success-toast {
+  --background: var(--ion-color-success);
+  --color: var(--ion-color-success-contrast);
+  --border-radius: 12px;
+  --box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  --max-width: 92vw;
+}
+
+:root {
+  --suga-bg: #fffdf8;
+  --suga-surface: #ffffff;
+  --suga-surface-alt: #fff6e8;
+  --suga-surface-muted: #f6f1e9;
+  --suga-border: #f0d7af;
+  --suga-text: #2a2f3a;
+  --suga-muted: #7a8596;
+  --suga-accent: #2c6ac2;
+  --suga-accent-2: #ffb347;
+  --suga-input-bg: #f8fafc;
+  --suga-input-border: #d9deea;
+  --suga-skeleton: rgba(49, 113, 224, 0.18);
+  --suga-skeleton-rgb: 49, 113, 224;
+}
+
+body.suga-light-theme {
+  color-scheme: light;
+  --ion-background-color: var(--suga-bg);
+  --ion-background-color-rgb: 255, 253, 248;
+  --ion-text-color: var(--suga-text);
+  --ion-text-color-rgb: 42, 47, 58;
+  --ion-card-background: var(--suga-surface);
+  --ion-item-background: var(--suga-surface);
+  --suga-surface: #ffffff;
+  --suga-surface-alt: #fff6e8;
+  --suga-surface-muted: #f6f1e9;
+  --suga-border: #f0d7af;
+  --suga-text: #2a2f3a;
+  --suga-muted: #7a8596;
+  --suga-accent: #2c6ac2;
+  --suga-accent-2: #ffb347;
+  --suga-input-bg: #f8fafc;
+  --suga-input-border: #d9deea;
+  --suga-skeleton: rgba(49, 113, 224, 0.18);
+  --suga-skeleton-rgb: 49, 113, 224;
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-color: var(--suga-text);
+  --ion-color-primary-text: #64748b;
+  --ion-color-primary-background: #e7eef9;
+  --ion-color-primary-modal: #f0f4fb;
+}
+
+body.suga-dark-theme {
+  color-scheme: dark;
+  --ion-background-color: #0f172a;
+  --ion-background-color-rgb: 15, 23, 42;
+  --ion-text-color: #e5e7eb;
+  --ion-text-color-rgb: 229, 231, 235;
+  --ion-card-background: #111827;
+  --ion-item-background: #111827;
+  --suga-surface: #111827;
+  --suga-surface-alt: #0b1220;
+  --suga-surface-muted: #1f2933;
+  --suga-border: #1f2933;
+  --suga-text: #e5e7eb;
+  --suga-muted: #9ca3af;
+  --suga-accent: #22c55e;
+  --suga-accent-2: #38bdf8;
+  --suga-input-bg: #1f2a3b;
+  --suga-input-border: #3c475a;
+  --suga-skeleton: rgba(255, 255, 255, 0.16);
+  --suga-skeleton-rgb: 255, 255, 255;
+  --ion-toolbar-background: #111827;
+  --ion-toolbar-color: #e5e7eb;
+  --ion-color-primary-text: #9ca3af;
+  --ion-color-primary-background: #1f2933;
+  --ion-color-primary-modal: #1f2933;
+  --ion-color-primary: #22c55e;
+  --ion-color-primary-contrast: #0b1220;
+}
+
+body.suga-light-theme ion-content,
+body.suga-dark-theme ion-content {
+  --background: var(--ion-background-color);
+}
+
+body.suga-dark-theme,
+body.suga-dark-theme ion-app,
+body.suga-dark-theme ion-router-outlet,
+body.suga-dark-theme ion-page {
+  background: var(--ion-background-color) !important;
+  color: var(--ion-text-color);
+}
+
+body.suga-dark-theme ion-footer,
+body.suga-dark-theme ion-item,
+body.suga-dark-theme ion-list,
+body.suga-dark-theme ion-menu,
+body.suga-dark-theme ion-menu ion-content {
+  --background: var(--suga-surface) !important;
+  background: var(--suga-surface) !important;
+  color: var(--ion-text-color) !important;
+  border-color: var(--suga-border) !important;
+}
+
+body.suga-dark-theme ion-header,
+body.suga-dark-theme ion-toolbar {
+  --background: var(--ion-color-primary) !important;
+  background: var(--ion-color-primary) !important;
+  color: var(--ion-color-primary-contrast) !important;
+}
+
+body.suga-dark-theme ion-modal,
+body.suga-dark-theme ion-popover,
+body.suga-dark-theme ion-alert,
+body.suga-dark-theme ion-action-sheet {
+  --background: var(--suga-surface) !important;
+  --ion-background-color: var(--suga-surface) !important;
+  color: var(--ion-text-color) !important;
+}
+
+body.suga-dark-theme ion-modal::part(content),
+body.suga-dark-theme ion-popover::part(content),
+body.suga-dark-theme ion-alert::part(content),
+body.suga-dark-theme ion-action-sheet::part(content) {
+  background: var(--suga-surface) !important;
+  color: var(--ion-text-color) !important;
+}
+
+body.suga-dark-theme .mainContainer,
+body.suga-dark-theme .topContainer,
+body.suga-dark-theme .exploreTop,
+body.suga-dark-theme .control,
+body.suga-dark-theme .tabs,
+body.suga-dark-theme .menuTop,
+body.suga-dark-theme .menuItems {
+  background: var(--ion-background-color) !important;
+  color: var(--ion-text-color) !important;
+}
+
+body.suga-dark-theme .glass,
+body.suga-dark-theme .chef-card,
+body.suga-dark-theme .stat-card,
+body.suga-dark-theme .video-card,
+body.suga-dark-theme .follower-item,
+body.suga-dark-theme .order-card,
+body.suga-dark-theme .orderHistoryTab,
+body.suga-dark-theme .tx-row,
+body.suga-dark-theme .wallet-form,
+body.suga-dark-theme .empty,
+body.suga-dark-theme .skeleton-card,
+body.suga-dark-theme .skeleton-row,
+body.suga-dark-theme .settings-card,
+body.suga-dark-theme .chef-my-food-item,
+body.suga-dark-theme .food-card,
+body.suga-dark-theme .notification-card {
+  background: var(--suga-surface) !important;
+  color: var(--ion-text-color) !important;
+  border: 1px solid var(--suga-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.suga-dark-theme .profile-btn,
+body.suga-dark-theme .action,
+body.suga-dark-theme .menuLink,
+body.suga-dark-theme .control span {
+  color: var(--ion-text-color) !important;
+}
+
+ion-modal.suga-order-fullsheet::part(content) {
+  --height: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+body.suga-dark-theme input,
+body.suga-dark-theme textarea,
+body.suga-dark-theme select,
+body.suga-dark-theme ion-input,
+body.suga-dark-theme ion-textarea,
+body.suga-dark-theme ion-select {
+  --background: var(--suga-input-bg) !important;
+  background: var(--suga-input-bg) !important;
+  color: var(--ion-text-color) !important;
+  border-color: var(--suga-input-border) !important;
+}
+
+body.suga-dark-theme .form-group ion-input,
+body.suga-dark-theme .form-group select {
+  border-color: var(--suga-input-border) !important;
+  box-shadow: none !important;
+}
+/* In your global styles or relevant SCSS file */
+.no-scroll {
+    overflow: hidden;
+  }
+  
+select{
+  width:90%;
+  height:50px;  
+  border:none;
+}
+
+
+.regSubmitBTN{
+    background-color: var(--ion-color-primary-food);
+    width: 96%;
+    margin-left: 2%;
+    height: 50px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px 3px var(--ion-color-primary-food);
+    border: none;
+    font-size: x-large;
+    color: white;
+}
+.left-align-buttons .action-sheet-button-inner.sc-ion-action-sheet-ios {
+    justify-content: flex-start;
+  }
+
+/* Skeleton theme */
+ion-skeleton-text {
+  --background: var(--suga-skeleton, rgba(49, 113, 224, 0.18));
+  --background-rgb: var(--suga-skeleton-rgb, 49, 113, 224);
+  --border-radius: 10px;
+}
+  .container{
+    width: 100%;
+     }
+  .warning{
+    width:90%;margin-left: 5%;
+    padding:5px 5px 5px 5px;
+    background-color:var(--ion-color-primary-food);
+    color:var( --ion-color-warning-contrast);
+    font-size:var(--font-strong);
+    height: auto;
+    border-radius: 5px;
+}
+.instructions{
+    width:90%;
+    height:100px;
+    margin-top:15px;
+    margin-left:5%;
+}
+p{
+    font-size:var(--font-strong);
+}
+h2{
+    font-size:var(--font-strong-h2);
+.greetingH2{
+    padding-left: 15px;
+}
+    
+   }
+   .greetings-profile{
+    width:98%;
+    margin-left: 1%;
+   }
+   .glass{
+    background:var(--ion-color-primary-food);
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(5px);
+-webkit-backdrop-filter: blur(5px);
+border: 1px solid #2c6bc240;
+   }
+   .Title h2{
+    font-weight: 600;
+   }
+   
+
+   .error-message {
+    color: var(--ion-color-danger);
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .prompt-message {
+    color: var( --ion-color-success );
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: center;
+  }
+    .form-group{
+    width: 100%;
+    
+  }
+
+  .form-group ion-label{
+    padding: 10px 0 0 10px;
+  }
+
+  .form-group   ion-input{
+    border: 2px solid #dcdcdc;
+    margin-top: 20px;
+    width: 96%;
+    height: 65px;
+    margin-left: 2%;
+    border-radius: 10px;
+    box-shadow: 0px 0px 1px #b9b9b9;
+    z-index:0;
+  }
+    .form-group   select{
+    border: 2px solid #dcdcdc;
+    margin-top: 20px;
+    width: 96%;
+    height: 70px;
+    margin-left: 2%;
+    border-radius: 10px;
+    box-shadow: 0px 0px 1px #b9b9b9;
+  }
+  //close icons butto stryle
+
+     .close{
+        justify-self: end;
+        margin-right: 25px;
+    }
+    .close ion-icon{
+        font-size: 35px;
+        color:#c6c6c7;
+    }
+@import "~leaflet/dist/leaflet.css";

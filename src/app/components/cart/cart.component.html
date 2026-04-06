@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <app-back-button></app-back-button>
+    </ion-buttons>
+    <ion-title>Your Cart</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="cart-page">
+    <div class="empty-state" *ngIf="!items.length">
+      <p>Your cart is empty.</p>
+      <ion-button routerLink="/components/explore">Browse Dishes</ion-button>
+    </div>
+
+    <div *ngIf="items.length">
+      <div class="cart-item" *ngFor="let item of items">
+        <div class="item-main">
+          <h3>{{ item.dishName | titlecase }}</h3>
+          <p>@{{ item.chefUsername }}</p>
+          <p>{{ item.category }}</p>
+        </div>
+        <div class="item-actions">
+          <div class="qty">
+            <button type="button" (click)="decrease(item)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button type="button" (click)="increase(item)">+</button>
+          </div>
+          <div class="line-price">₦{{ item.price * item.quantity | number:'1.0-0' }}</div>
+          <button class="remove" type="button" (click)="remove(item)">Remove</button>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div><span>Subtotal</span><strong>₦{{ subtotal | number:'1.0-0' }}</strong></div>
+        <div><span>Fee (10%)</span><strong>₦{{ feeAmount | number:'1.0-0' }}</strong></div>
+        <div class="total"><span>Total</span><strong>₦{{ totalAmount | number:'1.0-0' }}</strong></div>
+      </div>
+
+      <ion-button expand="block" color="danger" fill="outline" (click)="clearCart()" [disabled]="isSubmitting">
+        Clear Cart
+      </ion-button>
+      <ion-button expand="block" color="success" (click)="checkout()" [disabled]="isSubmitting">
+        Checkout
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

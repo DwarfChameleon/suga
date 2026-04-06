@@ -1,0 +1,24 @@
+<div class="profile-completeness-card" *ngIf="profile">
+  <div class="card-header">
+    <div>
+      <h3>Profile Completeness</h3>
+      <p>{{ percent }}% complete</p>
+    </div>
+    <button class="cta-btn" (click)="openProfile()" [disabled]="percent === 100">
+      {{ percent === 100 ? 'Complete' : 'Finish Now' }}
+    </button>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" [style.width.%]="percent"></div>
+  </div>
+
+  <div class="missing-list" *ngIf="missingItems.length > 0; else allDone">
+    <span *ngFor="let item of missingItems.slice(0, 4)" class="missing-chip">{{ item }}</span>
+    <span *ngIf="missingItems.length > 4" class="missing-chip more">+{{ missingItems.length - 4 }} more</span>
+  </div>
+
+  <ng-template #allDone>
+    <div class="done-message">Nice. Your profile is complete.</div>
+  </ng-template>
+</div>

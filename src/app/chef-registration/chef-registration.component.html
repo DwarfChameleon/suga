@@ -1,0 +1,128 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="registration" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="hero">
+    <h2>Chef Signup</h2>
+    <p>Step 1 role is done. Add country details, then account details.</p>
+  </div>
+
+  <div class="warning" *ngIf="invalidFormMessage">{{ invalidFormMessage }}</div>
+  <div *ngIf="errorMessage" class="error-message warning">{{ errorMessage }}</div>
+
+  <div class="reg-container">
+    <div class="form-card">
+      <div class="step-row">
+        <button type="button" class="step-pill done">1. Role</button>
+        <button type="button" class="step-pill" [class.active]="currentStep === 2" (click)="goToStep(2)">2. Country</button>
+        <button type="button" class="step-pill" [class.active]="currentStep === 3" (click)="goToStep(3)">3. Account</button>
+      </div>
+
+      <form [formGroup]="registrationForm" (ngSubmit)="submitForm()">
+        <div class="step-panel" *ngIf="currentStep === 2">
+          <div class="form-group">
+            <ion-label>Service Country</ion-label>
+            <ion-select formControlName="country" interface="popover" placeholder="Select country" (ionChange)="onCountryChange()">
+              <ion-select-option *ngFor="let c of countryOptions" [value]="c">{{ c }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('region') && isSelectField('region')">
+            <ion-label>{{ getFieldLabel('region', 'Region') }}</ion-label>
+            <ion-select formControlName="region" interface="popover" (ionChange)="onRegionOrStateChange()">
+              <ion-select-option *ngFor="let r of regions" [value]="r">{{ r }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('region') && !isSelectField('region')">
+            <ion-label>{{ getFieldLabel('region', 'Region') }}</ion-label>
+            <ion-input formControlName="region" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('state') && isSelectField('state')">
+            <ion-label>{{ getFieldLabel('state', 'State') }}</ion-label>
+            <ion-select formControlName="state" interface="popover" (ionChange)="onRegionOrStateChange()">
+              <ion-select-option *ngFor="let s of states" [value]="s">{{ s }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('state') && !isSelectField('state')">
+            <ion-label>{{ getFieldLabel('state', 'State') }}</ion-label>
+            <ion-input formControlName="state" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('city') && isSelectField('city')">
+            <ion-label>{{ getFieldLabel('city', 'City') }}</ion-label>
+            <ion-select formControlName="city" interface="popover">
+              <ion-select-option *ngFor="let city of cities" [value]="city">{{ city }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('city') && !isSelectField('city')">
+            <ion-label>{{ getFieldLabel('city', 'City') }}</ion-label>
+            <ion-input formControlName="city" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('localGovernment')">
+            <ion-label>{{ getFieldLabel('localGovernment', 'Local Government') }}</ion-label>
+            <ion-input formControlName="localGovernment" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('suburb')">
+            <ion-label>{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
+            <ion-input formControlName="suburb" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('street')">
+            <ion-label>{{ getFieldLabel('street', 'Street') }}</ion-label>
+            <ion-input formControlName="street" type="text"></ion-input>
+          </div>
+
+          <ion-button type="button" expand="block" class="regSubmitBTN" (click)="goToStep(3)">Continue to Account</ion-button>
+        </div>
+
+        <div class="step-panel" *ngIf="currentStep === 3">
+          <div class="form-group">
+            <ion-label>Username</ion-label>
+            <ion-input formControlName="username" type="text" placeholder="Choose username"></ion-input>
+          </div>
+
+          <div class="form-group">
+            <ion-label>Email</ion-label>
+            <ion-input formControlName="email" type="email" placeholder="you@example.com"></ion-input>
+          </div>
+
+          <div class="form-group">
+            <ion-label>Phone Number</ion-label>
+            <ion-input formControlName="phoneNumber" type="tel" placeholder="+2348012345678"></ion-input>
+          </div>
+
+          <div class="form-group">
+            <ion-label>Password</ion-label>
+            <ion-input type="password" formControlName="password" placeholder="At least 6 characters"></ion-input>
+          </div>
+
+          <div class="action-row">
+            <ion-button type="button" fill="outline" class="back-btn" (click)="goToStep(2)">Back</ion-button>
+            <ion-button type="submit" class="regSubmitBTN">Create Account</ion-button>
+          </div>
+
+          <div class="google-register">
+            <app-google-signin
+              [role]="'chef'"
+              [context]="'register'"
+              (authenticated)="onGoogleAuthenticated($event)">
+            </app-google-signin>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <app-loader *ngIf="loaderService.loading"></app-loader>
+</ion-content>

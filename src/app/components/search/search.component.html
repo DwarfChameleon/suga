@@ -1,0 +1,64 @@
+<ion-content>
+  <div class="search-page">
+    <div class="search-header">
+      <div class="header-row">
+        <ion-button fill="clear" size="small" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h2 class="primary-heading">Search</h2>
+      </div>
+      <div class="search-box">
+        <ion-icon name="search-outline"></ion-icon>
+        <input [(ngModel)]="query" (input)="search()" placeholder="Search dishes, chefs, categories, hashtags, @mentions..." />
+      </div>
+    </div>
+
+    <div class="quick-links">
+      <div class="section-title">Quick Links</div>
+      <div class="chips">
+        <button *ngFor="let link of filteredQuickLinks()" (click)="goTo(link.route)">{{ link.label }}</button>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="state">Searching...</div>
+
+    <ng-container *ngIf="results">
+      <div class="result-section">
+        <div class="section-title">Foods</div>
+        <div *ngIf="!results.foods.length" class="empty">No foods found.</div>
+        <div class="grid">
+          <div class="result-card" *ngFor="let food of results.foods" (click)="openFood(food._id)">
+            <div class="card-title">{{ food.dishName }}</div>
+            <div class="card-sub">@{{ food.chef }} · {{ food.category }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-section">
+        <div class="section-title">Videos</div>
+        <div *ngIf="!results.videos.length" class="empty">No videos found.</div>
+        <div class="grid">
+          <div class="result-card" *ngFor="let video of results.videos" (click)="openVideo(video._id)">
+            <div class="card-title">@{{ video.username }}</div>
+            <div class="card-sub">{{ video.description }}</div>
+            <div class="tag-row">
+              <span *ngFor="let tag of video.hashtags" (click)="$event.stopPropagation(); openTag(tag)">#{{ tag }}</span>
+              <span *ngFor="let mention of video.mentions" (click)="$event.stopPropagation(); openMention(mention)">@{{ mention }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-section">
+        <div class="section-title">Users</div>
+        <div *ngIf="!results.users.length" class="empty">No users found.</div>
+        <div class="grid">
+          <div class="result-card" *ngFor="let user of results.users" (click)="openUser(user.username)">
+            <div class="card-title">@{{ user.username }}</div>
+            <div class="card-sub">{{ user.roles?.join(', ') }}</div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ion-content>

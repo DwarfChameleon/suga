@@ -1,0 +1,75 @@
+<ion-content>
+  <div class="login-container">
+
+    <div *ngIf="loginError" class="error-message warning">
+      {{ loginError }}
+    </div>
+
+    <div class="modal">
+
+      <div class="close">
+        <ion-icon
+          name="close-circle-outline"
+          size="large"
+          (click)="dismiss()">
+        </ion-icon>
+      </div>
+
+      <div class="signIn" align="center">
+        <h2>Sign in</h2>
+        <p>to continue enjoying our app!</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+        <div class="form-group">
+          <ion-label position="floating">Username</ion-label>
+          <ion-input
+            formControlName="username"
+            [(ngModel)]="credentials.username"
+            type="text">
+          </ion-input>
+        </div>
+
+        <div class="form-group">
+          <ion-label position="floating">Password</ion-label>
+          <ion-input
+            formControlName="password"
+            [(ngModel)]="credentials.password"
+            type="password">
+          </ion-input>
+        </div>
+
+        <ion-button
+          type="submit"
+          expand="block"
+          [disabled]="isSubmitting"
+          class="regSubmitBTN modalBTN">
+          Sign In
+        </ion-button>
+
+        <div class="google-login">
+          <app-google-signin
+            [role]="'consumer'"
+            [context]="'login'"
+            (authenticated)="onGoogleAuthenticated($event)">
+          </app-google-signin>
+        </div>
+
+        <div align="center">
+          <a routerLink="/forgot-password" class="small-text">
+            Forgot Password?
+          </a>
+        </div>
+
+        <div class="newAccount">
+          <p>
+            Don't have an account?
+            <button type="button" class="signup-link-btn" (click)="goToRegistration()">Sign up</button>
+          </p>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</ion-content>

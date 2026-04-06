@@ -1,0 +1,66 @@
+<ion-app>
+  <div class="network-banner" *ngIf="!isInternetOnline">
+    <ion-icon name="wifi-outline"></ion-icon>
+    <span>No internet connection. Check your network.</span>
+  </div>
+  <ion-split-pane contentId="main-content">
+    <ion-menu contentId="main-content" type="overlay">
+      <ion-content>
+
+          
+          <div class="menuTop">
+            <h2>SUGA</h2>
+            <div  *ngIf="isLoggedIn; else loggedOut">
+              @{{ userName }}
+            </div>
+            <ng-template #loggedOut>
+              <a [routerLink]="'/login'"><ion-icon name="log-in-outline"></ion-icon></a>
+            </ng-template>
+          </div>
+
+       <div class="menuItems">
+        <div class="menuList">
+         
+        
+           
+          <a (click)="closeMenu()" [routerLink]="'/components/explore'" class="menuLink"><div class="menuIcons"><ion-icon name="home"></ion-icon> <span class="menuLabel"> Explore</span></div></a>
+          <a (click)="closeMenu()" [routerLink]="'/components/search'" class="menuLink"><div class="menuIcons"><ion-icon name="search-outline"></ion-icon> <span class="menuLabel"> Search</span></div></a>
+          <a (click)="closeMenu()" [routerLink]="'/components/story'" class="menuLink"><div class="menuIcons"><ion-icon name="play-circle-outline"></ion-icon><span class="menuLabel"> Food Story</span></div></a>
+          <a *ngIf="isLoggedIn && isConsumer()" (click)="closeMenu()" [routerLink]="'/components/cart'" class="menuLink">
+            <div class="menuIcons"><ion-icon name="cart-outline"></ion-icon><span class="menuLabel"> Cart</span></div>
+          </a>
+          <a *ngIf="isLoggedIn && isAdmin()" (click)="openAdminDashboard()" class="menuLink">
+            <div class="menuIcons"><ion-icon name="shield-checkmark-outline"></ion-icon><span class="menuLabel"> Admin Panel</span></div>
+          </a>
+          <a *ngIf="isLoggedIn" (click)="closeMenu()" [routerLink]="'/components/notifications'" class="menuLink">
+            <div class="menuIcons">
+              <ion-icon name="notifications-outline"></ion-icon>
+              <span class="menuLabel"> Notifications</span>
+              <ion-badge *ngIf="unreadCount > 0" color="danger">{{ unreadCount }}</ion-badge>
+            </div>
+          </a>
+          <a *ngIf="isLoggedIn" (click)="handleAccountClick()" class="menuLink"><div class="menuIcons"><ion-icon name="key-outline"></ion-icon><span class="menuLabel"> My Account</span></div></a>
+          <a *ngIf="!isLoggedIn" (click)="handleAccountClick()" class="menuLink">
+            <div class="menuIcons"><ion-icon name="log-in-outline"></ion-icon><span class="menuLabel"> Login</span></div>
+          </a>
+          <a *ngIf="isLoggedIn" (click)="logout()" class="menuLink">
+            <div class="menuIcons"><ion-icon name="log-out-outline"></ion-icon><span class="menuLabel"> Logout</span></div>
+          </a>
+          <a *ngIf="isLoggedIn" (click)="openSettings()" class="menuLink"><div class="menuIcons"><ion-icon name="settings-outline"></ion-icon><span class="menuLabel"> Settings</span></div></a>
+          <a *ngIf="isLoggedIn" (click)="closeMenu()" [routerLink]="'/components/logs'" class="menuLink">
+            <div class="menuIcons"><ion-icon name="bug-outline"></ion-icon><span class="menuLabel"> App Logs</span></div>
+          </a>
+   
+         
+        </div>
+        </div>
+  
+
+        
+     
+
+      </ion-content>
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>

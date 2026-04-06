@@ -1,0 +1,107 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/components/wallet"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Points & Rewards</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="openStoryPage()" aria-label="Story page">
+        <ion-icon slot="icon-only" name="play-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="rewards-hero">
+    <h2>Your Rewards Activity</h2>
+    <p>Earn points, convert to tokens, and swap tokens to wallet balance.</p>
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <h3>Activity Trend</h3>
+      <button class="collapse-toggle" type="button" (click)="toggleSection('trend')">
+        <ion-icon [name]="sections.trend ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+      </button>
+    </div>
+    <div class="card-body" *ngIf="sections.trend">
+      <div class="chart">
+        <div class="bar" *ngFor="let item of activity" [style.height.%]="(item.points / maxPoints()) * 100">
+          <span>{{ item.points }}</span>
+          <small>{{ item.day }}</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h3>How Points Are Earned</h3>
+      <button class="collapse-toggle" type="button" (click)="toggleSection('guidelines')">
+        <ion-icon [name]="sections.guidelines ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+      </button>
+    </div>
+    <div class="card-body" *ngIf="sections.guidelines">
+      <ul class="guidelines">
+        <li *ngFor="let rule of guidelines">
+          <strong>+{{ rule.points }} pts</strong> — {{ rule.action }}
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h3>Point History</h3>
+      <button class="collapse-toggle" type="button" (click)="toggleSection('history')">
+        <ion-icon [name]="sections.history ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+      </button>
+    </div>
+    <div class="card-body" *ngIf="sections.history">
+      <div *ngIf="history.length === 0" class="empty">No reward activity yet.</div>
+      <div class="history-list">
+        <button type="button" class="history-row" *ngFor="let row of history" (click)="selectHistory(row)">
+          <div class="meta">
+            <div class="action">{{ displayHistoryLabel(row) }}</div>
+            <div class="time">{{ row.createdAt | date:'medium' }}</div>
+          </div>
+          <div class="amount">
+            +{{ row.points }} pts
+            <span *ngIf="row.tokens"> · +{{ row.tokens }} tokens</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="history-detail" *ngIf="selectedHistory">
+        <div class="history-detail-top">
+          <div>
+            <h4>{{ displayHistoryLabel(selectedHistory) }}</h4>
+            <p>{{ selectedHistory.createdAt | date:'medium' }}</p>
+          </div>
+          <div class="detail-score">+{{ selectedHistory.points }} pts</div>
+        </div>
+
+        <div class="detail-chips">
+          <button *ngIf="selectedHistory.meta?.orderId" class="chip" type="button" (click)="openOrder(selectedHistory.meta?.orderId)">Open order</button>
+          <button *ngIf="selectedHistory.meta?.chefId" class="chip" type="button" (click)="openChefProfileById(selectedHistory.meta?.chefId)">Open chef</button>
+          <button *ngIf="selectedHistory.meta?.foodId" class="chip" type="button" (click)="openFood(selectedHistory.meta?.foodId)">Open dish</button>
+          <button *ngIf="selectedHistory.meta?.category" class="chip" type="button" (click)="openCategory(selectedHistory.meta?.category)">Open category</button>
+          <button *ngIf="selectedHistory.meta?.videoId" class="chip" type="button" (click)="openStoryPage()">Open story</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card tips" *ngIf="tips.length">
+    <div class="card-head">
+      <h3>Quick Tips</h3>
+      <button class="collapse-toggle" type="button" (click)="toggleSection('tips')">
+        <ion-icon [name]="sections.tips ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+      </button>
+    </div>
+    <div class="card-body" *ngIf="sections.tips">
+      <p *ngFor="let tip of tips">{{ tip }}</p>
+    </div>
+  </section>
+</ion-content>

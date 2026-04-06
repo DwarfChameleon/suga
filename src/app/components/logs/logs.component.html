@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="components/explore" text="" icon="arrow-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>App Logs</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="logs-page">
+    <div class="toolbar">
+      <select [(ngModel)]="filterLevel">
+        <option value="all">All</option>
+        <option value="error">Errors</option>
+        <option value="warn">Warnings</option>
+        <option value="info">Info</option>
+      </select>
+      <input type="text" [(ngModel)]="search" placeholder="Search logs" />
+      <button class="btn" (click)="copyLogs()">Copy</button>
+      <button class="btn danger" (click)="clearLogs()">Clear</button>
+    </div>
+
+    <div class="log-list">
+      <div *ngIf="filteredLogs().length === 0" class="empty">No logs yet.</div>
+      <div *ngFor="let log of filteredLogs()" class="log-card" [class.error]="log.level === 'error'" [class.warn]="log.level === 'warn'">
+        <div class="log-meta">
+          <span class="level">{{ log.level | uppercase }}</span>
+          <span class="time">{{ log.createdAt | date:'short' }}</span>
+        </div>
+        <div class="message">{{ log.message }}</div>
+        <pre *ngIf="log.stack" class="stack">{{ log.stack }}</pre>
+        <pre *ngIf="log.context" class="context">{{ log.context | json }}</pre>
+        <div class="url" *ngIf="log.url">{{ log.url }}</div>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,109 @@
+<ion-content>
+  <div class="payment-modal">
+    <div class="modal-header">
+      <div class="title">Payment</div>
+      <button class="close-btn" (click)="close()">
+        <ion-icon name="close-circle"></ion-icon>
+      </button>
+    </div>
+
+    <div class="summary-card">
+      <div class="row">
+        <span>{{ summaryLabel ? 'Items' : 'Dish' }}</span>
+        <strong>{{ summaryLabel || dishName }}</strong>
+      </div>
+      <div class="row">
+        <span>Price</span>
+        <strong>{{ price | number:'1.2-2' }}</strong>
+      </div>
+      <div class="row">
+        <span>Fee (10%)</span>
+        <strong>{{ feeAmount | number:'1.2-2' }}</strong>
+      </div>
+      <div class="row" *ngIf="deliveryFee !== undefined">
+        <span>Delivery</span>
+        <strong>{{ deliveryFee | number:'1.2-2' }}</strong>
+      </div>
+      <div class="row total">
+        <span>Total</span>
+        <strong>{{ totalAmount | number:'1.2-2' }}</strong>
+      </div>
+    </div>
+
+    <div class="local-pay" [class.disabled]="localPayDisabled">
+      <div class="section-title">Pay with Wallet / Tokens</div>
+      <div class="balances">
+        <div>Wallet: <strong>{{ walletBalance | number:'1.2-2' }}</strong></div>
+        <div>Tokens: <strong>{{ tokenBalance }}</strong> ({{ tokenNairaValue | number:'1.2-2' }})</div>
+      </div>
+      <div class="method-options">
+        <label>
+          <input type="radio" name="localPay" value="wallet" [(ngModel)]="localPayMethod" (change)="onLocalPayMethodChange()" [disabled]="!canUseWallet"/>
+          Wallet only
+        </label>
+        <label>
+          <input type="radio" name="localPay" value="token" [(ngModel)]="localPayMethod" (change)="onLocalPayMethodChange()" [disabled]="!canUseToken"/>
+          Tokens only
+        </label>
+        <label>
+          <input type="radio" name="localPay" value="split" [(ngModel)]="localPayMethod" (change)="onLocalPayMethodChange()" [disabled]="!canSplit"/>
+          Split
+        </label>
+      </div>
+
+      <div *ngIf="localPayMethod === 'split'" class="split-inputs">
+        <label>Tokens to use</label>
+        <input type="number" min="0" [(ngModel)]="tokenAmount" />
+        <label>Wallet amount</label>
+        <input type="number" min="0" [(ngModel)]="walletAmount" />
+      </div>
+
+      <div class="hint" *ngIf="localPayDisabled">
+        Wallet/token balances are insufficient. Use Paystack below.
+      </div>
+
+      <button class="pay-btn wallet" [disabled]="isSubmitting || localPayDisabled" (click)="payWithWalletOrTokens()">
+        Pay Now
+      </button>
+    </div>
+
+    <div class="reauth">
+      <label>Confirm with password</label>
+      <input type="password" [(ngModel)]="password" placeholder="Enter password" />
+    </div>
+    <div class="reauth">
+      <label>Payment Method</label>
+      <select [(ngModel)]="payMethod" (change)="onPayMethodChange()">
+        <option value="BankTransfer">Bank Transfer (OPay)</option>
+        <option value="OpayWalletNgQR">OPay Wallet (QR)</option>
+        <option value="OpayWalletNg">OPay Wallet (Account)</option>
+        <option value="Paystack">Paystack</option>
+      </select>
+    </div>
+    <div class="reauth">
+      <label>OPay Account Number</label>
+      <input
+        type="text"
+        [(ngModel)]="walletAccount"
+        [disabled]="payMethod !== 'OpayWalletNg'"
+        [placeholder]="payMethod === 'OpayWalletNg' ? 'Enter OPay account number' : 'Required only for OPay Wallet (Account)'"
+      />
+    </div>
+    <div class="reauth" *ngIf="payMethod === 'Paystack'">
+      <label>Email Address</label>
+      <input
+        type="email"
+        [(ngModel)]="paystackEmail"
+        placeholder="Enter email for Paystack payment"
+      />
+    </div>
+    <div *ngIf="paymentHint" class="hint">{{ paymentHint }}</div>
+
+    <button class="pay-btn" *ngIf="!transactionId" [disabled]="isSubmitting" (click)="continueToPayment()">
+      Continue to {{ paymentProvider === 'paystack' ? 'Paystack' : 'OPay' }}
+    </button>
+    <button class="pay-btn verify" *ngIf="transactionId" [disabled]="isSubmitting" (click)="verifyPayment()">
+      Verify Payment
+    </button>
+  </div>
+</ion-content>

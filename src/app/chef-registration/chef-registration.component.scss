@@ -1,0 +1,134 @@
+@import "/src/theme/variables.scss";
+
+.hero {
+  margin: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, #114b8b 0%, #2f8b4b 100%);
+}
+
+.hero h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.hero p {
+  margin: 0;
+  opacity: 0.95;
+}
+
+.warning {
+  width: calc(100% - 32px);
+  margin: 0 16px 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: #ffe7cc;
+  color: #7a4b00;
+  font-size: 14px;
+}
+
+.reg-container {
+  width: 100%;
+  padding: 0 16px 24px;
+}
+
+.form-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 18px 16px;
+  box-shadow: 0 14px 30px rgba(18, 35, 66, 0.12);
+  border: 1px solid rgba(17, 34, 68, 0.08);
+}
+
+.step-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.step-pill {
+  border: 0;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #46607d;
+}
+
+.step-pill.done {
+  background: #d9f7e6;
+  color: #16653b;
+}
+
+.step-pill.active {
+  background: #e4ecff;
+  color: #18469c;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+ion-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #415066;
+}
+
+ion-input,
+ion-select {
+  --background: #f6f8fc;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --border-radius: 12px;
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  min-height: 46px;
+}
+
+.regSubmitBTN {
+  margin-top: 14px;
+  height: 52px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.step-panel {
+  animation: fadeIn 180ms ease;
+}
+
+.google-register {
+  margin-top: 10px;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #627185;
+}
+
+.action-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 8px;
+}
+
+.back-btn {
+  height: 52px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

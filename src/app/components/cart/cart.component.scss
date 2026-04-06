@@ -1,0 +1,88 @@
+.cart-page {
+  padding: 16px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.header-row h2 {
+  margin: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 24px 8px;
+}
+
+.cart-item {
+  background: var(--suga-surface);
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.item-main h3 {
+  margin: 0 0 4px 0;
+}
+
+.item-main p {
+  margin: 2px 0;
+  font-size: 12px;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: var(--suga-input-bg);
+}
+
+.line-price {
+  font-weight: 600;
+}
+
+.remove {
+  border: none;
+  background: transparent;
+  color: var(--ion-color-danger);
+}
+
+.summary {
+  background: var(--suga-surface);
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.summary div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.summary .total {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 16px;
+}
