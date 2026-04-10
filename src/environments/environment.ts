@@ -4,7 +4,7 @@
 
 const resolveBackendBaseUrl = (): string => {
   const localhostBase = 'http://localhost:5000';
-  const fallbackTunnelBase = 'https://dclv5j4m-5000.uks1.devtunnels.ms';
+  const renderBackendBase = 'https://suga-server.onrender.com';
 
   if (typeof window === 'undefined') {
     return localhostBase;
@@ -14,9 +14,9 @@ const resolveBackendBaseUrl = (): string => {
   const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
   const isNativeApp = !!(window as any)?.Capacitor?.isNativePlatform?.();
 
-  // Native app webview uses localhost origin but backend is remote tunnel in dev.
+  // Native app webview uses localhost origin, so point it to the hosted backend.
   if (isLocalHost && isNativeApp) {
-    return fallbackTunnelBase;
+    return renderBackendBase;
   }
 
   // Browser localhost frontend -> localhost backend.
@@ -35,7 +35,7 @@ const resolveBackendBaseUrl = (): string => {
     return `${protocol}//${hostname}:5000`;
   }
 
-  return fallbackTunnelBase;
+  return renderBackendBase;
 };
 
 const backendBaseUrl = resolveBackendBaseUrl();

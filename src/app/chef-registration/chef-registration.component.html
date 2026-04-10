@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="registration-content">
   <div class="hero">
     <h2>Chef Signup</h2>
     <p>Step 1 role is done. Add country details, then account details.</p>
@@ -110,7 +110,7 @@
 
           <div class="action-row">
             <ion-button type="button" fill="outline" class="back-btn" (click)="goToStep(2)">Back</ion-button>
-            <ion-button type="submit" class="regSubmitBTN">Create Account</ion-button>
+            <ion-button type="button" class="regSubmitBTN" [disabled]="isSubmitting" (click)="submitForm()">Create Account</ion-button>
           </div>
 
           <div class="google-register">

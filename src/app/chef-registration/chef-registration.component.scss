@@ -1,5 +1,13 @@
 @import "/src/theme/variables.scss";
 
+.registration-content {
+  --padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
+.registration-content::part(scroll) {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
 .hero {
   margin: 16px;
   padding: 18px;
@@ -30,7 +38,7 @@
 
 .reg-container {
   width: 100%;
-  padding: 0 16px 24px;
+  padding: 0 16px calc(40px + env(safe-area-inset-bottom, 0px));
 }
 
 .form-card {
@@ -116,6 +124,11 @@ ion-select {
   gap: 10px;
   grid-template-columns: 1fr 1fr;
   margin-top: 8px;
+  position: sticky;
+  bottom: 0;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff 22%, #ffffff 100%);
+  z-index: 3;
 }
 
 .back-btn {

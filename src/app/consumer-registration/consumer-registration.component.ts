@@ -19,6 +19,7 @@ export class ConsumerRegistrationComponent implements OnInit {
   registrationForm!: FormGroup;
   invalidFormMessage = '';
   errorMessage = '';
+  isSubmitting = false;
   currentStep = 2;
   readonly countryOptions = this.addressData.getCountries();
   activeFields: Array<{ key: AddressFieldKey; label: string; type: 'select' | 'text' }> = [];
@@ -53,12 +54,18 @@ export class ConsumerRegistrationComponent implements OnInit {
   }
 
   async submitForm(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
     if (!this.registrationForm.valid) {
+      this.registrationForm.markAllAsTouched();
       this.invalidFormMessage = 'Please complete the required fields.';
       this.uiFeedback.error(this.invalidFormMessage);
       return;
     }
 
+    this.isSubmitting = true;
     await this.loadingService.show('Creating account...');
     const formData = this.registrationForm.value;
 
@@ -70,6 +77,7 @@ export class ConsumerRegistrationComponent implements OnInit {
       () => {
         this.uiFeedback.success('Registration successful.');
         this.loadingService.hide();
+        this.isSubmitting = false;
         const prefill = {
           username: formData.username,
           password: formData.pin,
@@ -88,6 +96,7 @@ export class ConsumerRegistrationComponent implements OnInit {
         this.errorMessage = error?.error?.message || 'An error occurred. Please try again later.';
         this.uiFeedback.error(this.errorMessage);
         this.loadingService.hide();
+        this.isSubmitting = false;
       }
     );
   }

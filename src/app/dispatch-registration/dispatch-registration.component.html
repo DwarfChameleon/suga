@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding dispatch-registration-content">
   <form [formGroup]="registrationForm" (ngSubmit)="submit()" class="dispatch-form">
     <ion-item>
       <ion-label position="stacked">Username</ion-label>
@@ -64,7 +64,7 @@
       <ion-input formControlName="operatingAreas" placeholder="Ikeja, Surulere"></ion-input>
     </ion-item>
 
-    <ion-button expand="block" type="submit" [disabled]="isSubmitting">
+    <ion-button expand="block" type="button" [disabled]="isSubmitting" (click)="submit()">
       Create Dispatch Account
     </ion-button>
   </form>

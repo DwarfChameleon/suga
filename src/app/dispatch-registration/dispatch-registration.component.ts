@@ -43,6 +43,7 @@ export class DispatchRegistrationComponent implements OnInit {
 
   async submit(): Promise<void> {
     if (this.registrationForm.invalid || this.isSubmitting) {
+      this.registrationForm.markAllAsTouched();
       this.uiFeedback.error('Complete all required fields.');
       return;
     }

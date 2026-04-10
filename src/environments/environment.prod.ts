@@ -1,29 +1,18 @@
 const resolveBackendBaseUrl = (): string => {
-  const localhostBase = 'http://localhost:5000';
-  const fallbackTunnelBase = 'https://dclv5j4m-5000.uks1.devtunnels.ms';
+  const renderBackendBase = 'https://suga-server.onrender.com';
 
   if (typeof window === 'undefined') {
-    return fallbackTunnelBase;
+    return renderBackendBase;
   }
 
   const { protocol, hostname } = window.location;
-  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
-  const isNativeApp = !!(window as any)?.Capacitor?.isNativePlatform?.();
-
-  if (isLocalHost && isNativeApp) {
-    return fallbackTunnelBase;
-  }
-
-  if (isLocalHost) {
-    return localhostBase;
-  }
 
   if (hostname.includes('.devtunnels.ms')) {
     const backendHost = hostname.replace(/-8100(\.)/i, '-5000$1');
     return `${protocol}//${backendHost}`;
   }
 
-  return fallbackTunnelBase;
+  return renderBackendBase;
 };
 
 const backendBaseUrl = resolveBackendBaseUrl();

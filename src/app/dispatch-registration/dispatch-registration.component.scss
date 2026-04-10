@@ -1,6 +1,15 @@
+.dispatch-registration-content {
+  --padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
+.dispatch-registration-content::part(scroll) {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+}
+
 .dispatch-form {
   display: grid;
   gap: 10px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
 }
 
 ion-item {
@@ -10,4 +19,6 @@ ion-item {
 
 ion-button {
   margin-top: 14px;
+  min-height: 52px;
+  margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
