@@ -64,6 +64,11 @@ export class LoginModalComponent implements OnInit {
     await this.router.navigate(['/registration']);
   }
 
+  async goToForgotPassword(): Promise<void> {
+    await this.modalCtrl.dismiss();
+    await this.router.navigate(['/forgot-password']);
+  }
+
   async login() {
     if (this.loginForm.invalid || this.isSubmitting) return;
 

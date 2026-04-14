@@ -43,7 +43,7 @@
       <div class="topCategory">
         <div *ngFor="let category of categories">
           <div class="foodCategory" (click)="openCategoryModal(category)">
-            <img [src]="getCategoryImage(category.image)" [alt]="category.name" />
+            <img [src]="getCategoryImage(category.image)" [alt]="category.name" (error)="onCategoryImageError(category.image)" />
             <div class="foodCategoryTitle">{{ category.name }}</div>
           </div>
         </div>
@@ -73,7 +73,10 @@
     <div class="foodStory">
       <div *ngIf="storyGroups.length === 0" class="story-empty">No story yet from followed chefs.</div>
       <div *ngFor="let group of storyGroups" class="story-chef-card" (click)="openStoryViewer(group)">
-        <video class="story-thumb" [src]="getStoryVideoUrl(group.latestThumb)" muted playsinline preload="metadata"></video>
+        <video *ngIf="!isStoryThumbBroken(group)" class="story-thumb" [src]="getStoryVideoUrl(group.latestThumb)" muted autoplay loop playsinline preload="auto" (error)="onStoryThumbError(group)"></video>
+        <div *ngIf="isStoryThumbBroken(group)" class="story-thumb-fallback">
+          <span>Story preview unavailable</span>
+        </div>
         <div class="story-chef-overlay">
           <div class="story-ring">
             <span
@@ -116,7 +119,7 @@
              </div>
        </div>
 </div>
-          <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" class="food-image"/>
+          <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" class="food-image" (error)="onFoodImageError(food.image)"/>
           <div class="food-info">
             <button class="metric-pill metric-price" (click)="openModalFood(food._id)">
               <ion-icon name="cash-outline"></ion-icon>
@@ -198,7 +201,7 @@
         >
           <video
             #viewerVideo
-            *ngIf="currentStory"
+            *ngIf="currentStory && !isViewerStoryBroken(currentStory._id)"
             [src]="getStoryVideoUrl(currentStory.path)"
             autoplay
             playsinline
@@ -207,9 +210,13 @@
             (loadedmetadata)="onViewerLoadedMetadata(viewerVideo)"
             (timeupdate)="onViewerTimeUpdate(viewerVideo)"
             (ended)="nextStory()"
+            (error)="onViewerStoryError(currentStory._id)"
             (click)="toggleViewerPlayback(viewerVideo)"
             class="story-viewer-video"
           ></video>
+          <div *ngIf="currentStory && isViewerStoryBroken(currentStory._id)" class="story-viewer-fallback">
+            This story video is unavailable right now.
+          </div>
 
           <div class="viewer-playback-hint" *ngIf="viewerPlaybackHint">
             <ion-icon [name]="viewerPlaybackHint === 'play' ? 'play' : 'pause'"></ion-icon>

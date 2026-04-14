@@ -30,11 +30,11 @@
           </div>
         </div>
         <div class="wallet-actions">
-          <button class="action primary" (click)="openForm('deposit')">
+          <button class="action primary" *ngIf="canDeposit" (click)="openForm('deposit')">
             <ion-icon name="add-circle-outline"></ion-icon>
             Deposit
           </button>
-          <button class="action" (click)="openForm('transfer')">
+          <button class="action" *ngIf="canTransfer" (click)="openForm('transfer')">
             <ion-icon name="swap-horizontal-outline"></ion-icon>
             Transfer
           </button>
@@ -108,32 +108,53 @@
       </div>
     </div>
 
-    <div class="wallet-form-grid" *ngIf="activeForm">
-      <div class="wallet-form" *ngIf="activeForm === 'deposit'">
-        <div class="form-title">Deposit to Wallet</div>
-        <input type="number" [(ngModel)]="depositAmount" placeholder="Amount" min="0" />
-        <div class="form-actions">
-          <button class="form-btn submit" (click)="requestDeposit()">Submit Deposit</button>
-          <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+    <div class="wallet-form-overlay" *ngIf="activeForm" (click)="closeForm()">
+      <div class="wallet-form-sheet" (click)="$event.stopPropagation()">
+        <div class="wallet-form-sheet-header">
+          <div>
+            <div class="label">Wallet Action</div>
+            <div class="card-subtitle">
+              {{
+                activeForm === 'deposit'
+                  ? 'Add funds through Paystack.'
+                  : activeForm === 'transfer'
+                    ? 'Send funds to another Suga user.'
+                    : 'Request a payout to your saved account.'
+              }}
+            </div>
+          </div>
+          <button class="sheet-close" type="button" (click)="closeForm()">
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </button>
         </div>
-      </div>
+        <div class="wallet-form-grid">
+          <div class="wallet-form" *ngIf="activeForm === 'deposit' && canDeposit">
+            <div class="form-title">Deposit to Wallet</div>
+            <input type="number" [(ngModel)]="depositAmount" placeholder="Amount" min="0" />
+            <div class="form-actions">
+              <button class="form-btn submit" (click)="requestDeposit()">Continue to Paystack</button>
+              <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+            </div>
+          </div>
 
-      <div class="wallet-form" *ngIf="activeForm === 'transfer'">
-        <div class="form-title">Transfer to Suga User</div>
-        <input type="text" [(ngModel)]="transferUsername" placeholder="Recipient username" />
-        <input type="number" [(ngModel)]="transferAmount" placeholder="Amount" min="0" />
-        <div class="form-actions">
-          <button class="form-btn submit" (click)="openPinPad('transfer')">Submit Transfer</button>
-          <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
-        </div>
-      </div>
+          <div class="wallet-form" *ngIf="activeForm === 'transfer' && canTransfer">
+            <div class="form-title">Transfer to Suga User</div>
+            <input type="text" [(ngModel)]="transferUsername" placeholder="Recipient username" />
+            <input type="number" [(ngModel)]="transferAmount" placeholder="Amount" min="0" />
+            <div class="form-actions">
+              <button class="form-btn submit" (click)="openPinPad('transfer')">Submit Transfer</button>
+              <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+            </div>
+          </div>
 
-      <div class="wallet-form" *ngIf="activeForm === 'withdraw' && canWithdraw">
-        <div class="form-title">Withdraw</div>
-        <input type="number" [(ngModel)]="withdrawAmount" placeholder="Amount" min="0" />
-        <div class="form-actions">
-          <button class="form-btn submit" (click)="openPinPad('withdraw')">Submit Withdrawal</button>
-          <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+          <div class="wallet-form" *ngIf="activeForm === 'withdraw' && canWithdraw">
+            <div class="form-title">Withdraw</div>
+            <input type="number" [(ngModel)]="withdrawAmount" placeholder="Amount" min="0" />
+            <div class="form-actions">
+              <button class="form-btn submit" (click)="openPinPad('withdraw')">Submit Withdrawal</button>
+              <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

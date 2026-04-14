@@ -37,7 +37,11 @@ interface WalletTx {
 export class WalletComponent implements OnInit {
   wallet: WalletSummary = { balance: 0, currency: 'NGN', isHidden: false };
   transactions: WalletTx[] = [];
+  roles: string[] = [];
   canWithdraw = false;
+  canDeposit = false;
+  canTransfer = false;
+  currentEmail = '';
   rewards = { pointsBalance: 0, tokenBalance: 0 };
   isLoading = false;
   depositAmount: number | null = null;
@@ -67,8 +71,12 @@ export class WalletComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const roles = (this.tokenStorage.getUser()?.roles || []).map((r: any) => String(r || '').toLowerCase());
-    this.canWithdraw = roles.includes('chef') || roles.includes('dispatch');
+    const user = this.tokenStorage.getUser();
+    this.roles = (user?.roles || []).map((r: any) => String(r || '').toLowerCase());
+    this.canWithdraw = this.roles.includes('chef') || this.roles.includes('dispatch');
+    this.canDeposit = this.roles.includes('consumer');
+    this.canTransfer = this.roles.includes('chef');
+    this.currentEmail = String(user?.email || '').trim();
     this.loadWallet();
   }
 
@@ -111,6 +119,14 @@ export class WalletComponent implements OnInit {
   }
 
   openForm(form: 'deposit' | 'transfer' | 'withdraw'): void {
+    if (form === 'deposit' && !this.canDeposit) {
+      this.uiFeedback.error('Only consumers can add wallet funds directly.');
+      return;
+    }
+    if (form === 'transfer' && !this.canTransfer) {
+      this.uiFeedback.error('Only chefs can transfer wallet funds.');
+      return;
+    }
     if (form === 'withdraw' && !this.canWithdraw) {
       this.uiFeedback.error('Only chefs or dispatch riders can request withdrawals.');
       return;
@@ -126,27 +142,46 @@ export class WalletComponent implements OnInit {
   }
 
   async requestDeposit(): Promise<void> {
+    if (!this.canDeposit) {
+      this.uiFeedback.error('Direct wallet deposit is available to consumers only.');
+      return;
+    }
     const amount = Number(this.depositAmount || 0);
     if (!amount || amount <= 0) {
       this.uiFeedback.error('Enter a valid deposit amount.');
       return;
     }
+    if (!this.currentEmail) {
+      this.uiFeedback.error('Please add your email to continue with Paystack.');
+      return;
+    }
 
-    await this.loading.show('Creating deposit...');
+    await this.loading.show('Redirecting to Paystack...');
     try {
-      await firstValueFrom(this.http.post<any>(`${environment.apiUrl}/wallet/deposit`, { amount }));
+      const response = await firstValueFrom(this.http.post<any>(`${environment.apiUrl}/wallet/topup/initiate-paystack`, {
+        amount,
+        email: this.currentEmail
+      }));
+      const authorizationUrl = String(response?.data?.authorization_url || '').trim();
+      if (!authorizationUrl) {
+        throw new Error('Unable to start Paystack payment right now.');
+      }
       this.depositAmount = null;
       this.activeForm = null;
-      this.uiFeedback.success('Deposit successful.');
-      await this.loadWallet();
+      this.uiFeedback.success('Paystack opened. Complete payment to top up your wallet.');
+      window.location.assign(authorizationUrl);
     } catch (error: any) {
-      this.uiFeedback.error(error?.error?.message || 'Deposit failed.');
+      this.uiFeedback.error(error?.error?.message || error?.message || 'Deposit could not be started.');
     } finally {
       await this.loading.hide();
     }
   }
 
   async requestTransfer(): Promise<void> {
+    if (!this.canTransfer) {
+      this.uiFeedback.error('Only chefs can transfer wallet funds.');
+      return;
+    }
     if (!this.pin) {
       this.pinPurpose = 'transfer';
       this.showPinPad = true;

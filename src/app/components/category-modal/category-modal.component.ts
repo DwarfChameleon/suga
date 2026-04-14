@@ -21,6 +21,7 @@ export class CategoryModalComponent implements OnInit {
   error = '';
   profileImages: string[] = [];
   activeProfileIndex = 0;
+  private brokenProfileImages = new Set<string>();
 
   constructor(
     private modalController: ModalController,
@@ -93,10 +94,16 @@ export class CategoryModalComponent implements OnInit {
   }
 
   getCategoryProfileImageUrl(image: string): string {
-    if (!image) return '/assets/img/regpage.jpeg';
-    if (image.startsWith('/assets/')) return image;
-    if (image.startsWith('http://') || image.startsWith('https://')) return image;
-    return `${environment.uploadUrl}/${image}`;
+    const normalized = String(image || '').trim().replace(/\\/g, '/').replace(/^\.\//, '').replace(/^\/+/, '');
+    if (!normalized || this.brokenProfileImages.has(normalized)) return '/assets/img/regpage.jpeg';
+    if (normalized.startsWith('/assets/')) return normalized;
+    if (normalized.startsWith('http://') || normalized.startsWith('https://')) return normalized;
+    return `${environment.uploadUrl}/${normalized}`;
+  }
+
+  onProfileImageError(image: string): void {
+    const normalized = String(image || '').trim().replace(/\\/g, '/').replace(/^\.\//, '').replace(/^\/+/, '');
+    if (normalized) this.brokenProfileImages.add(normalized);
   }
 
   close(): void {

@@ -12,6 +12,7 @@ import { NetworkService } from './services/network.service';
 import { UiFeedbackService } from './services/ui-feedback.service';
 import { ThemeService } from './services/theme.service';
 import { environment } from 'src/environments/environment';
+import { NativeUiService } from './services/native-ui.service';
 
 @Component({
   selector: 'app-root',
@@ -55,9 +56,11 @@ export class AppComponent implements OnInit, OnDestroy {
   , private networkService: NetworkService
   , private uiFeedback: UiFeedbackService
   , private themeService: ThemeService
+  , private nativeUi: NativeUiService
   ) {}
 
   ngOnInit(): void {
+    void this.nativeUi.initialize();
     this.themeService.apply(this.themeService.getSavedTheme());
     this.refreshUserState();
     this.authSub = this.tokenStorage.authState$.subscribe(() => {
@@ -117,6 +120,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isLoggedIn = !!token;
 
     if (this.isLoggedIn) {
+      void this.nativeUi.syncPushRegistration();
       const roles = this.userRolesList.map((r) => String(r || '').toLowerCase());
       if (roles.includes('admin')) {
         this.myAccountUrl = '/components/explore';
@@ -148,6 +152,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.socketSub = this.notificationSocket.notifications$.subscribe(n => {
             this.notificationService.addNotification(n);
             this.presentNotificationToast(n.title, n.message);
+            void this.nativeUi.notifyDevice(n.title, n.message, { notificationId: n._id, type: n.type });
           });
           this.unreadSub = this.notificationService.getUnreadCount().subscribe(count => {
             this.unreadCount = count;

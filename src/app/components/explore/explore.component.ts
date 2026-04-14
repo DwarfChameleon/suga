@@ -80,6 +80,10 @@ export class ExploreComponent implements OnInit {
   private touchStartX = 0;
   private touchEndX = 0;
   private seenStoryIds = new Set<string>();
+  private brokenCategoryImages = new Set<string>();
+  private brokenStoryThumbChefs = new Set<string>();
+  private brokenViewerStoryIds = new Set<string>();
+  private brokenFoodImages = new Set<string>();
 
   
   constructor(
@@ -530,11 +534,20 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   getImageUrl(image: string): string {
-    return `${environment.uploadUrl}/${image}`;
+    const normalized = this.normalizeMediaPath(image);
+    if (!normalized || this.brokenFoodImages.has(normalized)) {
+      return '/assets/img/regpage.jpeg';
+    }
+    return `${environment.uploadUrl}/${normalized}`;
   }
 
   getStoryVideoUrl(path: string): string {
-    return `${environment.baseUrl}/${String(path || '').replace(/^\/+/, '')}`;
+    const normalized = this.normalizeMediaPath(path);
+    if (!normalized) return '';
+    if (normalized.startsWith('videos/') || normalized.startsWith('uploads/')) {
+      return `${environment.baseUrl}/${normalized}`;
+    }
+    return `${environment.baseUrl}/videos/${normalized}`;
   }
 
   getChefImage(profilePicture: string): string {
@@ -553,8 +566,37 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   getCategoryImage(image?: string): string {
-    if (!image) return '/assets/img/regpage.jpeg';
-    return `${environment.uploadUrl}/${image}`;
+    const normalized = this.normalizeMediaPath(image);
+    if (!normalized || this.brokenCategoryImages.has(normalized)) return '/assets/img/regpage.jpeg';
+    return `${environment.uploadUrl}/${normalized}`;
+  }
+
+  onCategoryImageError(image?: string): void {
+    const normalized = this.normalizeMediaPath(image);
+    if (normalized) this.brokenCategoryImages.add(normalized);
+  }
+
+  onFoodImageError(image?: string): void {
+    const normalized = this.normalizeMediaPath(image);
+    if (normalized) this.brokenFoodImages.add(normalized);
+  }
+
+  onStoryThumbError(group: StoryChefGroup): void {
+    if (!group?.chefId) return;
+    this.brokenStoryThumbChefs.add(String(group.chefId));
+  }
+
+  isStoryThumbBroken(group: StoryChefGroup): boolean {
+    return this.brokenStoryThumbChefs.has(String(group?.chefId || ''));
+  }
+
+  onViewerStoryError(videoId: string): void {
+    const id = String(videoId || '');
+    if (id) this.brokenViewerStoryIds.add(id);
+  }
+
+  isViewerStoryBroken(videoId?: string): boolean {
+    return this.brokenViewerStoryIds.has(String(videoId || ''));
   }
 
   private loadMissedStoriesCount(): void {
@@ -734,6 +776,14 @@ getBackgroundImageStyle(imageUrl:string): any{
     if (!this.activeStoryPaused) {
       video.play().catch(() => {});
     }
+  }
+
+  private normalizeMediaPath(value?: string): string {
+    return String(value || '')
+      .trim()
+      .replace(/\\/g, '/')
+      .replace(/^\.\//, '')
+      .replace(/^\/+/, '');
   }
 
   private showViewerPlaybackHint(state: 'play' | 'pause'): void {

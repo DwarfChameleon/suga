@@ -126,6 +126,18 @@ ion-fab[vertical='bottom'] {
   padding-bottom: var(--suga-safe-bottom);
 }
 
+ion-modal::part(content),
+ion-popover::part(content) {
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 12px);
+  margin-top: calc(var(--suga-safe-top) + 6px);
+  margin-bottom: calc(var(--suga-safe-bottom) + 6px);
+}
+
+ion-modal ion-header,
+ion-popover ion-header {
+  padding-top: 0;
+}
+
 /* Notification toast styling */
 .suga-notification-toast {
   --background: var(--ion-color-primary);
@@ -326,9 +338,12 @@ body.suga-dark-theme .control span {
 }
 
 ion-modal.suga-order-fullsheet::part(content) {
-  --height: 100%;
-  height: 100%;
-  border-radius: 0;
+  --height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
+  margin-top: var(--suga-safe-top);
+  margin-bottom: var(--suga-safe-bottom);
+  border-radius: 18px 18px 0 0;
 }
 
 body.suga-dark-theme input,

@@ -1,14 +1,15 @@
 @import "/src/theme/variables.scss";
 .login-container{
-    height:100vh !important;
+    min-height:100vh !important;
     width: 100%;
     background-image: url(/assets/img/fstorybg.gif);
     background-size: 100% 22%;
     background-repeat: no-repeat;
     padding-top: 50%;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
 .modal{
-    height: 80% !important;
+    min-height: calc(80vh - env(safe-area-inset-bottom, 0px));
     width: 100%;
     background-color: var(--ion-color-primary-modal);
     text-align: center;
@@ -62,6 +63,13 @@
         text-decoration:none;
         color:var( --ion-color-dark-tint);
         text-align:center;
+    }
+    .forgot-link-btn{
+        border: none;
+        background: transparent;
+        font: inherit;
+        padding: 0;
+        cursor: pointer;
     }
     .signIn{
         text-align: center;

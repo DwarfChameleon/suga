@@ -13,10 +13,27 @@
   </div>
   <div *ngIf="emptyMessage" class="empty-state">{{ emptyMessage }}</div>
   <div *ngFor="let video of videos" class="video-container">
-    <video #videoEl [attr.data-id]="video._id" preload="auto" autoplay muted playsinline (play)="scheduleView(video._id)" (pause)="cancelView(video._id)" (dblclick)="likeVideo(video)" (click)="togglePlayPause(videoEl, video._id)">
-      <source [src]="getVideoUrl(video.path)" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+    <div class="video-frame">
+      <video
+        #videoEl
+        [attr.data-id]="video._id"
+        preload="auto"
+        autoplay
+        muted
+        playsinline
+        [class.video-hidden]="isVideoUnavailable(video._id)"
+        (error)="onVideoError(video._id, videoEl)"
+        (play)="scheduleView(video._id)"
+        (pause)="cancelView(video._id)"
+        (dblclick)="likeVideo(video)"
+        (click)="togglePlayPause(videoEl, video._id)">
+        <source [src]="getVideoUrl(video.path)" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div class="video-unavailable" *ngIf="isVideoUnavailable(video._id)">
+        This video is unavailable right now.
+      </div>
+    </div>
     <div class="playback-hint" *ngIf="playbackHint[video._id]">
       <ion-icon [name]="playbackHint[video._id] === 'play' ? 'play' : 'pause'"></ion-icon>
     </div>

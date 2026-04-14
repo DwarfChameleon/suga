@@ -12,7 +12,7 @@
     <div class="category-profile" *ngIf="profileImages.length">
       <div class="profile-track" (scroll)="onProfileScroll($event)">
         <div class="profile-slide" *ngFor="let image of profileImages">
-          <img [src]="getCategoryProfileImageUrl(image)" [alt]="category">
+          <img [src]="getCategoryProfileImageUrl(image)" [alt]="category" (error)="onProfileImageError(image)">
           <div class="profile-overlay">
             <span class="profile-kicker">Category Profile</span>
             <strong>{{ category | titlecase }}</strong>

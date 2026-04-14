@@ -82,6 +82,7 @@ export class StoryComponent implements OnInit {
   playbackHint: Record<string, 'play' | 'pause' | ''> = {};
   private playbackTimers: Record<string, any> = {};
   private seenStoryIds = new Set<string>();
+  private brokenVideoIds = new Set<string>();
 
   constructor(
     private http: HttpClient,
@@ -129,6 +130,7 @@ export class StoryComponent implements OnInit {
         this.emptyMessage = '';
       }
       this.scrollToTarget();
+      this.queueInitialAutoplay();
     });
 
     this.networkService.online$.subscribe((online) => {
@@ -144,7 +146,12 @@ export class StoryComponent implements OnInit {
     });
   }
   getVideoUrl(path: string): string {
-    return `${environment.baseUrl}/${path}`;
+    const normalized = this.normalizeVideoPath(path);
+    if (!normalized) return '';
+    if (normalized.startsWith('videos/') || normalized.startsWith('uploads/')) {
+      return `${environment.baseUrl}/${normalized}`;
+    }
+    return `${environment.baseUrl}/videos/${normalized}`;
   }
  onScroll(){
    
@@ -161,9 +168,12 @@ export class StoryComponent implements OnInit {
   }
   }
   togglePlayPause(videoElement: HTMLVideoElement, videoId?: string): void {
+    if (videoId && this.isVideoUnavailable(videoId)) {
+      return;
+    }
     if (videoElement) {
       if (videoElement.paused) {
-        videoElement.play();
+        videoElement.play().catch(() => {});
         if (videoId) this.scheduleView(videoId);
         if (videoId) this.showPlaybackHint(videoId, 'play');
       } else {
@@ -283,7 +293,11 @@ export class StoryComponent implements OnInit {
 
   ngAfterViewInit(): void {
     this.setupObserver();
-    this.videoEls.changes.subscribe(() => this.setupObserver());
+    this.videoEls.changes.subscribe(() => {
+      this.setupObserver();
+      this.queueInitialAutoplay();
+    });
+    this.queueInitialAutoplay();
   }
 
   private setupObserver(): void {
@@ -323,6 +337,48 @@ export class StoryComponent implements OnInit {
     if (el) {
       try { el.nativeElement.pause(); } catch {}
     }
+  }
+
+  isVideoUnavailable(videoId: string): boolean {
+    return this.brokenVideoIds.has(String(videoId || ''));
+  }
+
+  onVideoError(videoId: string, videoElement?: HTMLVideoElement): void {
+    const id = String(videoId || '');
+    if (!id) return;
+    this.brokenVideoIds.add(id);
+    this.cancelView(id);
+    if (this.currentPlayingId === id) {
+      this.currentPlayingId = undefined;
+    }
+    try {
+      videoElement?.pause();
+    } catch {}
+  }
+
+  private normalizeVideoPath(path: string): string {
+    return String(path || '')
+      .trim()
+      .replace(/\\/g, '/')
+      .replace(/^\.\//, '')
+      .replace(/^\/+/, '');
+  }
+
+  private queueInitialAutoplay(): void {
+    setTimeout(() => {
+      const targetId = this.targetVideoId && !this.isVideoUnavailable(this.targetVideoId)
+        ? this.targetVideoId
+        : String(this.videos.find((video) => !this.isVideoUnavailable(video._id))?._id || '');
+      if (!targetId) return;
+      const el = this.videoEls?.find((videoRef) => videoRef.nativeElement.dataset['id'] === targetId)?.nativeElement;
+      if (!el) return;
+      try {
+        el.muted = true;
+        el.play().catch(() => {});
+        this.scheduleView(targetId);
+        this.currentPlayingId = targetId;
+      } catch {}
+    }, 180);
   }
 
   openComments(video: Video): void {

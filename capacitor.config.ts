@@ -4,6 +4,24 @@ const config: CapacitorConfig = {
   appId: 'com.suga.app',
   appName: 'suga',
   webDir: 'www',
+  plugins: {
+    SplashScreen: {
+      launchAutoHide: false,
+      launchShowDuration: 1200,
+      backgroundColor: '#ffffffff',
+      showSpinner: false,
+      androidScaleType: 'CENTER_CROP'
+    },
+    StatusBar: {
+      overlaysWebView: false,
+      style: 'LIGHT',
+      backgroundColor: '#3880FF'
+    },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_suga',
+      iconColor: '#3880FF'
+    }
+  },
   cordova: {
     preferences: {
       ScrollEnabled: 'false',
