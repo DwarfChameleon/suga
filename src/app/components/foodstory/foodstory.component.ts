@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { MediaCapture } from '@awesome-cordova-plugins/media-capture/ngx';
+import { Capacitor } from '@capacitor/core';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
@@ -336,20 +337,84 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
     }
   }
 
-  captureVideo() {
-    this.mediaCapture.captureVideo()
-      .then((result: any) => {
-        if (!Array.isArray(result) || result.length === 0) return;
-        const mf: any = result[0];
-        this.uploadStatus = 'Captured video - proceed to details';
-        this.mediaType = 'video';
-        this.previewUrl = this.sanitizer.bypassSecurityTrustUrl(mf.fullPath || mf.localURL || mf.fullPath);
-        this.step = 'review';
-      })
-      .catch((err: any) => {
-        console.error('Capture error', err);
-        this.uiFeedback.error('Capture error. Please try again.');
-      });
+  async captureVideo() {
+    try {
+      const result: any = await this.mediaCapture.captureVideo();
+      if (!Array.isArray(result) || result.length === 0) return;
+
+      const media = result[0] || {};
+      const rawPath = String(media.localURL || media.fullPath || '').trim();
+      if (!rawPath) {
+        this.uiFeedback.error('Captured video could not be accessed.');
+        return;
+      }
+
+      const previewPath = this.toWebViewSrc(rawPath);
+      this.mediaFile = await this.createFileFromPath(rawPath, 'captured_story');
+      this.mediaType = 'video';
+      this.previewUrl = this.sanitizer.bypassSecurityTrustUrl(previewPath);
+      this.uploadStatus = 'Captured video - proceed to details';
+      this.step = 'review';
+    } catch (err: any) {
+      console.error('Capture error', err);
+      this.uiFeedback.error('Capture error. Please try again.');
+    }
+  }
+
+  private toWebViewSrc(pathValue: string): string {
+    const source = String(pathValue || '').trim();
+    if (!source) return source;
+    if (/^https?:\/\//i.test(source) || source.startsWith('blob:') || source.startsWith('data:')) {
+      return source;
+    }
+    if (source.startsWith('content://') || source.startsWith('file://')) {
+      return Capacitor.convertFileSrc(source);
+    }
+    return source;
+  }
+
+  private async createFileFromPath(pathValue: string, baseName: string): Promise<File> {
+    const webPath = this.toWebViewSrc(pathValue);
+    const response = await fetch(webPath);
+    if (!response.ok) {
+      throw new Error(`Unable to read captured media (${response.status})`);
+    }
+    const blob = await response.blob();
+    const mimeType = blob.type || this.guessMimeType(pathValue);
+    const extension = this.guessExtension(pathValue, mimeType);
+    return new File([blob], `${baseName}_${Date.now()}.${extension}`, { type: mimeType });
+  }
+
+  private guessExtension(pathValue: string, mimeType: string): string {
+    const fromPath = String(pathValue || '').split('?')[0].split('.').pop()?.toLowerCase();
+    if (fromPath && /^[a-z0-9]+$/.test(fromPath)) {
+      return fromPath;
+    }
+    if (mimeType.includes('webm')) return 'webm';
+    if (mimeType.includes('quicktime')) return 'mov';
+    if (mimeType.includes('3gpp')) return '3gp';
+    return 'mp4';
+  }
+
+  private guessMimeType(pathValue: string): string {
+    const extension = String(pathValue || '').split('?')[0].split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'webm':
+        return 'video/webm';
+      case 'mov':
+        return 'video/quicktime';
+      case 'm4v':
+        return 'video/x-m4v';
+      case '3gp':
+      case '3gpp':
+        return 'video/3gpp';
+      case 'mkv':
+        return 'video/x-matroska';
+      case 'avi':
+        return 'video/x-msvideo';
+      default:
+        return 'video/mp4';
+    }
   }
 
   private resetAll(): void {
