@@ -193,6 +193,19 @@ p{
 }
 .chef-tabs{
     margin: 6px 10px 10px 10px;
+    --background: transparent;
+    padding-bottom: 2px;
+}
+
+.chef-tabs ion-segment-button{
+    min-width: 0;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 4px;
+    --padding-bottom: 4px;
+    --indicator-height: 2px;
+    font-size: 12px;
+    line-height: 1.2;
 }
 .empty-tab{
     text-align: center;
@@ -344,6 +357,7 @@ p{
 .follower-actions{
   display: inline-flex;
   gap: 6px;
+  flex: 0 0 auto;
 }
 .follow-back-btn.ghost{
   background: transparent;

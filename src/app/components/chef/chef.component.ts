@@ -325,7 +325,8 @@ export class ChefComponent implements OnInit, OnDestroy {
 
     const modal = await this.modalController.create({
       component: OrderInfoComponent,
-      componentProps: { orderId }
+      componentProps: { orderId },
+      cssClass: 'suga-order-fullsheet'
     });
     await modal.present();
 
@@ -812,7 +813,11 @@ export class ChefComponent implements OnInit, OnDestroy {
     if (!follower?.username) return;
     const modal = await this.modalController.create({
       component: ProfileModalComponent,
-      componentProps: { username: follower.username, initialStatTab }
+      componentProps: { username: follower.username, initialStatTab },
+      cssClass: 'suga-profile-sheet',
+      handle: true,
+      initialBreakpoint: 0.76,
+      breakpoints: [0, 0.76, 0.94]
     });
     await modal.present();
   }
@@ -823,6 +828,11 @@ export class ChefComponent implements OnInit, OnDestroy {
     const followerId = String(follower?._id || '');
     const me = String(this.userProfile?._id || '');
     return !!followerId && followerId !== me && isChef;
+  }
+
+  isChefFollower(follower: any): boolean {
+    const roleList = Array.isArray(follower?.roles) ? follower.roles.map((r: string) => String(r).toLowerCase()) : [];
+    return roleList.includes('chef');
   }
 
   isFollowingFollower(followerId: string): boolean {

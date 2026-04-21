@@ -6,23 +6,15 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="auth-form">
-  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
-    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
-  </ion-refresher>
-
-
+<ion-content class="auth-form">
   <div id="container">
-    <div class="curvy-div2">
-     
-  </div>
-  <div class="curvy-div">
-    <div class="authAction">
-             <button [routerLink]="['/registration']" expand="block" class="regSubmitBTN signon" >Register</button>
+    <div class="curvy-div2"></div>
+    <div class="curvy-div">
+      <div class="authAction">
+        <button [routerLink]="['/registration']" expand="block" class="regSubmitBTN signon">Register</button>
         <h2 class="alreadyUser">Or</h2>
-          <button (click)="openLoginModal()" expand="block" class="regSubmitBTN signin">Sign In</button>
-          </div>
+        <button (click)="openLoginModal()" expand="block" class="regSubmitBTN signin">Sign In</button>
+      </div>
     </div>
-   
   </div>
 </ion-content>

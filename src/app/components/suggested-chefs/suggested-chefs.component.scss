@@ -1,3 +1,14 @@
+.header-close-btn {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  width: 44px;
+  height: 44px;
+}
+
+.header-close-btn ion-icon {
+  font-size: 28px;
+}
+
 .chef-list{
   padding: 12px;
   display: grid;
@@ -23,16 +34,23 @@
 .chef-info{
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .chef-name{
   font-weight: 600;
   color: var(--ion-color-primary-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chef-meta{
   font-size: 12px;
   opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chef-follow-btn{
@@ -62,5 +80,8 @@
 }
 
 .close-btn{
-  margin: 12px;
+  margin: 16px 12px calc(16px + var(--suga-safe-bottom));
+  min-height: 48px;
+  --border-radius: 16px;
+  font-weight: 700;
 }

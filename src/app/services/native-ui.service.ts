@@ -49,7 +49,7 @@ export class NativeUiService {
 
     window.setTimeout(() => {
       void this.hideSplash();
-    }, 900);
+    }, 180);
   }
 
   async syncPushRegistration(): Promise<void> {
@@ -157,7 +157,7 @@ export class NativeUiService {
 
   private async hideSplash(): Promise<void> {
     try {
-      await SplashScreen.hide({ fadeOutDuration: 250 });
+      await SplashScreen.hide({ fadeOutDuration: 180 });
     } catch {
       // Ignore when splash is already hidden.
     }

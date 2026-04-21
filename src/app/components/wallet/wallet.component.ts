@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import { ModalController } from '@ionic/angular';
 import { OrderInfoComponent } from '../order-info/order-info.component';
 import { humanizeHistoryLabel } from 'src/app/utils/history-formatters';
+import { Browser } from '@capacitor/browser';
 
 type WalletSectionKey = 'balance' | 'rewards' | 'payout' | 'transactions';
 
@@ -169,7 +170,7 @@ export class WalletComponent implements OnInit {
       this.depositAmount = null;
       this.activeForm = null;
       this.uiFeedback.success('Paystack opened. Complete payment to top up your wallet.');
-      window.location.assign(authorizationUrl);
+      await Browser.open({ url: authorizationUrl, presentationStyle: 'fullscreen' });
     } catch (error: any) {
       this.uiFeedback.error(error?.error?.message || error?.message || 'Deposit could not be started.');
     } finally {
@@ -315,7 +316,8 @@ export class WalletComponent implements OnInit {
 
     const modal = await this.modalController.create({
       component: OrderInfoComponent,
-      componentProps: { orderId: tx.orderId }
+      componentProps: { orderId: tx.orderId },
+      cssClass: 'suga-order-fullsheet'
     });
     await modal.present();
   }

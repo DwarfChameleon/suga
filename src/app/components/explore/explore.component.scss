@@ -66,17 +66,18 @@ ion-content {
   --background: none; /* Remove any default background */
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
 }
 
 .mainContainer {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
   margin: 0;
   background: var(--ion-background-color);
   display: flex;
   flex-direction: column; /* Allow column layout */
+  padding-bottom: calc(10px + var(--suga-safe-bottom));
 }
 
 .title{
@@ -144,36 +145,52 @@ ion-content {
 }
 
 .chef-card{
-  min-width: 140px;
+  width: 152px;
+  min-width: 152px;
+  max-width: 152px;
   background: var(--suga-surface);
   border-radius: 14px;
   padding: 8px;
   display: grid;
   gap: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  align-content: start;
 }
 
 .chef-card img{
-    width: 60%;
-    height: 75px;
-    object-fit: contain;
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
     border-radius: 50%;
+    justify-self: center;
 }
 
 .chef-meta{
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .chef-name{
   font-weight: 600;
   color: var(--ion-color-primary-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .chef-count{
   font-size: 12px;
   opacity: 0.7;
+  min-height: 32px;
+  line-height: 1.35;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  text-align: center;
 }
 
 .chef-follow-btn{
@@ -181,11 +198,17 @@ ion-content {
   background: var(--ion-color-primary);
   color: var(--ion-color-primary-contrast);
   border-radius: 10px;
-  padding: 6px 10px;
+  padding: 6px 8px;
   font-size: 12px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .chef-follow-btn.is-following{
   background: var(--suga-surface-muted);

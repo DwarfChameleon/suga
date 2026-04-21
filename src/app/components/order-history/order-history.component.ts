@@ -44,7 +44,8 @@ export class OrderHistoryComponent implements OnInit {
   async openOrder(orderId: string): Promise<void> {
     const modal = await this.modalController.create({
       component: OrderInfoComponent,
-      componentProps: { orderId }
+      componentProps: { orderId },
+      cssClass: 'suga-order-fullsheet'
     });
     await modal.present();
   }

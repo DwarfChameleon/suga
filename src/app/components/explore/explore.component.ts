@@ -208,7 +208,11 @@ getBackgroundImageStyle(imageUrl:string): any{
   async openChefProfile(username: string) {
     const modal = await this.modalController.create({
       component: ProfileModalComponent,
-      componentProps: { username }
+      componentProps: { username },
+      cssClass: 'suga-profile-sheet',
+      handle: true,
+      initialBreakpoint: 0.76,
+      breakpoints: [0, 0.76, 0.94]
     });
     await modal.present();
   }

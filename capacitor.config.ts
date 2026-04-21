@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   plugins: {
     SplashScreen: {
       launchAutoHide: false,
-      launchShowDuration: 1200,
+      launchShowDuration: 450,
       backgroundColor: '#ffffffff',
       showSpinner: false,
       androidScaleType: 'CENTER_CROP'
@@ -27,10 +27,10 @@ const config: CapacitorConfig = {
       ScrollEnabled: 'false',
       BackupWebStorage: 'none',
       SplashMaintainAspectRatio: 'true',
-      FadeSplashScreenDuration: '300',
+      FadeSplashScreenDuration: '120',
       SplashShowOnlyFirstTime: 'false',
       SplashScreen: 'screen',
-      SplashScreenDelay: '3000'
+      SplashScreenDelay: '450'
     }
   }
 };

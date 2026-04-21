@@ -3,15 +3,31 @@ ion-menu-button {
   color: var(--ion-color-primary);
 }
 
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.auth-form {
+  --background: var(--ion-background-color);
+}
+
+.auth-form::part(scroll) {
+  min-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
+  display: block;
+}
+
 #container {
+  width: 100%;
+  min-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   text-align: center;
-   position: relative;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
   background-image: url('/assets/img/regpage.jpg');
-  background-position: top;
+  background-position: center top;
+  background-size: cover;
+  padding-bottom: calc(18px + var(--suga-safe-bottom));
 }
 
 #container strong {
@@ -31,14 +47,14 @@ ion-menu-button {
 }
 .curvy-div {
   width: 100%;
-  height: 50vh;
+  min-height: 42vh;
   background-color: var( --ion-color-primary-food );
   border-top-left-radius: 60% 60px;
   border-top-right-radius: 50% 0px;
   color: #fff;
   text-align: center;
   font-size: 24px;
-  padding-top:60px;
+  padding: 46px 0 22px;
   z-index: 2; 
   animation: border-radius-animation 5s infinite;
   }
@@ -65,14 +81,14 @@ ion-menu-button {
 }
 
 .authAction{
-  width:96%;
-  margin-left: 1%;
-  padding-top: 50px;
+  width: min(96%, 460px);
+  margin: 0 auto;
+  padding-top: 18px;
 
 }
           .curvy-div2 {
             width: 100%;
-            height: 50vh;
+            min-height: 38vh;
   background-image: transparent;
   border-bottom-left-radius: 0px 0px;
   border-bottom-right-radius: 0px 0px;
@@ -96,4 +112,5 @@ ion-menu-button {
 }
 .alreadyUser{
   font-size: var(--font-strong);
+  margin: 14px 0;
 }

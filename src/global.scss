@@ -338,12 +338,20 @@ body.suga-dark-theme .control span {
 }
 
 ion-modal.suga-order-fullsheet::part(content) {
-  --height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
-  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
-  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
-  margin-top: var(--suga-safe-top);
-  margin-bottom: var(--suga-safe-bottom);
+  --height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 12px);
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 12px);
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 12px);
+  margin-top: calc(var(--suga-safe-top) + 6px);
+  margin-bottom: calc(var(--suga-safe-bottom) + 6px);
   border-radius: 18px 18px 0 0;
+}
+
+ion-modal.suga-profile-sheet::part(content) {
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 100px);
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 100px);
+  margin-top: calc(var(--suga-safe-top) + 50px);
+  margin-bottom: calc(var(--suga-safe-bottom) + 50px);
+  border-radius: 26px;
 }
 
 body.suga-dark-theme input,

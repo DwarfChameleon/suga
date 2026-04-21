@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { environment } from 'src/environments/environment';
+import { Browser } from '@capacitor/browser';
 
 @Component({
   selector: 'app-payment-modal',
@@ -176,7 +177,7 @@ export class PaymentModalComponent implements OnInit {
         const cashUrl = resp?.paymentData?.cashierUrl || '';
         const paymentUrl = deepLink || cashUrl || qrCode || '';
         if (paymentUrl) {
-          window.open(paymentUrl, '_blank');
+          void Browser.open({ url: paymentUrl, presentationStyle: 'fullscreen' });
           this.paymentHint = 'Complete payment in OPay, then tap Verify Payment.';
         } else {
           this.paymentHint = 'Payment created. Complete payment in OPay, then tap Verify Payment.';
@@ -208,11 +209,12 @@ export class PaymentModalComponent implements OnInit {
         const authorizationUrl = resp?.data?.authorization_url || '';
         if (authorizationUrl) {
           try {
-            // Keep flow in same tab to avoid extra browser tab.
             sessionStorage.setItem('suga:pendingPaystackRef', this.paymentReference || '');
             sessionStorage.setItem('suga:pendingPaystackTx', this.transactionId || '');
           } catch {}
-          window.location.assign(authorizationUrl);
+          void Browser.open({ url: authorizationUrl, presentationStyle: 'fullscreen' });
+          this.paymentHint = 'Complete payment in the secure Paystack window, then return and tap Verify Payment.';
+          this.uiFeedback.success('Paystack opened inside the app.');
           return;
         } else {
           this.paymentHint = 'Payment created. Complete payment on Paystack, then tap Verify Payment.';

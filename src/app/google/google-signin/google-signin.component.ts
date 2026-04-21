@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import { AuthService } from 'src/app/services/authservice.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
@@ -24,6 +25,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
 
   private static gsiScriptPromise?: Promise<void>;
   private destroyed = false;
+  readonly isNativeApp = Capacitor.isNativePlatform();
 
   constructor(
     private readonly authService: AuthService,
@@ -42,6 +44,10 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
   }
 
   private async initializeGoogleButton(): Promise<void> {
+    if (this.isNativeApp) {
+      return;
+    }
+
     try {
       await this.loadGoogleScript();
       if (this.destroyed) return;
@@ -77,6 +83,10 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
       console.error('Google script load failed:', error);
       this.uiFeedback.error('Unable to load Google sign-in.');
     }
+  }
+
+  showNativeGoogleHint(): void {
+    this.uiFeedback.error('Google sign-in is not ready inside the APK yet. Please use email sign-up for now.');
   }
 
   private async handleGoogleCredential(idToken: string): Promise<void> {

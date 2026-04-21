@@ -179,9 +179,8 @@
         <div *ngFor="let follower of followers" class="follower-item" (click)="openFollowerProfile(follower)">
           <img [src]="getFollowerImage(follower.profilePicture)" alt="{{ follower.username }}" />
           <div class="follower-meta">@{{ follower.username }}</div>
-          <div class="follower-actions">
+          <div class="follower-actions" *ngIf="isChefFollower(follower)">
             <button type="button" class="follow-back-btn ghost" (click)="openFollowerProfile(follower, 'dishes'); $event.stopPropagation()">Dishes</button>
-            <button type="button" class="follow-back-btn ghost" (click)="openFollowerProfile(follower, 'stories'); $event.stopPropagation()">Stories</button>
           </div>
           <button
             type="button"

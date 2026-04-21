@@ -228,7 +228,8 @@ export class ConsumerComponent implements OnInit {
 
     const modal = await this.modalController.create({
       component: OrderInfoComponent,
-      componentProps: { orderId: order._id }
+      componentProps: { orderId: order._id },
+      cssClass: 'suga-order-fullsheet'
     });
     await modal.present();
   }

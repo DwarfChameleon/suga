@@ -9,12 +9,30 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoginModalComponent } from 'src/app/login-modal/login-modal.component';
 import { HttpClient } from '@angular/common/http';
 
+interface PublicProfileSummary {
+  level?: string;
+  rating?: number;
+  engagementLabel?: string;
+  totalOrdersMade?: number;
+  totalDeliveries?: number;
+  dishes?: number;
+  stories?: number;
+  dishLikes?: number;
+  storyLikes?: number;
+  verificationStatus?: string;
+}
+
 interface UserDetails {
+  _id: string;
   username: string;
-  email: string;
   roles: string[];
-  chefLevel?: string;
+  primaryRole: 'chef' | 'consumer' | 'dispatch' | string;
+  displayRole: string;
   profilePicture?: string;
+  coverPicture?: string;
+  isOnline?: boolean;
+  followersCount?: number;
+  summary?: PublicProfileSummary;
 }
 
 @Component({
@@ -55,52 +73,81 @@ export class ProfileModalComponent implements OnInit {
     const currentUser = JSON.parse(localStorage.getItem('auth-user') || 'null');
     this.currentUserId = currentUser?._id;
 
-    if (this.initialStatTab) {
-      this.selectedStatTab = this.initialStatTab;
-    }
-
     this.userService.getChefProfile(this.username).subscribe(
       (data: any) => {
-        data.roles = data.roles || [];
+        data.roles = Array.isArray(data?.roles) ? data.roles : [];
         this.userDetails = data;
-        this.chefId = data._id;
-        this.getFoodsByChefUsername(this.username);
-        if (this.chefId) {
-          this.loadStats(this.chefId);
-          this.loadFollowing(this.chefId);
-          this.loadFollowersList(this.chefId);
-          this.loadStoriesByChef(this.chefId);
+        this.chefId = data?._id;
+        this.followers = Number(data?.followersCount || 0);
+        this.dishes = Number(data?.summary?.dishes || 0);
+        this.stories = Number(data?.summary?.stories || 0);
+        this.dishLikes = Number(data?.summary?.dishLikes || 0);
+        this.storyLikes = Number(data?.summary?.storyLikes || 0);
+
+        if (this.isChefProfile) {
+          this.selectedStatTab = this.initialStatTab || 'dishes';
+          this.getFoodsByChefUsername(this.username);
+          if (this.chefId) {
+            this.loadFollowing(this.chefId);
+            this.loadFollowersList(this.chefId);
+            this.loadStoriesByChef(this.chefId);
+          }
         }
       },
       (error) => {
-        console.error('Error fetching chef profile:', error);
+        console.error('Error fetching profile:', error);
       }
     );
+  }
+
+  get isChefProfile(): boolean {
+    return this.userDetails?.primaryRole === 'chef';
+  }
+
+  get isConsumerProfile(): boolean {
+    return this.userDetails?.primaryRole === 'consumer';
+  }
+
+  get isDispatchProfile(): boolean {
+    return this.userDetails?.primaryRole === 'dispatch';
+  }
+
+  get roleHeading(): string {
+    return this.userDetails?.displayRole || 'User';
+  }
+
+  get levelLabel(): string {
+    return this.userDetails?.summary?.level || 'Starter';
+  }
+
+  get ratingLabel(): string {
+    const rating = Number(this.userDetails?.summary?.rating || 0);
+    return rating > 0 ? rating.toFixed(1) : 'New';
+  }
+
+  get engagementLabel(): string {
+    return this.userDetails?.summary?.engagementLabel || 'New';
+  }
+
+  get totalOrdersMade(): number {
+    return Number(this.userDetails?.summary?.totalOrdersMade || 0);
+  }
+
+  get totalDeliveries(): number {
+    return Number(this.userDetails?.summary?.totalDeliveries || 0);
+  }
+
+  get onlineLabel(): string {
+    return this.userDetails?.isOnline ? 'Online' : 'Offline';
   }
 
   getFoodsByChefUsername(username: string): void {
     this.foodService.getFoodsByChefUsername(username).subscribe(
       (foods: Food[]) => {
         this.chefFoods = foods;
-        console.log('Fetched foods by chef username:', this.chefFoods);
       },
       (error) => {
         console.error('Error fetching foods by chef username:', error);
-      }
-    );
-  }
-
-  loadStats(chefId: string): void {
-    this.userService.getChefStats(chefId).subscribe(
-      (stats) => {
-        this.followers = stats.followers || 0;
-        this.dishes = stats.dishes || 0;
-        this.stories = stats.stories || 0;
-        this.dishLikes = stats.dishLikes || 0;
-        this.storyLikes = stats.storyLikes || 0;
-      },
-      (error) => {
-        console.error('Error fetching chef stats:', error);
       }
     );
   }
@@ -117,7 +164,7 @@ export class ProfileModalComponent implements OnInit {
   }
 
   toggleFollow(): void {
-    if (!this.chefId) return;
+    if (!this.isChefProfile || !this.chefId) return;
     if (!this.tokenStorage.getAccessToken()) {
       this.uiFeedback.error('Please login to follow a chef.');
       this.openLoginModal();
@@ -172,6 +219,7 @@ export class ProfileModalComponent implements OnInit {
   }
 
   selectStatTab(tab: 'followers' | 'dishes' | 'stories'): void {
+    if (!this.isChefProfile) return;
     this.selectedStatTab = tab;
   }
 

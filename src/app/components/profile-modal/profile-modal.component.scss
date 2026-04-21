@@ -1,214 +1,285 @@
-.profile{
-    width:100%;
-    min-height:100vh;
-    background-color: var(--suga-surface);
-    position: fixed;
-    border-radius:0;
-    bottom:0px;
-    padding: 10px;
-    overflow: hidden;
+:host {
+  display: block;
+  height: 100%;
 }
-.chef-banner{
-    height: 140px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 30px 30px 18px 18px;
-    position: relative;
+
+.profile-content {
+  --background: transparent;
 }
-.banner-overlay{
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.1));
+
+.profile-sheet {
+  min-height: 100%;
+  padding: 10px 14px calc(18px + var(--suga-safe-bottom));
+  background: var(--suga-surface);
+  color: var(--ion-text-color);
+  overflow-y: auto;
 }
-.modal-header{
-    display:flex;
-    position: relative;
-    justify-content: space-between;
-    width: auto;
-    padding: 0 20px 8px 20px;
-    text-align: center;
-    margin-top: -40px;
-    align-items: flex-end;
+
+.drag-handle {
+  width: 52px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--suga-surface-muted);
+  margin: 4px auto 12px;
 }
-.modal-header ion-icon{
-    font-size: 28px;
-    color: var(--ion-color-primary);
-    background: var(--suga-surface);
-    border-radius: 50%;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
-.modal-header h2{
-font-size: var( --font-strong-xxlarge);
+
+.identity-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
-.modal-header h3,p{
-   text-align: center;
-    }
-.chef-hero{
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    background: var(--suga-surface);
-    padding: 10px 12px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+
+.profile-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--ion-color-primary-food);
+  background: var(--suga-surface-alt);
+  flex: 0 0 auto;
 }
-.chef-avatar{
-    width: 72px;
-    height: 72px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid var(--ion-color-primary);
+
+.identity-copy {
+  min-width: 0;
 }
-.chef-hero-text{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+
+.identity-copy h2 {
+  margin: 8px 0 4px;
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--ion-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.chef-role{
-    margin: 0;
-    font-size: var(--font-small);
-    opacity: 0.7;
+
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 112, 67, 0.12);
+  color: var(--ion-color-primary-food);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
-.chef-level{
-    margin: 2px 0 0 0;
-    font-size: var(--font-small);
-    font-weight: 600;
-    color: var(--ion-color-primary);
+
+.sub-line {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--suga-muted);
+  font-size: 12px;
 }
-.chef-tagline{
-    text-align: left;
-    padding: 0 12px;
-    color: var(--ion-color-primary-text);
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--ion-text-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
 }
-.profile-stats{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 8px 12px 4px 12px;
+
+.close-btn ion-icon {
+  font-size: 22px;
 }
-.stat{
-    background: var(--suga-surface-muted);
-    border-radius: 10px;
-    padding: 8px;
-    text-align: center;
-    border: 0;
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
 }
-.stat.clickable{
-    cursor: pointer;
+
+.compact-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.stat-label{
-    display: block;
-    font-size: var(--font-small);
-    opacity: 0.7;
+
+.summary-card {
+  background: var(--suga-surface-muted);
+  border-radius: 16px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 86px;
 }
-.stat-value{
-    display: block;
-    font-weight: 700;
-    font-size: var(--font-strong);
+
+.summary-card span {
+  font-size: 12px;
+  color: var(--suga-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
-.follow-row{
-    display: flex;
-    justify-content: center;
-    margin: 6px 0 12px 0;
+
+.summary-card strong {
+  font-size: 18px;
+  color: var(--ion-text-color);
 }
-.follow-row ion-button{
-  width: 80%;
+
+.follow-row {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 4px;
 }
-.content-divider{
-  width: calc(100% - 24px);
-  height: 1px;
-  margin: 6px 12px 10px;
-  background: linear-gradient(90deg, transparent, var(--ion-color-primary), transparent);
-  opacity: 0.45;
+
+.follow-row ion-button {
+  width: min(100%, 320px);
 }
-.list-shell{
+
+.content-divider {
   width: 100%;
-  padding: 0 10px 12px;
+  height: 1px;
+  margin: 18px 0 12px;
+  background: linear-gradient(90deg, transparent, var(--ion-color-primary-food), transparent);
+  opacity: 0.35;
 }
-.empty-list{
+
+.tab-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tab-row button {
+  border: none;
+  border-radius: 999px;
+  min-height: 38px;
+  background: var(--suga-surface-muted);
+  color: var(--ion-text-color);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tab-row button.active {
+  background: var(--ion-color-primary-food);
+  color: #fff;
+}
+
+.list-shell {
+  padding-top: 14px;
+}
+
+.empty-list {
   text-align: center;
   color: var(--suga-muted);
+  padding: 12px 0;
 }
-.list-row{
+
+.list-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px;
-  border-radius: 10px;
+  padding: 10px;
+  border-radius: 14px;
   background: var(--suga-surface-muted);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
-.list-row img{
-  width: 36px;
-  height: 36px;
+
+.list-row img {
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
 }
-.list-meta h4{
-  margin: 0;
-  font-size: 13px;
+
+.list-meta {
+  min-width: 0;
 }
-.list-meta p{
-  margin: 2px 0 0;
-  text-align: left;
+
+.list-meta h4 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ion-text-color);
+}
+
+.list-meta p {
+  margin: 4px 0 0;
   font-size: 12px;
   color: var(--suga-muted);
+  text-align: left;
 }
-.story-row video{
-  width: 72px;
-  height: 110px;
+
+.story-row video {
+  width: 78px;
+  height: 122px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
+  background: #000;
 }
-.load-more-btn{
+
+.load-more-btn {
   width: 100%;
+  min-height: 40px;
   border: 1px solid var(--suga-border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--suga-surface);
-  color: var(--ion-color-primary);
-  font-weight: 600;
-  padding: 10px;
-  margin-top: 6px;
+  color: var(--ion-color-primary-food);
+  font-weight: 700;
 }
-.videoModalChefFood-MotherBox{
-    width:100%;
-    height:auto;
-    display: flex;
-    padding: 10px;
-    overflow-y: scroll;
+
+.food-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
-.videoModalChefFood{
-   min-width:40%;
-    height:auto;
-    padding:10px;
-    display: grid;
-    position: relative;
-    margin-left: 15px;
-    box-shadow:0px 0px 5px 0px #80808063;
-    font-size: var(--font-small);
-    text-align: center;
-    background: var(--suga-surface);
-    border-radius: 12px;
+
+.food-card {
+  min-width: 144px;
+  max-width: 144px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--suga-surface-muted);
 }
-.videoModalChefFood p,h3{
-    font-size: var(--font-small);
+
+.food-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--suga-surface-alt);
 }
-.videoModalChefFood ion-icon{
-    font-size: var(--font-small);
+
+.food-details {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
 }
-.videoModalChefFood img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    background: var(--suga-surface-alt);
-    margin-right: 20px;
-    border-radius: 50%;
+
+.food-details h3,
+.food-details p {
+  margin: 0;
+  text-align: left;
+}
+
+.naira {
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .summary-grid,
+  .compact-grid {
+    grid-template-columns: 1fr 1fr;
   }
-  
-  .food-details {
-    display: flex;
-    flex-direction: column;
+
+  .identity-copy h2 {
+    font-size: 20px;
   }
-  ng-template p{
-    text-align: center;
-  }
+}

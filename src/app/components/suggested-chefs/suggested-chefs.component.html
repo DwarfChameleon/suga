@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Suggested Chefs</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="close()">
+      <ion-button fill="clear" class="header-close-btn" (click)="close()">
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -15,7 +15,7 @@
       <img [src]="getChefImage(chef.profilePicture)" alt="{{ chef.username }}" />
       <div class="chef-info">
         <div class="chef-name">@{{ chef.username }}</div>
-        <div class="chef-meta">{{ chef.dishCount }} dishes Â· {{ chef.followersCount }} followers</div>
+        <div class="chef-meta">{{ chef.dishCount }} dishes · {{ chef.followersCount }} followers</div>
       </div>
       <button class="chef-follow-btn" [class.is-following]="isFollowing(chef._id)" (click)="toggleFollow(chef._id)">
         <ion-icon *ngIf="!isFollowing(chef._id)" name="add-circle-outline"></ion-icon>
@@ -27,5 +27,5 @@
     <ion-checkbox (ionChange)="toggleDontShow($event)"></ion-checkbox>
     <span>Don't show me this page again</span>
   </div>
-  <ion-button expand="block" class="close-btn" (click)="close()">Close</ion-button>
+  <ion-button expand="block" class="close-btn" (click)="close()">Close Suggestions</ion-button>
 </ion-content>

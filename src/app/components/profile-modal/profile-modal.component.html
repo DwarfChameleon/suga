@@ -1,57 +1,99 @@
-<ion-content>
-  <div class="profile">
-    <div class="chef-banner" [style.backgroundImage]="'url(' + getImageUrl(userDetails?.profilePicture || '') + ')'">
-      <div class="banner-overlay"></div>
-    </div>
+<ion-content class="profile-content">
+  <div class="profile-sheet" *ngIf="userDetails as profile">
+    <div class="drag-handle"></div>
 
     <div class="modal-header">
-      <div class="chef-hero">
-        <img class="chef-avatar" [src]="getImageUrl(userDetails?.profilePicture || '')" alt="{{ userDetails?.username }}">
-        <div class="chef-hero-text">
-          <h2 class="modal-title">Chef @{{ userDetails?.username }}</h2>
-          <p class="chef-role" *ngIf="userDetails?.roles">Role: {{ userDetails?.roles }}</p>
-          <p class="chef-level" *ngIf="userDetails?.chefLevel">Level: {{ userDetails?.chefLevel }}</p>
+      <div class="identity-block">
+        <img class="profile-avatar" [src]="getImageUrl(profile.profilePicture || '')" alt="{{ profile.username }}">
+        <div class="identity-copy">
+          <span class="role-pill">{{ roleHeading }}</span>
+          <h2>@{{ profile.username }}</h2>
+          <div class="sub-line">
+            <span>{{ onlineLabel }}</span>
+            <span *ngIf="isDispatchProfile && profile.summary?.verificationStatus">{{ profile.summary?.verificationStatus | titlecase }}</span>
+          </div>
         </div>
       </div>
-      <ion-icon name="close-circle" (click)="closeModal()"></ion-icon>
+      <button type="button" class="close-btn" (click)="closeModal()" aria-label="Close profile">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
     </div>
 
-    <div class="modal-body">
-      <p class="chef-tagline">Bringing flavor to your table.</p>
-    </div>
-
-    <div class="profile-stats">
-      <button class="stat clickable" (click)="selectStatTab('followers')">
-        <span class="stat-label">Followers</span>
-        <span class="stat-value">{{ followers }}</span>
-      </button>
-      <button class="stat clickable" (click)="selectStatTab('dishes')">
-        <span class="stat-label">Dishes</span>
-        <span class="stat-value">{{ dishes }}</span>
-      </button>
-      <button class="stat clickable" (click)="selectStatTab('stories')">
-        <span class="stat-label">Stories</span>
-        <span class="stat-value">{{ stories }}</span>
-      </button>
-      <div class="stat">
-        <span class="stat-label">Dish Likes</span>
-        <span class="stat-value">{{ dishLikes }}</span>
+    <div class="summary-grid" *ngIf="isChefProfile; else compactProfile">
+      <div class="summary-card">
+        <span>Followers</span>
+        <strong>{{ followers }}</strong>
       </div>
-      <div class="stat">
-        <span class="stat-label">Story Likes</span>
-        <span class="stat-value">{{ storyLikes }}</span>
+      <div class="summary-card">
+        <span>Dishes</span>
+        <strong>{{ dishes }}</strong>
+      </div>
+      <div class="summary-card">
+        <span>Stories</span>
+        <strong>{{ stories }}</strong>
+      </div>
+      <div class="summary-card">
+        <span>Rating</span>
+        <strong>{{ ratingLabel }}</strong>
+      </div>
+      <div class="summary-card">
+        <span>Level</span>
+        <strong>{{ levelLabel }}</strong>
+      </div>
+      <div class="summary-card">
+        <span>Engagement</span>
+        <strong>{{ engagementLabel }}</strong>
       </div>
     </div>
 
-    <div class="follow-row" *ngIf="userDetails?.roles?.includes('chef')">
+    <ng-template #compactProfile>
+      <div class="summary-grid compact-grid">
+        <div class="summary-card">
+          <span>Role</span>
+          <strong>{{ roleHeading }}</strong>
+        </div>
+        <div class="summary-card">
+          <span>Level</span>
+          <strong>{{ levelLabel }}</strong>
+        </div>
+        <div class="summary-card">
+          <span>Rating</span>
+          <strong>{{ ratingLabel }}</strong>
+        </div>
+        <div class="summary-card" *ngIf="isConsumerProfile">
+          <span>Total Orders</span>
+          <strong>{{ totalOrdersMade }}</strong>
+        </div>
+        <div class="summary-card" *ngIf="isDispatchProfile">
+          <span>Deliveries</span>
+          <strong>{{ totalDeliveries }}</strong>
+        </div>
+        <div class="summary-card">
+          <span>Engagement</span>
+          <strong>{{ engagementLabel }}</strong>
+        </div>
+        <div class="summary-card">
+          <span>Status</span>
+          <strong>{{ onlineLabel }}</strong>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="follow-row" *ngIf="isChefProfile">
       <ion-button (click)="toggleFollow()" [color]="isFollowing ? 'medium' : 'primary'">
         {{ isFollowing ? 'Following' : 'Follow' }}
       </ion-button>
     </div>
 
-    <div class="content-divider"></div>
+    <div class="content-divider" *ngIf="isChefProfile"></div>
 
-    <div *ngIf="selectedStatTab === 'followers'" class="list-shell">
+    <div class="tab-row" *ngIf="isChefProfile">
+      <button type="button" [class.active]="selectedStatTab === 'dishes'" (click)="selectStatTab('dishes')">Dishes</button>
+      <button type="button" [class.active]="selectedStatTab === 'followers'" (click)="selectStatTab('followers')">Followers</button>
+      <button type="button" [class.active]="selectedStatTab === 'stories'" (click)="selectStatTab('stories')">Stories</button>
+    </div>
+
+    <div *ngIf="isChefProfile && selectedStatTab === 'followers'" class="list-shell">
       <div *ngIf="followerList.length === 0" class="empty-list">No followers yet.</div>
       <div *ngFor="let follower of pagedFollowers" class="list-row">
         <img [src]="getImageUrl(follower.profilePicture || '')" alt="{{ follower.username }}">
@@ -62,22 +104,23 @@
       <button *ngIf="hasMoreFollowers" class="load-more-btn" (click)="loadMoreFollowers()">Load more followers</button>
     </div>
 
-    <div *ngIf="selectedStatTab === 'dishes'" class="list-shell">
-      <div *ngIf="chefFoods.length > 0; else noFoods" class="videoModalChefFood-MotherBox">
-        <div *ngFor="let food of chefFoods" class="videoModalChefFood">
+    <div *ngIf="isChefProfile && selectedStatTab === 'dishes'" class="list-shell">
+      <div *ngIf="chefFoods.length > 0; else noFoods" class="food-scroll">
+        <div *ngFor="let food of chefFoods" class="food-card">
           <img [src]="getFoodImageUrl(food.image)" alt="{{ food.dishName }}">
           <div class="food-details">
             <h3>{{ food.dishName }}</h3>
-            <p><ion-icon name="timer-outline"></ion-icon><br>{{ food.preparationTime }}<br><span class="naira">&#8358;</span> {{ food.price }}</p>
+            <p>{{ food.preparationTime }}</p>
+            <p><span class="naira">&#8358;</span> {{ food.price }}</p>
           </div>
         </div>
       </div>
       <ng-template #noFoods>
-        <p>No foods available.</p>
+        <p class="empty-list">No dishes available yet.</p>
       </ng-template>
     </div>
 
-    <div *ngIf="selectedStatTab === 'stories'" class="list-shell">
+    <div *ngIf="isChefProfile && selectedStatTab === 'stories'" class="list-shell">
       <div *ngIf="storyList.length === 0" class="empty-list">No stories yet.</div>
       <div *ngFor="let story of pagedStories" class="list-row story-row">
         <video [src]="getStoryUrl(story.path)" muted controls preload="metadata"></video>
