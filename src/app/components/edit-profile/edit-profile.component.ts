@@ -48,6 +48,7 @@ export class EditProfileComponent implements OnInit {
   regions: string[] = [];
   states: string[] = [];
   cities: string[] = [];
+  suburbs: string[] = [];
   streetSuggestions: Array<{ displayName: string; lat: number; lng: number; address: any }> = [];
   private streetTimer?: ReturnType<typeof setTimeout>;
 
@@ -197,6 +198,7 @@ export class EditProfileComponent implements OnInit {
     if (addr.city) this.profile.city = addr.city;
     if (addr.state) this.profile.state = addr.state;
     if (addr.country) this.profile.country = addr.country;
+    this.suburbs = this.addressData.getSuburbs(this.profile.country || '', this.profile.state || this.profile.region || '', this.profile.city || '');
     this.streetSuggestions = [];
   }
 
@@ -323,6 +325,14 @@ export class EditProfileComponent implements OnInit {
     const locator = this.profile.state || this.profile.region || '';
     this.cities = this.addressData.getCities(this.profile.country || '', locator);
     this.profile.city = '';
+    this.suburbs = [];
+    this.profile.suburb = '';
+  }
+
+  onCityChanged(): void {
+    const locator = this.profile.state || this.profile.region || '';
+    this.suburbs = this.addressData.getSuburbs(this.profile.country || '', locator, this.profile.city || '');
+    this.profile.suburb = '';
   }
 
   isAddressFieldActive(key: AddressFieldKey): boolean {
@@ -343,5 +353,6 @@ export class EditProfileComponent implements OnInit {
     this.states = this.addressData.getStates(country);
     const locator = this.profile.state || this.profile.region || '';
     this.cities = this.addressData.getCities(country, locator);
+    this.suburbs = this.addressData.getSuburbs(country, locator, this.profile.city || '');
   }
 }

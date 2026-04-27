@@ -101,11 +101,11 @@
       <div class="row two" *ngIf="isAddressFieldActive('city')">
         <div>
           <label>{{ addressFieldLabel('city', 'City') }}</label>
-          <select *ngIf="isAddressFieldSelect('city')" [(ngModel)]="profile.city">
+          <select *ngIf="isAddressFieldSelect('city')" [(ngModel)]="profile.city" (ngModelChange)="onCityChanged()">
             <option value="" disabled>Select {{ addressFieldLabel('city', 'City') }}</option>
             <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
           </select>
-          <input *ngIf="!isAddressFieldSelect('city')" [(ngModel)]="profile.city" />
+          <input *ngIf="!isAddressFieldSelect('city')" [(ngModel)]="profile.city" (ngModelChange)="onCityChanged()" />
         </div>
       </div>
 
@@ -119,7 +119,11 @@
       <div class="row two" *ngIf="isAddressFieldActive('suburb')">
         <div>
           <label>{{ addressFieldLabel('suburb', 'Suburb') }}</label>
-          <input [(ngModel)]="profile.suburb" />
+          <select *ngIf="isAddressFieldSelect('suburb')" [(ngModel)]="profile.suburb">
+            <option value="" disabled>Select {{ addressFieldLabel('suburb', 'Suburb') }}</option>
+            <option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('suburb')" [(ngModel)]="profile.suburb" />
         </div>
       </div>
 

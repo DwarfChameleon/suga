@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -51,6 +51,12 @@ import { DispatchProfileComponent } from './components/dispatch-profile/dispatch
 import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './services/global-error-handler';
 import { ErrorLoggingInterceptor } from './services/error-logging.interceptor';
+import { AddressDataService } from './services/address-data.service';
+
+export function preloadAddressCatalog(addressDataService: AddressDataService): () => Promise<void> {
+  return () => addressDataService.warmCatalog();
+}
+
 @NgModule({
   declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent],
   imports: [BrowserModule, HttpClientModule, FormsModule, IonicModule.forRoot(), LoginPageModule, AppRoutingModule, ReactiveFormsModule],
@@ -58,6 +64,12 @@ import { ErrorLoggingInterceptor } from './services/error-logging.interceptor';
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     UserService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: preloadAddressCatalog,
+      deps: [AddressDataService],
+      multi: true
+    },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorLoggingInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },

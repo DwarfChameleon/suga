@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { City, State } from 'country-state-city';
+import { firstValueFrom, of } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { LOCATION_OVERRIDES } from '../data/location-overrides';
 
 export type AddressFieldKey = 'region' | 'state' | 'city' | 'suburb' | 'localGovernment' | 'street';
 export type AddressFieldType = 'select' | 'text';
@@ -15,17 +20,26 @@ interface CountryProfile {
   fields: AddressFieldConfig[];
 }
 
+interface AddressCatalogPayload {
+  version: number;
+  updatedAt: string;
+  profiles: Record<string, CountryProfile>;
+  coverage: Record<string, { states: Record<string, Array<{ name: string; suburbs?: string[] }>> }>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AddressDataService {
-  private readonly profiles: Record<string, CountryProfile> = {
+  private static readonly CACHE_KEY = 'suga.address.catalog.v1';
+  private readonly fallbackProfiles: Record<string, CountryProfile> = {
     Nigeria: {
       isoCode: 'NG',
       fields: [
         { key: 'state', label: 'State', type: 'select' },
-        { key: 'localGovernment', label: 'Local Government', type: 'text' },
-        { key: 'city', label: 'Town or City', type: 'select' }
+        { key: 'city', label: 'Town or City', type: 'select' },
+        { key: 'suburb', label: 'Area / Neighborhood', type: 'select' },
+        { key: 'localGovernment', label: 'Local Government', type: 'text' }
       ]
     },
     'United States': {
@@ -88,48 +102,142 @@ export class AddressDataService {
       ]
     }
   };
+  private profiles: Record<string, CountryProfile> = { ...this.fallbackProfiles };
+  private coverage: AddressCatalogPayload['coverage'] = LOCATION_OVERRIDES;
+  private catalogBootPromise?: Promise<void>;
+
+  constructor(private readonly http: HttpClient) {
+    this.loadFromCache();
+  }
 
   getCountries(): string[] {
-    return Object.keys(this.profiles);
+    return Object.keys(this.profiles).sort((a, b) => a.localeCompare(b));
   }
 
   getFieldConfig(country: string): AddressFieldConfig[] {
     return this.profiles[country]?.fields || [];
   }
 
+  async warmCatalog(force = false): Promise<void> {
+    if (!force && this.catalogBootPromise) {
+      return this.catalogBootPromise;
+    }
+
+    this.catalogBootPromise = firstValueFrom(
+      this.http.get<AddressCatalogPayload>(`${environment.apiUrl}/locations/catalog`).pipe(
+        timeout(2500),
+        catchError(() => of(null))
+      )
+    ).then((payload) => {
+      if (payload?.profiles) {
+        this.applyCatalog(payload);
+      }
+    }).finally(() => {
+      if (force) {
+        this.catalogBootPromise = undefined;
+      }
+    });
+
+    return this.catalogBootPromise;
+  }
+
   getRegions(country: string): string[] {
     const iso = this.profiles[country]?.isoCode;
     if (!iso) return [];
-    return this.uniqueSorted(State.getStatesOfCountry(iso).map((s) => s.name));
+    return this.mergeWithOverrides(this.getOverrideStateNames(country), State.getStatesOfCountry(iso).map((s) => s.name));
   }
 
   getStates(country: string): string[] {
     const iso = this.profiles[country]?.isoCode;
     if (!iso) return [];
-    return this.uniqueSorted(State.getStatesOfCountry(iso).map((s) => s.name));
+    const libraryStates = State.getStatesOfCountry(iso).map((s) => s.name);
+    const overrideStates = this.getOverrideStateNames(country);
+    return this.mergeWithOverrides(overrideStates, libraryStates);
   }
 
   getCities(country: string, stateOrRegion: string): string[] {
     const iso = this.profiles[country]?.isoCode;
     if (!iso || !stateOrRegion) return [];
 
-    const state = State.getStatesOfCountry(iso).find((s) => s.name === stateOrRegion);
-    if (!state) return [];
+    const overrideCities = (this.coverage[country]?.states?.[stateOrRegion] || []).map((entry) => entry.name);
 
-    return this.uniqueSorted(
-      City.getCitiesOfState(iso, state.isoCode).map((c) => c.name)
-    );
+    const state = State.getStatesOfCountry(iso).find((s) => s.name === stateOrRegion);
+    const libraryCities = state
+      ? City.getCitiesOfState(iso, state.isoCode).map((c) => c.name)
+      : [];
+
+    return this.mergeWithOverrides(overrideCities, libraryCities);
   }
 
-  getSuburbs(_country: string, _stateOrRegion: string): string[] {
-    return [];
+  getSuburbs(country: string, stateOrRegion: string, city: string): string[] {
+    if (!country || !stateOrRegion || !city) return [];
+    const suburbs = this.coverage[country]?.states?.[stateOrRegion]
+      ?.find((entry) => entry.name === city)
+      ?.suburbs || [];
+    return this.uniqueInOrder(suburbs);
   }
 
   getLocalGovernments(_country: string, _stateOrRegion: string): string[] {
     return [];
   }
 
-  private uniqueSorted(values: string[]): string[] {
-    return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b));
+  private applyCatalog(payload: AddressCatalogPayload): void {
+    this.profiles = Object.keys(payload.profiles || {}).length
+      ? payload.profiles
+      : { ...this.fallbackProfiles };
+    this.coverage = Object.keys(payload.coverage || {}).length
+      ? payload.coverage
+      : LOCATION_OVERRIDES;
+    this.writeCache(payload);
+  }
+
+  private loadFromCache(): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const raw = localStorage.getItem(AddressDataService.CACHE_KEY);
+      if (!raw) return;
+      const cached = JSON.parse(raw) as AddressCatalogPayload;
+      if (cached?.profiles) {
+        this.profiles = Object.keys(cached.profiles).length ? cached.profiles : { ...this.fallbackProfiles };
+      }
+      if (cached?.coverage) {
+        this.coverage = Object.keys(cached.coverage).length ? cached.coverage : LOCATION_OVERRIDES;
+      }
+    } catch {
+      // Ignore invalid cache and continue with bundled fallback data.
+    }
+  }
+
+  private writeCache(payload: AddressCatalogPayload): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      localStorage.setItem(AddressDataService.CACHE_KEY, JSON.stringify(payload));
+    } catch {
+      // Ignore storage errors so registration flow still works.
+    }
+  }
+
+  private getOverrideStateNames(country: string): string[] {
+    return Object.keys(this.coverage[country]?.states || {});
+  }
+
+  private mergeWithOverrides(priorityValues: string[], fallbackValues: string[]): string[] {
+    const fallbackOnly = fallbackValues
+      .filter((value) => !priorityValues.includes(value))
+      .sort((a, b) => a.localeCompare(b));
+    return this.uniqueInOrder([...priorityValues, ...fallbackOnly]);
+  }
+
+  private uniqueInOrder(values: string[]): string[] {
+    const seen = new Set<string>();
+    const output: string[] = [];
+    for (const value of values) {
+      if (!value || seen.has(value)) {
+        continue;
+      }
+      seen.add(value);
+      output.push(value);
+    }
+    return output;
   }
 }

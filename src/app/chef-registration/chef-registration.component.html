@@ -59,7 +59,7 @@
 
           <div class="form-group" *ngIf="isFieldActive('city') && isSelectField('city')">
             <ion-label>{{ getFieldLabel('city', 'City') }}</ion-label>
-            <ion-select formControlName="city" interface="popover">
+            <ion-select formControlName="city" interface="popover" (ionChange)="onCityChange()">
               <ion-select-option *ngFor="let city of cities" [value]="city">{{ city }}</ion-select-option>
             </ion-select>
           </div>
@@ -74,7 +74,14 @@
             <ion-input formControlName="localGovernment" type="text"></ion-input>
           </div>
 
-          <div class="form-group" *ngIf="isFieldActive('suburb')">
+          <div class="form-group" *ngIf="isFieldActive('suburb') && isSelectField('suburb')">
+            <ion-label>{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
+            <ion-select formControlName="suburb" interface="popover">
+              <ion-select-option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('suburb') && !isSelectField('suburb')">
             <ion-label>{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
             <ion-input formControlName="suburb" type="text"></ion-input>
           </div>

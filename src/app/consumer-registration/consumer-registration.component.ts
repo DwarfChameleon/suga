@@ -26,6 +26,7 @@ export class ConsumerRegistrationComponent implements OnInit {
   regions: string[] = [];
   states: string[] = [];
   cities: string[] = [];
+  suburbs: string[] = [];
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -130,6 +131,7 @@ export class ConsumerRegistrationComponent implements OnInit {
     this.regions = this.addressData.getRegions(country);
     this.states = this.addressData.getStates(country);
     this.cities = [];
+    this.suburbs = [];
     this.registrationForm.patchValue({
       region: '',
       state: '',
@@ -145,7 +147,16 @@ export class ConsumerRegistrationComponent implements OnInit {
     const country = this.registrationForm.get('country')?.value || '';
     const locator = this.registrationForm.get('state')?.value || this.registrationForm.get('region')?.value || '';
     this.cities = this.addressData.getCities(country, locator);
-    this.registrationForm.patchValue({ city: '' });
+    this.suburbs = [];
+    this.registrationForm.patchValue({ city: '', suburb: '' });
+  }
+
+  onCityChange(): void {
+    const country = this.registrationForm.get('country')?.value || '';
+    const locator = this.registrationForm.get('state')?.value || this.registrationForm.get('region')?.value || '';
+    const city = this.registrationForm.get('city')?.value || '';
+    this.suburbs = this.addressData.getSuburbs(country, locator, city);
+    this.registrationForm.patchValue({ suburb: '' });
   }
 
   isFieldActive(key: AddressFieldKey): boolean {

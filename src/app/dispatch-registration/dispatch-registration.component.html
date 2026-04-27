@@ -31,12 +31,67 @@
 
     <ion-item>
       <ion-label position="stacked">Country</ion-label>
-      <ion-input formControlName="country"></ion-input>
+      <ion-select formControlName="country" interface="popover" placeholder="Select country" (ionChange)="onCountryChange()">
+        <ion-select-option *ngFor="let c of countryOptions" [value]="c">{{ c }}</ion-select-option>
+      </ion-select>
     </ion-item>
 
-    <ion-item>
-      <ion-label position="stacked">City</ion-label>
+    <ion-item *ngIf="isFieldActive('region') && isSelectField('region')">
+      <ion-label position="stacked">{{ getFieldLabel('region', 'Region') }}</ion-label>
+      <ion-select formControlName="region" interface="popover" (ionChange)="onRegionOrStateChange()">
+        <ion-select-option *ngFor="let region of regions" [value]="region">{{ region }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('region') && !isSelectField('region')">
+      <ion-label position="stacked">{{ getFieldLabel('region', 'Region') }}</ion-label>
+      <ion-input formControlName="region"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('state') && isSelectField('state')">
+      <ion-label position="stacked">{{ getFieldLabel('state', 'State') }}</ion-label>
+      <ion-select formControlName="state" interface="popover" (ionChange)="onRegionOrStateChange()">
+        <ion-select-option *ngFor="let state of states" [value]="state">{{ state }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('state') && !isSelectField('state')">
+      <ion-label position="stacked">{{ getFieldLabel('state', 'State') }}</ion-label>
+      <ion-input formControlName="state"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('city') && isSelectField('city')">
+      <ion-label position="stacked">{{ getFieldLabel('city', 'City') }}</ion-label>
+      <ion-select formControlName="city" interface="popover" (ionChange)="onCityChange()">
+        <ion-select-option *ngFor="let city of cities" [value]="city">{{ city }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('city') && !isSelectField('city')">
+      <ion-label position="stacked">{{ getFieldLabel('city', 'City') }}</ion-label>
       <ion-input formControlName="city"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('suburb') && isSelectField('suburb')">
+      <ion-label position="stacked">{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
+      <ion-select formControlName="suburb" interface="popover">
+        <ion-select-option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('suburb') && !isSelectField('suburb')">
+      <ion-label position="stacked">{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
+      <ion-input formControlName="suburb"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('localGovernment')">
+      <ion-label position="stacked">{{ getFieldLabel('localGovernment', 'Local Government') }}</ion-label>
+      <ion-input formControlName="localGovernment"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="isFieldActive('street')">
+      <ion-label position="stacked">{{ getFieldLabel('street', 'Street') }}</ion-label>
+      <ion-input formControlName="street"></ion-input>
     </ion-item>
 
     <ion-item lines="none">
