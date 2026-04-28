@@ -1,7 +1,7 @@
 <div class="google-signin-wrapper">
   <div *ngIf="!isNativeApp" #googleButtonContainer class="google-button-host"></div>
   <button *ngIf="isNativeApp" type="button" class="native-google-fallback" (click)="showNativeGoogleHint()">
-    Continue with Google
-    <span>Web only for now</span>
+    Google sign-in
+    <span>Not active in this APK yet</span>
   </button>
 </div>

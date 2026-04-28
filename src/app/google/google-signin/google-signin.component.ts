@@ -86,7 +86,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
   }
 
   showNativeGoogleHint(): void {
-    this.uiFeedback.error('Google sign-in is not ready inside the APK yet. Please use email sign-up for now.');
+    this.uiFeedback.error('Google sign-in is not wired for this APK build yet. Use username, email, and password for now.');
   }
 
   private async handleGoogleCredential(idToken: string): Promise<void> {

@@ -23,7 +23,7 @@
       <form [formGroup]="loginForm" (ngSubmit)="login()">
 
         <div class="form-group">
-          <ion-label position="floating">Username</ion-label>
+          <ion-label position="floating">Username or Email</ion-label>
           <ion-input
             formControlName="username"
             [(ngModel)]="credentials.username"
