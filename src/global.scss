@@ -66,16 +66,20 @@ ion-header{
   padding: 0;
   background: var(--ion-color-primary);
   border-bottom: none;
-  padding-top: var(--suga-safe-top);
+  min-height: 56px;
 }
 
 ion-header ion-toolbar{
   --background: var(--ion-color-primary);
   --color: var(--ion-color-primary-contrast);
-  --min-height: 56px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  min-height: 56px;
+  --min-height: 52px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  min-height: 52px;
+  height: 52px;
+  max-height: 56px;
+  display: flex;
+  align-items: center;
 }
 
 ion-header ion-back-button,
@@ -88,16 +92,17 @@ ion-header ion-title{
 
 ion-header ion-title {
   font-weight: 600;
-  font-size: 18px;
-  padding-inline: 8px;
+  font-size: 17px;
+  line-height: 1.2;
+  padding-inline: 6px;
 }
 
 ion-header ion-buttons[slot="start"] {
-  margin-inline-end: 6px;
+  margin-inline-end: 4px;
 }
 
 ion-header ion-buttons[slot="end"] {
-  margin-inline-start: 6px;
+  margin-inline-start: 4px;
 }
 
 app-back-button ion-button{

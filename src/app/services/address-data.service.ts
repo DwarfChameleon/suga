@@ -31,7 +31,7 @@ interface AddressCatalogPayload {
   providedIn: 'root'
 })
 export class AddressDataService {
-  private static readonly CACHE_KEY = 'suga.address.catalog.v1';
+  private static readonly CACHE_KEY = 'suga.address.catalog.v2';
   private readonly fallbackProfiles: Record<string, CountryProfile> = {
     Nigeria: {
       isoCode: 'NG',
