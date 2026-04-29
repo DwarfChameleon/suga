@@ -20,6 +20,14 @@ const config: CapacitorConfig = {
     LocalNotifications: {
       smallIcon: 'ic_stat_suga',
       iconColor: '#3880FF'
+    },
+    SocialLogin: {
+      providers: {
+        google: true,
+        facebook: false,
+        apple: false,
+        twitter: false
+      }
     }
   },
   cordova: {

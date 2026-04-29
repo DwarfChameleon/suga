@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
+import { SocialLogin } from '@capgo/capacitor-social-login';
 import { AuthService } from 'src/app/services/authservice.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
@@ -24,7 +25,9 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
   @ViewChild('googleButtonContainer', { static: true }) googleButtonContainer!: ElementRef<HTMLDivElement>;
 
   private static gsiScriptPromise?: Promise<void>;
+  private static nativeGoogleInitPromise?: Promise<void>;
   private destroyed = false;
+  isNativeBusy = false;
   readonly isNativeApp = Capacitor.isNativePlatform();
 
   constructor(
@@ -36,7 +39,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit(): void {
-    this.initializeGoogleButton();
+    void this.initializeGoogleButton();
   }
 
   ngOnDestroy(): void {
@@ -45,6 +48,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
 
   private async initializeGoogleButton(): Promise<void> {
     if (this.isNativeApp) {
+      await this.initializeNativeGoogle();
       return;
     }
 
@@ -66,7 +70,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
             this.uiFeedback.error('Google sign-in failed. Please try again.');
             return;
           }
-          this.handleGoogleCredential(credential);
+          void this.handleGoogleCredential(credential);
         }
       });
 
@@ -85,25 +89,65 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  showNativeGoogleHint(): void {
-    this.uiFeedback.error('Google sign-in is not wired for this APK build yet. Use username, email, and password for now.');
+  async signInWithNativeGoogle(): Promise<void> {
+    if (this.isNativeBusy) {
+      return;
+    }
+
+    this.isNativeBusy = true;
+    try {
+      await this.initializeNativeGoogle();
+      await this.loadingService.show('Opening Google...');
+
+      const result = await SocialLogin.login({
+        provider: 'google',
+        options: {
+          scopes: ['email', 'profile', 'openid'],
+          style: 'bottom',
+          filterByAuthorizedAccounts: false,
+          autoSelectEnabled: false
+        }
+      });
+
+      const idToken = result.result.responseType === 'online' ? result.result.idToken : null;
+      if (!idToken) {
+        throw new Error('Google sign-in did not return an ID token.');
+      }
+
+      await this.handleGoogleCredential(idToken, true);
+    } catch (error: any) {
+      await this.loadingService.hide();
+      if (this.isUserCancellation(error) || error?.uiHandled) {
+        return;
+      }
+      console.error('Native Google sign-in failed:', error);
+      this.uiFeedback.error(this.resolveNativeGoogleError(error));
+    } finally {
+      this.isNativeBusy = false;
+    }
   }
 
-  private async handleGoogleCredential(idToken: string): Promise<void> {
-    await this.loadingService.show('Signing in with Google...');
+  private async handleGoogleCredential(idToken: string, loaderAlreadyVisible = false): Promise<void> {
+    if (!loaderAlreadyVisible) {
+      await this.loadingService.show('Signing in with Google...');
+    }
 
-    this.authService.loginWithGoogle(idToken, [this.role]).subscribe({
-      next: async (response) => {
-        await this.loadingService.hide();
-        this.authenticated.emit(response);
-        if (this.authenticated.observers.length === 0) {
-          this.redirectAfterLogin(response);
+    return new Promise<void>((resolve, reject) => {
+      this.authService.loginWithGoogle(idToken, [this.role]).subscribe({
+        next: async (response) => {
+          await this.loadingService.hide();
+          this.authenticated.emit(response);
+          if (this.authenticated.observers.length === 0) {
+            this.redirectAfterLogin(response);
+          }
+          resolve();
+        },
+        error: async (error) => {
+          await this.loadingService.hide();
+          this.uiFeedback.error('Google authentication failed.');
+          reject({ ...error, uiHandled: true });
         }
-      },
-      error: async () => {
-        await this.loadingService.hide();
-        this.uiFeedback.error('Google authentication failed.');
-      }
+      });
     });
   }
 
@@ -148,5 +192,47 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
     });
 
     return GoogleSigninComponent.gsiScriptPromise;
+  }
+
+  private initializeNativeGoogle(): Promise<void> {
+    if (!this.isNativeApp) {
+      return Promise.resolve();
+    }
+
+    const clientId = environment.googleClientId?.trim();
+    if (!clientId) {
+      this.uiFeedback.error('Google Sign-In is not configured.');
+      return Promise.reject(new Error('Missing Google web client ID.'));
+    }
+
+    if (!GoogleSigninComponent.nativeGoogleInitPromise) {
+      GoogleSigninComponent.nativeGoogleInitPromise = SocialLogin.initialize({
+        google: {
+          webClientId: clientId,
+          mode: 'online'
+        }
+      }).catch((error) => {
+        GoogleSigninComponent.nativeGoogleInitPromise = undefined;
+        throw error;
+      });
+    }
+
+    return GoogleSigninComponent.nativeGoogleInitPromise;
+  }
+
+  private isUserCancellation(error: any): boolean {
+    const message = String(error?.message || error || '').toLowerCase();
+    return message.includes('cancel') || message.includes('dismiss') || message.includes('12501');
+  }
+
+  private resolveNativeGoogleError(error: any): string {
+    const message = String(error?.message || error || '');
+    if (message.toLowerCase().includes('no credentials')) {
+      return 'No Google account is ready on this device yet. Add or unlock a Google account and try again.';
+    }
+    if (message.toLowerCase().includes('network')) {
+      return 'Google sign-in could not reach the network. Please check your connection and try again.';
+    }
+    return 'Google sign-in could not start on this device. Please try again.';
   }
 }

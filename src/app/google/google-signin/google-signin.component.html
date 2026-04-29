@@ -1,7 +1,10 @@
 <div class="google-signin-wrapper">
   <div *ngIf="!isNativeApp" #googleButtonContainer class="google-button-host"></div>
-  <button *ngIf="isNativeApp" type="button" class="native-google-fallback" (click)="showNativeGoogleHint()">
-    Google sign-in
-    <span>Not active in this APK yet</span>
+  <button *ngIf="isNativeApp" type="button" class="native-google-button" [disabled]="isNativeBusy" (click)="signInWithNativeGoogle()">
+    <span class="google-mark" aria-hidden="true">G</span>
+    <span class="native-google-copy">
+      <strong>{{ context === 'register' ? 'Sign up with Google' : 'Continue with Google' }}</strong>
+      <small>{{ isNativeBusy ? 'Opening Google...' : 'Use the Google account on this device' }}</small>
+    </span>
   </button>
 </div>
