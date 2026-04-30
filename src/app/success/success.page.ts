@@ -1,6 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../services/authservice.service';
+import { LoadingService } from '../services/loading.service';
+import { UiFeedbackService } from '../services/ui-feedback.service';
 
 @Component({
   selector: 'app-success',
@@ -15,15 +19,18 @@ export class SuccessPage implements OnInit, OnDestroy {
   @Input() ctaLabel?: string;
   @Input() autoLoginPrefill?: { username?: string; password?: string; auto?: boolean };
 
+  isContinuing = false;
   private redirectTimer?: number;
 
-  constructor(private router: Router, private modalController: ModalController) {}
+  constructor(
+    private router: Router,
+    private modalController: ModalController,
+    private authService: AuthService,
+    private loadingService: LoadingService,
+    private uiFeedback: UiFeedbackService
+  ) {}
 
   ngOnInit(): void {
-    if (this.autoLoginPrefill) {
-      sessionStorage.setItem('suga-login-prefill', JSON.stringify(this.autoLoginPrefill));
-    }
-
     if (this.autoRedirectTo) {
       const delay = Number(this.autoRedirectDelayMs || 5000);
       this.redirectTimer = window.setTimeout(() => {
@@ -38,12 +45,34 @@ export class SuccessPage implements OnInit, OnDestroy {
     }
   }
 
-  continue(): void {
-    if (this.autoRedirectTo) {
-      this.navigateTo(this.autoRedirectTo);
+  async continue(): Promise<void> {
+    if (this.isContinuing) {
       return;
     }
-    this.router.navigate(['/components/explore']);
+
+    if (this.autoLoginPrefill?.username && this.autoLoginPrefill?.password) {
+      this.isContinuing = true;
+      await this.loadingService.show('Signing you in...');
+      try {
+        const response = await firstValueFrom(
+          this.authService.login(this.autoLoginPrefill.username, this.autoLoginPrefill.password)
+        );
+        await this.loadingService.hide();
+        await this.modalController.dismiss();
+        this.redirectAfterLogin(response);
+      } catch (error) {
+        await this.loadingService.hide();
+        this.isContinuing = false;
+        this.uiFeedback.error('Account created, but automatic sign-in failed. Please sign in manually.');
+      }
+      return;
+    }
+
+    if (this.autoRedirectTo) {
+      await this.navigateTo(this.autoRedirectTo);
+      return;
+    }
+    await this.navigateTo('/components/explore');
   }
 
   private async navigateTo(url: string): Promise<void> {
@@ -53,6 +82,18 @@ export class SuccessPage implements OnInit, OnDestroy {
       // ignore if not opened as a modal
     }
     this.router.navigateByUrl(url, { replaceUrl: true });
+  }
+
+  private redirectAfterLogin(response: any): void {
+    const rolesRaw = response?.user?.roles ?? [];
+    const roles = Array.isArray(rolesRaw) ? rolesRaw : [rolesRaw];
+    const target = roles.includes('chef')
+      ? '/components/chef'
+      : roles.includes('dispatch')
+        ? '/components/dispatch'
+        : '/components/consumer';
+
+    this.router.navigateByUrl(target, { replaceUrl: true });
   }
 
   refresh(event: any): void {

@@ -10,7 +10,7 @@
 <ion-content [fullscreen]="true" class="registration-content">
   <div class="hero">
     <h2>Consumer Signup</h2>
-    <p>Step 1 role is done. Continue with country details, then account details.</p>
+    <p>Choose your service area, then finish your account details.</p>
   </div>
 
   <div class="warning" *ngIf="invalidFormMessage">{{ invalidFormMessage }}</div>
@@ -69,11 +69,6 @@
             <ion-input formControlName="city" type="text"></ion-input>
           </div>
 
-          <div class="form-group" *ngIf="isFieldActive('localGovernment')">
-            <ion-label>{{ getFieldLabel('localGovernment', 'Local Government') }}</ion-label>
-            <ion-input formControlName="localGovernment" type="text"></ion-input>
-          </div>
-
           <div class="form-group" *ngIf="isFieldActive('suburb') && isSelectField('suburb')">
             <ion-label>{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
             <ion-select formControlName="suburb" interface="popover">
@@ -91,7 +86,7 @@
             <ion-input formControlName="street" type="text"></ion-input>
           </div>
 
-          <ion-button type="button" expand="block" class="regSubmitBTN" (click)="goToStep(3)">Continue to Account</ion-button>
+          <ion-button type="button" expand="block" class="regSubmitBTN" (click)="goToStep(3)">Continue</ion-button>
         </div>
 
         <div class="step-panel" *ngIf="currentStep === 3">

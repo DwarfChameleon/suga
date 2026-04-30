@@ -1,24 +1,24 @@
 @import "/src/theme/variables.scss";
 
 .registration-content {
-  --padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  --padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
 .registration-content::part(scroll) {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
 .hero {
   margin: 16px;
-  padding: 18px;
+  padding: 16px;
   border-radius: 18px;
   color: #fff;
-  background: linear-gradient(135deg, #114b8b 0%, #2f8b4b 100%);
+  background: linear-gradient(135deg, #fe2c55 0%, #ff7b45 100%);
 }
 
 .hero h2 {
   margin: 0 0 6px;
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .hero p {
@@ -38,14 +38,14 @@
 
 .reg-container {
   width: 100%;
-  padding: 0 16px calc(40px + env(safe-area-inset-bottom, 0px));
+  padding: 0 16px calc(20px + env(safe-area-inset-bottom, 0px));
 }
 
 .form-card {
   background: #ffffff;
   border-radius: 20px;
-  padding: 18px 16px;
-  box-shadow: 0 14px 30px rgba(18, 35, 66, 0.12);
+  padding: 16px 14px;
+  box-shadow: 0 12px 24px rgba(18, 35, 66, 0.08);
   border: 1px solid rgba(17, 34, 68, 0.08);
 }
 
@@ -95,14 +95,14 @@ ion-select {
   --border-radius: 12px;
   border: 1px solid #dbe2ef;
   border-radius: 12px;
-  min-height: 46px;
+  min-height: 42px;
 }
 
 .regSubmitBTN {
-  margin-top: 14px;
-  height: 52px;
+  margin-top: 10px;
+  height: 42px;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .step-panel {
@@ -123,16 +123,12 @@ ion-select {
   display: grid;
   gap: 10px;
   grid-template-columns: 1fr 1fr;
-  margin-top: 8px;
-  position: sticky;
-  bottom: 0;
-  padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff 22%, #ffffff 100%);
-  z-index: 3;
+  margin-top: 10px;
+  padding-top: 4px;
 }
 
 .back-btn {
-  height: 52px;
+  height: 42px;
 }
 
 @keyframes fadeIn {

@@ -1,9 +1,9 @@
 .dispatch-registration-content {
-  --padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  --padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
 }
 
 .dispatch-registration-content::part(scroll) {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
 }
 
 .dispatch-form {
@@ -14,11 +14,10 @@
 
 ion-item {
   --border-radius: 12px;
-  --background: rgba(255, 255, 255, 0.06);
+  --background: rgba(247, 248, 252, 1);
 }
 
-ion-button {
-  margin-top: 14px;
-  min-height: 52px;
+.dispatch-submit {
+  margin-top: 10px;
   margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }

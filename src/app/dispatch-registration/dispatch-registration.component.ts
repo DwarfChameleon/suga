@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { UiFeedbackService } from '../services/ui-feedback.service';
 import { LoadingService } from '../services/loading.service';
 import { ModalControlService } from '../services/modal-control.service';
-import { AddressDataService, AddressFieldKey } from '../services/address-data.service';
+import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
 
 @Component({
   selector: 'app-dispatch-registration',
@@ -17,7 +17,7 @@ export class DispatchRegistrationComponent implements OnInit {
   registrationForm: FormGroup;
   isSubmitting = false;
   readonly countryOptions = this.addressData.getCountries();
-  activeFields: Array<{ key: AddressFieldKey; label: string; type: 'select' | 'text' }> = [];
+  activeFields: AddressFieldConfig[] = [];
   regions: string[] = [];
   states: string[] = [];
   cities: string[] = [];
@@ -112,9 +112,7 @@ export class DispatchRegistrationComponent implements OnInit {
         };
         this.modalControlService.openSuccessModal({
           category: 'dispatch',
-          autoRedirectTo: '/login',
-          autoRedirectDelayMs: 5000,
-          ctaLabel: 'Continue to Login',
+          ctaLabel: 'Continue to My Profile',
           autoLoginPrefill: prefill
         });
         this.isSubmitting = false;
@@ -169,6 +167,10 @@ export class DispatchRegistrationComponent implements OnInit {
     return this.activeFields.find((field) => field.key === key)?.type === 'select';
   }
 
+  isRequiredField(key: AddressFieldKey): boolean {
+    return this.activeFields.find((field) => field.key === key)?.required !== false;
+  }
+
   getFieldLabel(key: AddressFieldKey, fallback: string): string {
     return this.activeFields.find((field) => field.key === key)?.label || fallback;
   }
@@ -178,8 +180,10 @@ export class DispatchRegistrationComponent implements OnInit {
     allFields.forEach((field) => {
       const control = this.registrationForm.get(field);
       if (!control) return;
-      if (this.isFieldActive(field)) {
+      if (this.isFieldActive(field) && this.isRequiredField(field)) {
         control.setValidators([Validators.required]);
+      } else if (this.isFieldActive(field)) {
+        control.clearValidators();
       } else {
         control.clearValidators();
         control.setValue('');

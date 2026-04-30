@@ -66,18 +66,18 @@ ion-header{
   padding: 0;
   background: var(--ion-color-primary);
   border-bottom: none;
-  min-height: 56px;
+  min-height: 94px;
 }
 
 ion-header ion-toolbar{
   --background: var(--ion-color-primary);
   --color: var(--ion-color-primary-contrast);
-  --min-height: 52px;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  min-height: 52px;
-  height: 52px;
-  max-height: 56px;
+  --min-height: 90px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  min-height: 90px;
+  height: 90px;
+  max-height: 94px;
   display: flex;
   align-items: center;
 }
@@ -92,9 +92,9 @@ ion-header ion-title{
 
 ion-header ion-title {
   font-weight: 600;
-  font-size: 17px;
+  font-size: 20px;
   line-height: 1.2;
-  padding-inline: 6px;
+  padding-inline: 8px;
 }
 
 ion-header ion-buttons[slot="start"] {
@@ -112,7 +112,7 @@ app-back-button ion-button{
 
 //all input height
 ion-input{
-   height:50px; 
+   height:42px; 
 }
 
 ion-content {
@@ -383,21 +383,37 @@ body.suga-dark-theme .form-group select {
   
 select{
   width:90%;
-  height:50px;  
+  height:42px;  
   border:none;
 }
 
 
 .regSubmitBTN{
     background-color: var(--ion-color-primary-food);
-    width: 96%;
-    margin-left: 2%;
-    height: 50px;
-    border-radius: 5px;
-    box-shadow: 1px 1px 1px 3px var(--ion-color-primary-food);
+    width: 100%;
+    margin-left: 0;
+    height: 42px;
+    min-height: 42px;
+    border-radius: 12px;
+    box-shadow: none;
     border: none;
-    font-size: x-large;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-transform: none;
     color: white;
+}
+
+ion-content ion-button,
+ion-modal ion-button {
+  --border-radius: 12px;
+  --box-shadow: none;
+  min-height: 42px;
+  height: 42px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 .left-align-buttons .action-sheet-button-inner.sc-ion-action-sheet-ios {
     justify-content: flex-start;
@@ -471,27 +487,27 @@ border: 1px solid #2c6bc240;
   }
 
   .form-group ion-label{
-    padding: 10px 0 0 10px;
+    padding: 4px 0 0 4px;
   }
 
   .form-group   ion-input{
     border: 2px solid #dcdcdc;
-    margin-top: 20px;
-    width: 96%;
-    height: 65px;
-    margin-left: 2%;
+    margin-top: 6px;
+    width: 100%;
+    height: 42px;
+    margin-left: 0;
     border-radius: 10px;
-    box-shadow: 0px 0px 1px #b9b9b9;
+    box-shadow: none;
     z-index:0;
   }
     .form-group   select{
     border: 2px solid #dcdcdc;
-    margin-top: 20px;
-    width: 96%;
-    height: 70px;
-    margin-left: 2%;
+    margin-top: 6px;
+    width: 100%;
+    height: 42px;
+    margin-left: 0;
     border-radius: 10px;
-    box-shadow: 0px 0px 1px #b9b9b9;
+    box-shadow: none;
   }
   //close icons butto stryle
 

@@ -16,14 +16,15 @@
     </div>
 
     <div class="successinstructions">
-      <h2>Congratulations</h2>
+      <h2>Account ready</h2>
       <p>Your Suga account has been created successfully.</p>
 
       <ion-button
         expand="block"
         class="successBTN"
+        [disabled]="isContinuing"
         (click)="continue()">
-        {{ ctaLabel || 'Continue' }}
+        {{ ctaLabel || 'Continue to My Profile' }}
       </ion-button>
     </div>
 

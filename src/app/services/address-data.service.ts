@@ -13,6 +13,7 @@ export interface AddressFieldConfig {
   key: AddressFieldKey;
   label: string;
   type: AddressFieldType;
+  required?: boolean;
 }
 
 interface CountryProfile {
@@ -31,15 +32,14 @@ interface AddressCatalogPayload {
   providedIn: 'root'
 })
 export class AddressDataService {
-  private static readonly CACHE_KEY = 'suga.address.catalog.v2';
+  private static readonly CACHE_KEY = 'suga.address.catalog.v3';
   private readonly fallbackProfiles: Record<string, CountryProfile> = {
     Nigeria: {
       isoCode: 'NG',
       fields: [
         { key: 'state', label: 'State', type: 'select' },
         { key: 'city', label: 'Town or City', type: 'select' },
-        { key: 'suburb', label: 'Area / Neighborhood', type: 'select' },
-        { key: 'localGovernment', label: 'Local Government', type: 'text' }
+        { key: 'suburb', label: 'Area / Neighborhood (optional)', type: 'select', required: false }
       ]
     },
     'United States': {
@@ -47,8 +47,8 @@ export class AddressDataService {
       fields: [
         { key: 'state', label: 'State', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
-        { key: 'suburb', label: 'Suburb', type: 'text' },
-        { key: 'street', label: 'Street', type: 'text' }
+        { key: 'suburb', label: 'Suburb (optional)', type: 'text', required: false },
+        { key: 'street', label: 'Street (optional)', type: 'text', required: false }
       ]
     },
     'United Kingdom': {
@@ -56,8 +56,8 @@ export class AddressDataService {
       fields: [
         { key: 'state', label: 'County / Nation', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
-        { key: 'suburb', label: 'District / Suburb', type: 'text' },
-        { key: 'street', label: 'Street', type: 'text' }
+        { key: 'suburb', label: 'District / Suburb (optional)', type: 'text', required: false },
+        { key: 'street', label: 'Street (optional)', type: 'text', required: false }
       ]
     },
     'South Africa': {
@@ -65,16 +65,15 @@ export class AddressDataService {
       fields: [
         { key: 'state', label: 'Province', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
-        { key: 'suburb', label: 'Suburb', type: 'text' },
-        { key: 'street', label: 'Street', type: 'text' }
+        { key: 'suburb', label: 'Suburb (optional)', type: 'text', required: false },
+        { key: 'street', label: 'Street (optional)', type: 'text', required: false }
       ]
     },
     Ghana: {
       isoCode: 'GH',
       fields: [
         { key: 'region', label: 'Region', type: 'select' },
-        { key: 'city', label: 'Town or City', type: 'select' },
-        { key: 'localGovernment', label: 'District / Municipality', type: 'text' }
+        { key: 'city', label: 'Town or City', type: 'select' }
       ]
     },
     Kenya: {
@@ -82,7 +81,7 @@ export class AddressDataService {
       fields: [
         { key: 'state', label: 'County', type: 'select' },
         { key: 'city', label: 'Town or City', type: 'select' },
-        { key: 'suburb', label: 'Suburb', type: 'text' }
+        { key: 'suburb', label: 'Suburb (optional)', type: 'text', required: false }
       ]
     },
     France: {
@@ -90,7 +89,7 @@ export class AddressDataService {
       fields: [
         { key: 'region', label: 'Region', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
-        { key: 'street', label: 'Street', type: 'text' }
+        { key: 'street', label: 'Street (optional)', type: 'text', required: false }
       ]
     },
     Italy: {
@@ -98,7 +97,7 @@ export class AddressDataService {
       fields: [
         { key: 'region', label: 'Region', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
-        { key: 'street', label: 'Street', type: 'text' }
+        { key: 'street', label: 'Street (optional)', type: 'text', required: false }
       ]
     }
   };

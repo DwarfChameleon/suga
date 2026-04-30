@@ -1,4 +1,4 @@
-<ion-content>
+<ion-content [scrollY]="false" class="login-content">
   <div class="login-container">
 
     <div *ngIf="loginError" class="error-message warning">
@@ -17,7 +17,7 @@
 
       <div class="signIn" align="center">
         <h2>Sign in</h2>
-        <p>to continue enjoying our app!</p>
+        <p>Welcome back to Suga.</p>
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="login()">

@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { UiFeedbackService } from '../services/ui-feedback.service';
 import { LoadingService } from '../services/loading.service';
-import { AddressDataService, AddressFieldKey } from '../services/address-data.service';
+import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
 
 @Component({
   selector: 'app-consumer-registration',
@@ -22,7 +22,7 @@ export class ConsumerRegistrationComponent implements OnInit {
   isSubmitting = false;
   currentStep = 2;
   readonly countryOptions = this.addressData.getCountries();
-  activeFields: Array<{ key: AddressFieldKey; label: string; type: 'select' | 'text' }> = [];
+  activeFields: AddressFieldConfig[] = [];
   regions: string[] = [];
   states: string[] = [];
   cities: string[] = [];
@@ -86,9 +86,7 @@ export class ConsumerRegistrationComponent implements OnInit {
         };
         this.modalControlService.openSuccessModal({
           category: 'consumer',
-          autoRedirectTo: '/login',
-          autoRedirectDelayMs: 5000,
-          ctaLabel: 'Continue to Login',
+          ctaLabel: 'Continue to My Profile',
           autoLoginPrefill: prefill
         });
       },
@@ -167,6 +165,10 @@ export class ConsumerRegistrationComponent implements OnInit {
     return this.activeFields.find((f) => f.key === key)?.type === 'select';
   }
 
+  isRequiredField(key: AddressFieldKey): boolean {
+    return this.activeFields.find((f) => f.key === key)?.required !== false;
+  }
+
   getFieldLabel(key: AddressFieldKey, fallback: string): string {
     return this.activeFields.find((f) => f.key === key)?.label || fallback;
   }
@@ -189,7 +191,7 @@ export class ConsumerRegistrationComponent implements OnInit {
     if (!countryValid) return false;
     return this.activeFields.every((field) => {
       const control = this.registrationForm.get(field.key);
-      return !control?.validator || !!String(control?.value || '').trim();
+      return field.required === false || !control?.validator || !!String(control?.value || '').trim();
     });
   }
 
@@ -198,8 +200,10 @@ export class ConsumerRegistrationComponent implements OnInit {
     allFields.forEach((field) => {
       const control = this.registrationForm.get(field);
       if (!control) return;
-      if (this.isFieldActive(field)) {
+      if (this.isFieldActive(field) && this.isRequiredField(field)) {
         control.setValidators([Validators.required]);
+      } else if (this.isFieldActive(field)) {
+        control.clearValidators();
       } else {
         control.clearValidators();
         control.setValue('');

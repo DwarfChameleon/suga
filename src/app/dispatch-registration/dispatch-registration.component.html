@@ -84,11 +84,6 @@
       <ion-input formControlName="suburb"></ion-input>
     </ion-item>
 
-    <ion-item *ngIf="isFieldActive('localGovernment')">
-      <ion-label position="stacked">{{ getFieldLabel('localGovernment', 'Local Government') }}</ion-label>
-      <ion-input formControlName="localGovernment"></ion-input>
-    </ion-item>
-
     <ion-item *ngIf="isFieldActive('street')">
       <ion-label position="stacked">{{ getFieldLabel('street', 'Street') }}</ion-label>
       <ion-input formControlName="street"></ion-input>
@@ -119,7 +114,7 @@
       <ion-input formControlName="operatingAreas" placeholder="Ikeja, Surulere"></ion-input>
     </ion-item>
 
-    <ion-button expand="block" type="button" [disabled]="isSubmitting" (click)="submit()">
+    <ion-button class="regSubmitBTN dispatch-submit" expand="block" type="button" [disabled]="isSubmitting" (click)="submit()">
       Create Dispatch Account
     </ion-button>
   </form>
