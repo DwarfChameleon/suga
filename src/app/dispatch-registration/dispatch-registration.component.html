@@ -21,8 +21,21 @@
 
     <ion-item>
       <ion-label position="stacked">Phone Number</ion-label>
-      <ion-input type="tel" formControlName="phoneNumber"></ion-input>
+      <ion-input type="tel" formControlName="phoneNumber" (ionInput)="onPhoneNumberChange()"></ion-input>
     </ion-item>
+    <div class="phone-verify" *ngIf="requiresPhoneVerification">
+      <div class="phone-verify-row" *ngIf="phoneVerificationState !== 'codeSent' && phoneVerificationState !== 'verified'">
+        <button type="button" class="verify-btn" [disabled]="phoneVerificationState === 'sending'" (click)="startPhoneVerification()">
+          {{ phoneVerificationState === 'sending' ? 'Sending...' : 'Verify Number' }}
+        </button>
+      </div>
+      <div class="phone-verify-row code-row" *ngIf="phoneVerificationState === 'codeSent'">
+        <input type="text" [(ngModel)]="phoneVerificationCode" [ngModelOptions]="{ standalone: true }" placeholder="Enter SMS code" />
+        <button type="button" class="verify-btn" (click)="confirmPhoneVerification()">Confirm</button>
+      </div>
+      <small class="verify-ok" *ngIf="phoneVerificationState === 'verified'">Phone number verified.</small>
+      <small class="field-error" *ngIf="phoneVerificationError">{{ phoneVerificationError }}</small>
+    </div>
 
     <ion-item>
       <ion-label position="stacked">PIN / Password</ion-label>

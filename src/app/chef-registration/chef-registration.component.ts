@@ -8,6 +8,7 @@ import { UiFeedbackService } from '../services/ui-feedback.service';
 import { LoadingService } from '../services/loading.service';
 import { Router } from '@angular/router';
 import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
+import { PhoneVerificationProof, PhoneVerificationService } from '../services/phone-verification.service';
 
 @Component({
   selector: 'app-chef-registration',
@@ -26,6 +27,11 @@ export class ChefRegistrationComponent implements OnInit {
   states: string[] = [];
   cities: string[] = [];
   suburbs: string[] = [];
+  readonly requiresPhoneVerification = this.phoneVerification.isNativeSupported();
+  phoneVerificationState: 'idle' | 'sending' | 'codeSent' | 'verified' = 'idle';
+  phoneVerificationCode = '';
+  phoneVerificationError = '';
+  phoneVerificationProof: PhoneVerificationProof | null = null;
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -35,7 +41,8 @@ export class ChefRegistrationComponent implements OnInit {
     private readonly uiFeedback: UiFeedbackService,
     private readonly loadingService: LoadingService,
     private readonly router: Router,
-    private readonly addressData: AddressDataService
+    private readonly addressData: AddressDataService,
+    private readonly phoneVerification: PhoneVerificationService
   ) {
     this.registrationForm = this.formBuilder.group({
       username: ['', Validators.required],
@@ -57,6 +64,12 @@ export class ChefRegistrationComponent implements OnInit {
       return;
     }
 
+    if (this.requiresPhoneVerification && !this.phoneVerificationProof) {
+      this.phoneVerificationError = 'Verify your phone number before creating your account.';
+      this.uiFeedback.error(this.phoneVerificationError);
+      return;
+    }
+
     if (!this.registrationForm.valid) {
       this.registrationForm.markAllAsTouched();
       this.invalidFormMessage = 'Please complete the required fields.';
@@ -70,6 +83,7 @@ export class ChefRegistrationComponent implements OnInit {
 
     this.http.post(`${environment.apiUrl}/auth/register`, {
       ...formData,
+      phoneVerification: this.phoneVerificationProof,
       roles: ['chef']
     }).subscribe(
       () => {
@@ -157,6 +171,56 @@ export class ChefRegistrationComponent implements OnInit {
     return this.activeFields.find((f) => f.key === key)?.type === 'select';
   }
 
+  onPhoneNumberChange(): void {
+    if (!this.phoneVerificationProof) {
+      return;
+    }
+    const currentPhone = this.normalizePhone(this.registrationForm.get('phoneNumber')?.value || '');
+    if (currentPhone !== this.normalizePhone(this.phoneVerificationProof.phoneNumber)) {
+      this.resetPhoneVerification();
+    }
+  }
+
+  async startPhoneVerification(): Promise<void> {
+    const phoneNumber = String(this.registrationForm.get('phoneNumber')?.value || '').trim();
+    if (!phoneNumber) {
+      this.phoneVerificationError = 'Enter your phone number first.';
+      this.uiFeedback.error(this.phoneVerificationError);
+      return;
+    }
+
+    this.phoneVerificationState = 'sending';
+    this.phoneVerificationError = '';
+    try {
+      const result = await this.phoneVerification.startVerification(phoneNumber);
+      if (result.status === 'verified' && result.proof) {
+        this.phoneVerificationProof = result.proof;
+        this.phoneVerificationState = 'verified';
+        this.uiFeedback.success('Phone number verified.');
+      } else {
+        this.phoneVerificationState = 'codeSent';
+        this.uiFeedback.success('Verification code sent to your phone.');
+      }
+    } catch (error: any) {
+      this.phoneVerificationState = 'idle';
+      this.phoneVerificationError = error?.message || 'Unable to verify phone number.';
+      this.uiFeedback.error(this.phoneVerificationError);
+    }
+  }
+
+  async confirmPhoneVerification(): Promise<void> {
+    this.phoneVerificationError = '';
+    try {
+      const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
+      this.phoneVerificationProof = proof;
+      this.phoneVerificationState = 'verified';
+      this.uiFeedback.success('Phone number verified.');
+    } catch (error: any) {
+      this.phoneVerificationError = error?.message || 'Verification code is invalid.';
+      this.uiFeedback.error(this.phoneVerificationError);
+    }
+  }
+
   isRequiredField(key: AddressFieldKey): boolean {
     return this.activeFields.find((f) => f.key === key)?.required !== false;
   }
@@ -220,5 +284,17 @@ export class ChefRegistrationComponent implements OnInit {
       'Europe/Rome': 'Italy',
     };
     return map[tz] || '';
+  }
+
+  private resetPhoneVerification(): void {
+    this.phoneVerificationProof = null;
+    this.phoneVerificationCode = '';
+    this.phoneVerificationError = '';
+    this.phoneVerificationState = 'idle';
+    this.phoneVerification.clearVerificationState();
+  }
+
+  private normalizePhone(value: string): string {
+    return String(value || '').replace(/\D/g, '');
   }
 }

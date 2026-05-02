@@ -7,6 +7,7 @@ import { UiFeedbackService } from '../services/ui-feedback.service';
 import { LoadingService } from '../services/loading.service';
 import { ModalControlService } from '../services/modal-control.service';
 import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
+import { PhoneVerificationProof, PhoneVerificationService } from '../services/phone-verification.service';
 
 @Component({
   selector: 'app-dispatch-registration',
@@ -22,6 +23,11 @@ export class DispatchRegistrationComponent implements OnInit {
   states: string[] = [];
   cities: string[] = [];
   suburbs: string[] = [];
+  readonly requiresPhoneVerification = this.phoneVerification.isNativeSupported();
+  phoneVerificationState: 'idle' | 'sending' | 'codeSent' | 'verified' = 'idle';
+  phoneVerificationCode = '';
+  phoneVerificationError = '';
+  phoneVerificationProof: PhoneVerificationProof | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -30,7 +36,8 @@ export class DispatchRegistrationComponent implements OnInit {
     private readonly uiFeedback: UiFeedbackService,
     private readonly loadingService: LoadingService,
     private readonly modalControlService: ModalControlService,
-    private readonly addressData: AddressDataService
+    private readonly addressData: AddressDataService,
+    private readonly phoneVerification: PhoneVerificationService
   ) {
     this.registrationForm = this.fb.group({
       username: ['', Validators.required],
@@ -61,6 +68,12 @@ export class DispatchRegistrationComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
+    if (this.requiresPhoneVerification && !this.phoneVerificationProof) {
+      this.phoneVerificationError = 'Verify your phone number before creating your account.';
+      this.uiFeedback.error(this.phoneVerificationError);
+      return;
+    }
+
     if (this.registrationForm.invalid || this.isSubmitting) {
       this.registrationForm.markAllAsTouched();
       this.uiFeedback.error('Complete all required fields.');
@@ -75,6 +88,7 @@ export class DispatchRegistrationComponent implements OnInit {
       username: value.username,
       email: value.email,
       phoneNumber: value.phoneNumber,
+      phoneVerification: this.phoneVerificationProof,
       password: value.pin,
       roles: ['dispatch'],
       country: value.country,
@@ -167,6 +181,56 @@ export class DispatchRegistrationComponent implements OnInit {
     return this.activeFields.find((field) => field.key === key)?.type === 'select';
   }
 
+  onPhoneNumberChange(): void {
+    if (!this.phoneVerificationProof) {
+      return;
+    }
+    const currentPhone = this.normalizePhone(this.registrationForm.get('phoneNumber')?.value || '');
+    if (currentPhone !== this.normalizePhone(this.phoneVerificationProof.phoneNumber)) {
+      this.resetPhoneVerification();
+    }
+  }
+
+  async startPhoneVerification(): Promise<void> {
+    const phoneNumber = String(this.registrationForm.get('phoneNumber')?.value || '').trim();
+    if (!phoneNumber) {
+      this.phoneVerificationError = 'Enter your phone number first.';
+      this.uiFeedback.error(this.phoneVerificationError);
+      return;
+    }
+
+    this.phoneVerificationState = 'sending';
+    this.phoneVerificationError = '';
+    try {
+      const result = await this.phoneVerification.startVerification(phoneNumber);
+      if (result.status === 'verified' && result.proof) {
+        this.phoneVerificationProof = result.proof;
+        this.phoneVerificationState = 'verified';
+        this.uiFeedback.success('Phone number verified.');
+      } else {
+        this.phoneVerificationState = 'codeSent';
+        this.uiFeedback.success('Verification code sent to your phone.');
+      }
+    } catch (error: any) {
+      this.phoneVerificationState = 'idle';
+      this.phoneVerificationError = error?.message || 'Unable to verify phone number.';
+      this.uiFeedback.error(this.phoneVerificationError);
+    }
+  }
+
+  async confirmPhoneVerification(): Promise<void> {
+    this.phoneVerificationError = '';
+    try {
+      const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
+      this.phoneVerificationProof = proof;
+      this.phoneVerificationState = 'verified';
+      this.uiFeedback.success('Phone number verified.');
+    } catch (error: any) {
+      this.phoneVerificationError = error?.message || 'Verification code is invalid.';
+      this.uiFeedback.error(this.phoneVerificationError);
+    }
+  }
+
   isRequiredField(key: AddressFieldKey): boolean {
     return this.activeFields.find((field) => field.key === key)?.required !== false;
   }
@@ -208,5 +272,17 @@ export class DispatchRegistrationComponent implements OnInit {
       'Europe/Rome': 'Italy'
     };
     return map[tz] || '';
+  }
+
+  private resetPhoneVerification(): void {
+    this.phoneVerificationProof = null;
+    this.phoneVerificationCode = '';
+    this.phoneVerificationError = '';
+    this.phoneVerificationState = 'idle';
+    this.phoneVerification.clearVerificationState();
+  }
+
+  private normalizePhone(value: string): string {
+    return String(value || '').replace(/\D/g, '');
   }
 }

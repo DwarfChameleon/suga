@@ -4,8 +4,9 @@ import { EditableProfile, UserService } from 'src/app/services/user.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { ThemeService } from 'src/app/services/theme.service';
-import { AddressDataService, AddressFieldKey } from 'src/app/services/address-data.service';
+import { AddressDataService, AddressFieldConfig, AddressFieldKey } from 'src/app/services/address-data.service';
 import { MapService } from 'src/app/services/map.service';
+import { PhoneVerificationProof, PhoneVerificationService } from 'src/app/services/phone-verification.service';
 
 @Component({
   selector: 'app-edit-profile',
@@ -44,13 +45,18 @@ export class EditProfileComponent implements OnInit {
   selectedCoverImage?: File;
   private touchedFields: Record<string, boolean> = {};
   readonly countryOptions = this.addressData.getCountries();
-  activeFields: Array<{ key: AddressFieldKey; label: string; type: 'select' | 'text' }> = [];
+  activeFields: AddressFieldConfig[] = [];
   regions: string[] = [];
   states: string[] = [];
   cities: string[] = [];
   suburbs: string[] = [];
   streetSuggestions: Array<{ displayName: string; lat: number; lng: number; address: any }> = [];
   private streetTimer?: ReturnType<typeof setTimeout>;
+  readonly requiresPhoneVerification = this.phoneVerification.isNativeSupported();
+  phoneVerificationState: 'idle' | 'sending' | 'codeSent' | 'verified' = 'idle';
+  phoneVerificationCode = '';
+  phoneVerificationError = '';
+  phoneVerificationProof: PhoneVerificationProof | null = null;
 
   constructor(
     private readonly userService: UserService,
@@ -58,7 +64,8 @@ export class EditProfileComponent implements OnInit {
     private readonly uiFeedback: UiFeedbackService,
     private readonly themeService: ThemeService,
     private readonly addressData: AddressDataService,
-    private readonly mapService: MapService
+    private readonly mapService: MapService,
+    private readonly phoneVerification: PhoneVerificationService
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +80,8 @@ export class EditProfileComponent implements OnInit {
     const normalize = (data: EditableProfile) => JSON.stringify(this.normalizeProfile(data));
     const profileChanged = normalize(this.profile) !== normalize(this.initialProfile);
     const mediaChanged = !!this.selectedProfileImage || !!this.selectedCoverImage;
-    return profileChanged || mediaChanged;
+    const phoneVerificationChanged = !!this.phoneVerificationProof;
+    return profileChanged || mediaChanged || phoneVerificationChanged;
   }
 
   get isFormValid(): boolean {
@@ -202,6 +210,56 @@ export class EditProfileComponent implements OnInit {
     this.streetSuggestions = [];
   }
 
+  onPhoneNumberChange(): void {
+    if (!this.phoneVerificationProof) {
+      return;
+    }
+    const currentPhone = this.normalizePhone(this.profile.phoneNumber || '');
+    if (currentPhone !== this.normalizePhone(this.phoneVerificationProof.phoneNumber)) {
+      this.resetPhoneVerification();
+    }
+  }
+
+  async startPhoneVerification(): Promise<void> {
+    const phoneNumber = String(this.profile.phoneNumber || '').trim();
+    if (!phoneNumber) {
+      this.phoneVerificationError = 'Enter your phone number first.';
+      this.uiFeedback.error(this.phoneVerificationError);
+      return;
+    }
+
+    this.phoneVerificationState = 'sending';
+    this.phoneVerificationError = '';
+    try {
+      const result = await this.phoneVerification.startVerification(phoneNumber);
+      if (result.status === 'verified' && result.proof) {
+        this.phoneVerificationProof = result.proof;
+        this.phoneVerificationState = 'verified';
+        this.uiFeedback.success('Phone number verified.');
+      } else {
+        this.phoneVerificationState = 'codeSent';
+        this.uiFeedback.success('Verification code sent to your phone.');
+      }
+    } catch (error: any) {
+      this.phoneVerificationState = 'idle';
+      this.phoneVerificationError = error?.message || 'Unable to verify phone number.';
+      this.uiFeedback.error(this.phoneVerificationError);
+    }
+  }
+
+  async confirmPhoneVerification(): Promise<void> {
+    this.phoneVerificationError = '';
+    try {
+      const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
+      this.phoneVerificationProof = proof;
+      this.phoneVerificationState = 'verified';
+      this.uiFeedback.success('Phone number verified.');
+    } catch (error: any) {
+      this.phoneVerificationError = error?.message || 'Verification code is invalid.';
+      this.uiFeedback.error(this.phoneVerificationError);
+    }
+  }
+
   pickProfileImage(): void {
     this.profileImageInput?.nativeElement.click();
   }
@@ -226,11 +284,22 @@ export class EditProfileComponent implements OnInit {
       return;
     }
 
+    const phoneNumberChanged = this.normalizePhone(this.profile.phoneNumber || '') !== this.normalizePhone(this.initialProfile.phoneNumber || '');
+    if (this.requiresPhoneVerification && phoneNumberChanged && !this.phoneVerificationProof) {
+      this.phoneVerificationError = 'Verify your new phone number before saving.';
+      this.uiFeedback.error(this.phoneVerificationError);
+      return;
+    }
+
     this.isSaving = true;
     try {
-      const response = await firstValueFrom(this.userService.updateEditableProfile(this.profile));
+      const response = await firstValueFrom(this.userService.updateEditableProfile({
+        ...this.profile,
+        phoneVerification: phoneNumberChanged ? (this.phoneVerificationProof || undefined) : undefined
+      }));
       this.profile = this.normalizeProfile(response.profile);
       this.initialProfile = this.normalizeProfile(response.profile);
+      this.resetPhoneVerification();
       const existingUser = this.tokenStorage.getUser();
       if (existingUser) {
         this.tokenStorage.saveUser({
@@ -354,5 +423,17 @@ export class EditProfileComponent implements OnInit {
     const locator = this.profile.state || this.profile.region || '';
     this.cities = this.addressData.getCities(country, locator);
     this.suburbs = this.addressData.getSuburbs(country, locator, this.profile.city || '');
+  }
+
+  private resetPhoneVerification(): void {
+    this.phoneVerificationProof = null;
+    this.phoneVerificationCode = '';
+    this.phoneVerificationError = '';
+    this.phoneVerificationState = 'idle';
+    this.phoneVerification.clearVerificationState();
+  }
+
+  private normalizePhone(value: string): string {
+    return String(value || '').replace(/\D/g, '');
   }
 }

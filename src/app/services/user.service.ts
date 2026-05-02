@@ -41,6 +41,12 @@ export interface EditableProfile {
   coverPicture?: string;
   uiTheme?: 'light' | 'dark';
   themeColor?: string;
+  phoneVerification?: {
+    idToken: string;
+    uid: string;
+    phoneNumber: string;
+    verifiedAt: string;
+  };
 }
 
 export interface FollowToggleResponse {

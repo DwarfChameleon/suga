@@ -21,3 +21,42 @@ ion-item {
   margin-top: 10px;
   margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
+
+.phone-verify {
+  display: grid;
+  gap: 6px;
+  margin-top: -2px;
+}
+
+.phone-verify-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.phone-verify-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 42px;
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #f6f8fc;
+}
+
+.verify-btn {
+  height: 42px;
+  border: 1px solid rgba(254, 44, 85, 0.24);
+  border-radius: 12px;
+  background: rgba(254, 44, 85, 0.08);
+  color: var(--ion-color-primary-food);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 12px;
+}
+
+.verify-ok {
+  color: #18844d;
+  font-size: 12px;
+  font-weight: 700;
+}
