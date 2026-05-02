@@ -32,6 +32,7 @@ export class ChefRegistrationComponent implements OnInit {
   phoneVerificationCode = '';
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
+  private lastDialCode = '';
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -45,18 +46,19 @@ export class ChefRegistrationComponent implements OnInit {
     private readonly phoneVerification: PhoneVerificationService
   ) {
     this.registrationForm = this.formBuilder.group({
-      username: ['', Validators.required],
       country: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[0-9()\-\s]{7,20}$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       region: [''],
       state: [''],
       city: [''],
-      suburb: [''],
-      localGovernment: [''],
-      street: ['']
+      suburb: ['']
     });
+  }
+
+  get phoneDialCode(): string {
+    return this.addressData.getDialCode(this.registrationForm.get('country')?.value || '');
   }
 
   async submitForm(): Promise<void> {
@@ -80,9 +82,11 @@ export class ChefRegistrationComponent implements OnInit {
     this.isSubmitting = true;
     await this.loadingService.show('Creating account...');
     const formData = this.registrationForm.value;
+    const normalizedPhoneNumber = this.normalizeInternationalPhone(formData.phoneNumber);
 
     this.http.post(`${environment.apiUrl}/auth/register`, {
       ...formData,
+      phoneNumber: normalizedPhoneNumber,
       phoneVerification: this.phoneVerificationProof,
       roles: ['chef']
     }).subscribe(
@@ -91,7 +95,7 @@ export class ChefRegistrationComponent implements OnInit {
         this.loadingService.hide();
         this.isSubmitting = false;
         const prefill = {
-          username: formData.username,
+          username: formData.email,
           password: formData.password,
           auto: true
         };
@@ -140,11 +144,10 @@ export class ChefRegistrationComponent implements OnInit {
       region: '',
       state: '',
       city: '',
-      suburb: '',
-      localGovernment: '',
-      street: ''
+      suburb: ''
     });
     this.applyFieldRules();
+    this.seedDialCode();
   }
 
   onRegionOrStateChange(): void {
@@ -182,9 +185,9 @@ export class ChefRegistrationComponent implements OnInit {
   }
 
   async startPhoneVerification(): Promise<void> {
-    const phoneNumber = String(this.registrationForm.get('phoneNumber')?.value || '').trim();
-    if (!phoneNumber) {
-      this.phoneVerificationError = 'Enter your phone number first.';
+    const phoneNumber = this.normalizeInternationalPhone(this.registrationForm.get('phoneNumber')?.value || '');
+    if (!/^\+[0-9]{7,15}$/.test(phoneNumber)) {
+      this.phoneVerificationError = 'Enter a valid phone number before verification.';
       this.uiFeedback.error(this.phoneVerificationError);
       return;
     }
@@ -196,9 +199,11 @@ export class ChefRegistrationComponent implements OnInit {
       if (result.status === 'verified' && result.proof) {
         this.phoneVerificationProof = result.proof;
         this.phoneVerificationState = 'verified';
+        this.registrationForm.patchValue({ phoneNumber: result.proof.phoneNumber });
         this.uiFeedback.success('Phone number verified.');
       } else {
         this.phoneVerificationState = 'codeSent';
+        this.registrationForm.patchValue({ phoneNumber });
         this.uiFeedback.success('Verification code sent to your phone.');
       }
     } catch (error: any) {
@@ -214,6 +219,7 @@ export class ChefRegistrationComponent implements OnInit {
       const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
       this.phoneVerificationProof = proof;
       this.phoneVerificationState = 'verified';
+      this.registrationForm.patchValue({ phoneNumber: proof.phoneNumber });
       this.uiFeedback.success('Phone number verified.');
     } catch (error: any) {
       this.phoneVerificationError = error?.message || 'Verification code is invalid.';
@@ -256,6 +262,12 @@ export class ChefRegistrationComponent implements OnInit {
     allFields.forEach((field) => {
       const control = this.registrationForm.get(field);
       if (!control) return;
+      if (['localGovernment', 'street'].includes(field)) {
+        control.clearValidators();
+        control.setValue('');
+        control.updateValueAndValidity({ emitEvent: false });
+        return;
+      }
       if (this.isFieldActive(field) && this.isRequiredField(field)) {
         control.setValidators([Validators.required]);
       } else if (this.isFieldActive(field)) {
@@ -286,6 +298,20 @@ export class ChefRegistrationComponent implements OnInit {
     return map[tz] || '';
   }
 
+  private seedDialCode(): void {
+    const control = this.registrationForm.get('phoneNumber');
+    const nextDialCode = this.phoneDialCode;
+    const current = String(control?.value || '').trim();
+    if (!control || !nextDialCode) {
+      this.lastDialCode = nextDialCode;
+      return;
+    }
+    if (!current || current === this.lastDialCode) {
+      control.setValue(nextDialCode);
+    }
+    this.lastDialCode = nextDialCode;
+  }
+
   private resetPhoneVerification(): void {
     this.phoneVerificationProof = null;
     this.phoneVerificationCode = '';
@@ -296,5 +322,27 @@ export class ChefRegistrationComponent implements OnInit {
 
   private normalizePhone(value: string): string {
     return String(value || '').replace(/\D/g, '');
+  }
+
+  private normalizeInternationalPhone(value: string): string {
+    const raw = String(value || '').trim();
+    if (!raw) {
+      return '';
+    }
+    if (raw.startsWith('+')) {
+      return `+${this.normalizePhone(raw)}`;
+    }
+
+    const digits = this.normalizePhone(raw);
+    const dialDigits = this.normalizePhone(this.phoneDialCode);
+    if (!digits) {
+      return this.phoneDialCode;
+    }
+    if (dialDigits && digits.startsWith(dialDigits)) {
+      return `+${digits}`;
+    }
+
+    const localDigits = digits.startsWith('0') ? digits.slice(1) : digits;
+    return `${this.phoneDialCode}${localDigits}`;
   }
 }

@@ -17,6 +17,9 @@ import { PhoneVerificationProof, PhoneVerificationService } from '../services/ph
 export class DispatchRegistrationComponent implements OnInit {
   registrationForm: FormGroup;
   isSubmitting = false;
+  invalidFormMessage = '';
+  errorMessage = '';
+  currentStep = 2;
   readonly countryOptions = this.addressData.getCountries();
   activeFields: AddressFieldConfig[] = [];
   regions: string[] = [];
@@ -28,6 +31,7 @@ export class DispatchRegistrationComponent implements OnInit {
   phoneVerificationCode = '';
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
+  private lastDialCode = '';
 
   constructor(
     private readonly fb: FormBuilder,
@@ -40,23 +44,19 @@ export class DispatchRegistrationComponent implements OnInit {
     private readonly phoneVerification: PhoneVerificationService
   ) {
     this.registrationForm = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[0-9]{7,15}$/)]],
-      pin: ['', [Validators.required, Validators.minLength(6)]],
       country: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[0-9()\-\s]{7,20}$/)]],
+      pin: ['', [Validators.required, Validators.minLength(6)]],
       region: [''],
       state: [''],
       city: [''],
-      suburb: [''],
-      localGovernment: [''],
-      street: [''],
-      isCompany: [false],
-      companyName: [''],
-      vehicleTypes: ['', Validators.required],
-      plateNumber: [''],
-      operatingAreas: ['', Validators.required]
+      suburb: ['']
     });
+  }
+
+  get phoneDialCode(): string {
+    return this.addressData.getDialCode(this.registrationForm.get('country')?.value || '');
   }
 
   ngOnInit(): void {
@@ -83,11 +83,11 @@ export class DispatchRegistrationComponent implements OnInit {
     this.isSubmitting = true;
     await this.loadingService.show('Creating dispatch account...');
     const value = this.registrationForm.value;
+    const normalizedPhoneNumber = this.normalizeInternationalPhone(value.phoneNumber);
 
     const payload = {
-      username: value.username,
       email: value.email,
-      phoneNumber: value.phoneNumber,
+      phoneNumber: normalizedPhoneNumber,
       phoneVerification: this.phoneVerificationProof,
       password: value.pin,
       roles: ['dispatch'],
@@ -95,24 +95,7 @@ export class DispatchRegistrationComponent implements OnInit {
       region: value.region,
       state: value.state,
       city: value.city,
-      suburb: value.suburb,
-      localGovernment: value.localGovernment,
-      street: value.street,
-      dispatchProfile: {
-        isCompany: !!value.isCompany,
-        companyName: value.companyName || '',
-        vehicleTypes: String(value.vehicleTypes || '')
-          .split(',')
-          .map((entry: string) => entry.trim())
-          .filter(Boolean),
-        plateNumber: value.plateNumber || '',
-        operatingAreas: String(value.operatingAreas || '')
-          .split(',')
-          .map((entry: string) => entry.trim())
-          .filter(Boolean),
-        isAvailable: true,
-        verificationStatus: 'pending'
-      }
+      suburb: value.suburb
     };
 
     this.http.post(`${environment.apiUrl}/auth/register`, payload).subscribe({
@@ -120,7 +103,7 @@ export class DispatchRegistrationComponent implements OnInit {
         await this.loadingService.hide();
         this.uiFeedback.success('Dispatch account created.');
         const prefill = {
-          username: value.username,
+          username: value.email,
           password: value.pin,
           auto: true
         };
@@ -150,11 +133,10 @@ export class DispatchRegistrationComponent implements OnInit {
       region: '',
       state: '',
       city: '',
-      suburb: '',
-      localGovernment: '',
-      street: ''
+      suburb: ''
     });
     this.applyFieldRules();
+    this.seedDialCode();
   }
 
   onRegionOrStateChange(): void {
@@ -192,9 +174,9 @@ export class DispatchRegistrationComponent implements OnInit {
   }
 
   async startPhoneVerification(): Promise<void> {
-    const phoneNumber = String(this.registrationForm.get('phoneNumber')?.value || '').trim();
-    if (!phoneNumber) {
-      this.phoneVerificationError = 'Enter your phone number first.';
+    const phoneNumber = this.normalizeInternationalPhone(this.registrationForm.get('phoneNumber')?.value || '');
+    if (!/^\+[0-9]{7,15}$/.test(phoneNumber)) {
+      this.phoneVerificationError = 'Enter a valid phone number before verification.';
       this.uiFeedback.error(this.phoneVerificationError);
       return;
     }
@@ -206,9 +188,11 @@ export class DispatchRegistrationComponent implements OnInit {
       if (result.status === 'verified' && result.proof) {
         this.phoneVerificationProof = result.proof;
         this.phoneVerificationState = 'verified';
+        this.registrationForm.patchValue({ phoneNumber: result.proof.phoneNumber });
         this.uiFeedback.success('Phone number verified.');
       } else {
         this.phoneVerificationState = 'codeSent';
+        this.registrationForm.patchValue({ phoneNumber });
         this.uiFeedback.success('Verification code sent to your phone.');
       }
     } catch (error: any) {
@@ -224,6 +208,7 @@ export class DispatchRegistrationComponent implements OnInit {
       const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
       this.phoneVerificationProof = proof;
       this.phoneVerificationState = 'verified';
+      this.registrationForm.patchValue({ phoneNumber: proof.phoneNumber });
       this.uiFeedback.success('Phone number verified.');
     } catch (error: any) {
       this.phoneVerificationError = error?.message || 'Verification code is invalid.';
@@ -239,11 +224,39 @@ export class DispatchRegistrationComponent implements OnInit {
     return this.activeFields.find((field) => field.key === key)?.label || fallback;
   }
 
+  goToStep(step: number): void {
+    if (step === 2) {
+      this.currentStep = 2;
+      return;
+    }
+    if (step === 3 && this.isStepTwoValid()) {
+      this.invalidFormMessage = '';
+      this.currentStep = 3;
+      return;
+    }
+    this.invalidFormMessage = 'Complete country and location details first.';
+  }
+
+  isStepTwoValid(): boolean {
+    const countryValid = !!this.registrationForm.get('country')?.value;
+    if (!countryValid) return false;
+    return this.activeFields.every((field) => {
+      const control = this.registrationForm.get(field.key);
+      return field.required === false || !control?.validator || !!String(control?.value || '').trim();
+    });
+  }
+
   private applyFieldRules(): void {
     const allFields: AddressFieldKey[] = ['region', 'state', 'city', 'suburb', 'localGovernment', 'street'];
     allFields.forEach((field) => {
       const control = this.registrationForm.get(field);
       if (!control) return;
+      if (['localGovernment', 'street'].includes(field)) {
+        control.clearValidators();
+        control.setValue('');
+        control.updateValueAndValidity({ emitEvent: false });
+        return;
+      }
       if (this.isFieldActive(field) && this.isRequiredField(field)) {
         control.setValidators([Validators.required]);
       } else if (this.isFieldActive(field)) {
@@ -274,6 +287,20 @@ export class DispatchRegistrationComponent implements OnInit {
     return map[tz] || '';
   }
 
+  private seedDialCode(): void {
+    const control = this.registrationForm.get('phoneNumber');
+    const nextDialCode = this.phoneDialCode;
+    const current = String(control?.value || '').trim();
+    if (!control || !nextDialCode) {
+      this.lastDialCode = nextDialCode;
+      return;
+    }
+    if (!current || current === this.lastDialCode) {
+      control.setValue(nextDialCode);
+    }
+    this.lastDialCode = nextDialCode;
+  }
+
   private resetPhoneVerification(): void {
     this.phoneVerificationProof = null;
     this.phoneVerificationCode = '';
@@ -284,5 +311,27 @@ export class DispatchRegistrationComponent implements OnInit {
 
   private normalizePhone(value: string): string {
     return String(value || '').replace(/\D/g, '');
+  }
+
+  private normalizeInternationalPhone(value: string): string {
+    const raw = String(value || '').trim();
+    if (!raw) {
+      return '';
+    }
+    if (raw.startsWith('+')) {
+      return `+${this.normalizePhone(raw)}`;
+    }
+
+    const digits = this.normalizePhone(raw);
+    const dialDigits = this.normalizePhone(this.phoneDialCode);
+    if (!digits) {
+      return this.phoneDialCode;
+    }
+    if (dialDigits && digits.startsWith(dialDigits)) {
+      return `+${digits}`;
+    }
+
+    const localDigits = digits.startsWith('0') ? digits.slice(1) : digits;
+    return `${this.phoneDialCode}${localDigits}`;
   }
 }

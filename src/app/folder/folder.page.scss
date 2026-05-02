@@ -54,7 +54,10 @@ ion-menu-button {
   color: #fff;
   text-align: center;
   font-size: 24px;
-  padding: 30px 0 calc(18px + var(--suga-safe-bottom));
+  padding: 18px 0 calc(18px + var(--suga-safe-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 2; 
   animation: border-radius-animation 5s infinite;
   margin-top: auto;
@@ -84,7 +87,7 @@ ion-menu-button {
 .authAction{
   width: min(92%, 420px);
   margin: 0 auto;
-  padding-top: 8px;
+  padding: 0 0 6px;
 
 }
 .curvy-div2 {

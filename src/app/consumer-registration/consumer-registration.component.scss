@@ -116,6 +116,33 @@ ion-input, ion-select{
   margin-top: 10px;
 }
 
+
+.phone-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-prefix {
+  min-width: 58px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  background: #f6f8fc;
+  color: #415066;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 10px;
+}
+
+.phone-input-row ion-input {
+  min-height: 42px;
+}
+
 .phone-verify {
   margin-top: 8px;
 }

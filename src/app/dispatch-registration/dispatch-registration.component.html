@@ -3,132 +3,125 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/registration"></ion-back-button>
     </ion-buttons>
-    <ion-title>Dispatch Registration</ion-title>
+    <ion-title></ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding dispatch-registration-content">
-  <form [formGroup]="registrationForm" (ngSubmit)="submit()" class="dispatch-form">
-    <ion-item>
-      <ion-label position="stacked">Username</ion-label>
-      <ion-input formControlName="username"></ion-input>
-    </ion-item>
+<ion-content [fullscreen]="true" class="registration-content dispatch-registration-content">
+  <div class="hero">
+    <h2>Dispatch Signup</h2>
+    <p>Select your service area first, then finish with phone, email, and password.</p>
+  </div>
 
-    <ion-item>
-      <ion-label position="stacked">Email</ion-label>
-      <ion-input type="email" formControlName="email"></ion-input>
-    </ion-item>
+  <div class="warning" *ngIf="invalidFormMessage">{{ invalidFormMessage }}</div>
+  <div *ngIf="errorMessage" class="error-message warning">{{ errorMessage }}</div>
 
-    <ion-item>
-      <ion-label position="stacked">Phone Number</ion-label>
-      <ion-input type="tel" formControlName="phoneNumber" (ionInput)="onPhoneNumberChange()"></ion-input>
-    </ion-item>
-    <div class="phone-verify" *ngIf="requiresPhoneVerification">
-      <div class="phone-verify-row" *ngIf="phoneVerificationState !== 'codeSent' && phoneVerificationState !== 'verified'">
-        <button type="button" class="verify-btn" [disabled]="phoneVerificationState === 'sending'" (click)="startPhoneVerification()">
-          {{ phoneVerificationState === 'sending' ? 'Sending...' : 'Verify Number' }}
-        </button>
+  <div class="reg-container">
+    <div class="form-card">
+      <div class="step-row">
+        <button type="button" class="step-pill done">1. Role</button>
+        <button type="button" class="step-pill" [class.active]="currentStep === 2" (click)="goToStep(2)">2. Location</button>
+        <button type="button" class="step-pill" [class.active]="currentStep === 3" (click)="goToStep(3)">3. Account</button>
       </div>
-      <div class="phone-verify-row code-row" *ngIf="phoneVerificationState === 'codeSent'">
-        <input type="text" [(ngModel)]="phoneVerificationCode" [ngModelOptions]="{ standalone: true }" placeholder="Enter SMS code" />
-        <button type="button" class="verify-btn" (click)="confirmPhoneVerification()">Confirm</button>
-      </div>
-      <small class="verify-ok" *ngIf="phoneVerificationState === 'verified'">Phone number verified.</small>
-      <small class="field-error" *ngIf="phoneVerificationError">{{ phoneVerificationError }}</small>
+
+      <form [formGroup]="registrationForm" (ngSubmit)="submit()">
+        <div class="step-panel" *ngIf="currentStep === 2">
+          <div class="form-group">
+            <ion-label>Service Country</ion-label>
+            <ion-select formControlName="country" interface="popover" placeholder="Select country" (ionChange)="onCountryChange()">
+              <ion-select-option *ngFor="let c of countryOptions" [value]="c">{{ c }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('region') && isSelectField('region')">
+            <ion-label>{{ getFieldLabel('region', 'Region') }}</ion-label>
+            <ion-select formControlName="region" interface="popover" (ionChange)="onRegionOrStateChange()">
+              <ion-select-option *ngFor="let r of regions" [value]="r">{{ r }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('region') && !isSelectField('region')">
+            <ion-label>{{ getFieldLabel('region', 'Region') }}</ion-label>
+            <ion-input formControlName="region" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('state') && isSelectField('state')">
+            <ion-label>{{ getFieldLabel('state', 'State') }}</ion-label>
+            <ion-select formControlName="state" interface="popover" (ionChange)="onRegionOrStateChange()">
+              <ion-select-option *ngFor="let s of states" [value]="s">{{ s }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('state') && !isSelectField('state')">
+            <ion-label>{{ getFieldLabel('state', 'State') }}</ion-label>
+            <ion-input formControlName="state" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('city') && isSelectField('city')">
+            <ion-label>{{ getFieldLabel('city', 'Town or City') }}</ion-label>
+            <ion-select formControlName="city" interface="popover" (ionChange)="onCityChange()">
+              <ion-select-option *ngFor="let city of cities" [value]="city">{{ city }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('city') && !isSelectField('city')">
+            <ion-label>{{ getFieldLabel('city', 'Town or City') }}</ion-label>
+            <ion-input formControlName="city" type="text"></ion-input>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('suburb') && isSelectField('suburb')">
+            <ion-label>{{ getFieldLabel('suburb', 'Area / Neighborhood') }}</ion-label>
+            <ion-select formControlName="suburb" interface="popover">
+              <ion-select-option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</ion-select-option>
+            </ion-select>
+          </div>
+
+          <div class="form-group" *ngIf="isFieldActive('suburb') && !isSelectField('suburb')">
+            <ion-label>{{ getFieldLabel('suburb', 'Area / Neighborhood') }}</ion-label>
+            <ion-input formControlName="suburb" type="text"></ion-input>
+          </div>
+
+          <ion-button type="button" expand="block" class="regSubmitBTN" (click)="goToStep(3)">Continue</ion-button>
+        </div>
+
+        <div class="step-panel" *ngIf="currentStep === 3">
+          <div class="form-group">
+            <ion-label>Email</ion-label>
+            <ion-input type="email" formControlName="email" placeholder="you@example.com"></ion-input>
+          </div>
+
+          <div class="form-group">
+            <ion-label>Phone Number</ion-label>
+            <div class="phone-input-row">
+              <span class="phone-prefix">{{ phoneDialCode || '+' }}</span>
+              <ion-input type="tel" formControlName="phoneNumber" placeholder="8012345678" (ionInput)="onPhoneNumberChange()"></ion-input>
+            </div>
+            <div class="phone-verify" *ngIf="requiresPhoneVerification">
+              <div class="phone-verify-row" *ngIf="phoneVerificationState !== 'codeSent' && phoneVerificationState !== 'verified'">
+                <button type="button" class="verify-btn" [disabled]="phoneVerificationState === 'sending'" (click)="startPhoneVerification()">
+                  {{ phoneVerificationState === 'sending' ? 'Sending...' : 'Verify Number' }}
+                </button>
+              </div>
+              <div class="phone-verify-row code-row" *ngIf="phoneVerificationState === 'codeSent'">
+                <input type="text" [(ngModel)]="phoneVerificationCode" [ngModelOptions]="{ standalone: true }" placeholder="Enter SMS code" />
+                <button type="button" class="verify-btn" (click)="confirmPhoneVerification()">Confirm</button>
+              </div>
+              <small class="verify-ok" *ngIf="phoneVerificationState === 'verified'">Phone number verified.</small>
+              <small class="field-error" *ngIf="phoneVerificationError">{{ phoneVerificationError }}</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <ion-label>Password</ion-label>
+            <ion-input type="password" formControlName="pin" placeholder="At least 6 characters"></ion-input>
+          </div>
+
+          <div class="action-row">
+            <ion-button type="button" fill="outline" class="back-btn" (click)="goToStep(2)">Back</ion-button>
+            <ion-button class="regSubmitBTN" type="button" [disabled]="isSubmitting" (click)="submit()">Create Account</ion-button>
+          </div>
+        </div>
+      </form>
     </div>
-
-    <ion-item>
-      <ion-label position="stacked">PIN / Password</ion-label>
-      <ion-input type="password" formControlName="pin"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="stacked">Country</ion-label>
-      <ion-select formControlName="country" interface="popover" placeholder="Select country" (ionChange)="onCountryChange()">
-        <ion-select-option *ngFor="let c of countryOptions" [value]="c">{{ c }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('region') && isSelectField('region')">
-      <ion-label position="stacked">{{ getFieldLabel('region', 'Region') }}</ion-label>
-      <ion-select formControlName="region" interface="popover" (ionChange)="onRegionOrStateChange()">
-        <ion-select-option *ngFor="let region of regions" [value]="region">{{ region }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('region') && !isSelectField('region')">
-      <ion-label position="stacked">{{ getFieldLabel('region', 'Region') }}</ion-label>
-      <ion-input formControlName="region"></ion-input>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('state') && isSelectField('state')">
-      <ion-label position="stacked">{{ getFieldLabel('state', 'State') }}</ion-label>
-      <ion-select formControlName="state" interface="popover" (ionChange)="onRegionOrStateChange()">
-        <ion-select-option *ngFor="let state of states" [value]="state">{{ state }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('state') && !isSelectField('state')">
-      <ion-label position="stacked">{{ getFieldLabel('state', 'State') }}</ion-label>
-      <ion-input formControlName="state"></ion-input>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('city') && isSelectField('city')">
-      <ion-label position="stacked">{{ getFieldLabel('city', 'City') }}</ion-label>
-      <ion-select formControlName="city" interface="popover" (ionChange)="onCityChange()">
-        <ion-select-option *ngFor="let city of cities" [value]="city">{{ city }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('city') && !isSelectField('city')">
-      <ion-label position="stacked">{{ getFieldLabel('city', 'City') }}</ion-label>
-      <ion-input formControlName="city"></ion-input>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('suburb') && isSelectField('suburb')">
-      <ion-label position="stacked">{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
-      <ion-select formControlName="suburb" interface="popover">
-        <ion-select-option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('suburb') && !isSelectField('suburb')">
-      <ion-label position="stacked">{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
-      <ion-input formControlName="suburb"></ion-input>
-    </ion-item>
-
-    <ion-item *ngIf="isFieldActive('street')">
-      <ion-label position="stacked">{{ getFieldLabel('street', 'Street') }}</ion-label>
-      <ion-input formControlName="street"></ion-input>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-label>Registering as a company</ion-label>
-      <ion-toggle formControlName="isCompany"></ion-toggle>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="stacked">Company Name (optional)</ion-label>
-      <ion-input formControlName="companyName"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="stacked">Vehicle Types (comma separated)</ion-label>
-      <ion-input formControlName="vehicleTypes" placeholder="bike, car, van"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="stacked">Vehicle Plate Number (optional)</ion-label>
-      <ion-input formControlName="plateNumber"></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="stacked">Operating Areas (comma separated)</ion-label>
-      <ion-input formControlName="operatingAreas" placeholder="Ikeja, Surulere"></ion-input>
-    </ion-item>
-
-    <ion-button class="regSubmitBTN dispatch-submit" expand="block" type="button" [disabled]="isSubmitting" (click)="submit()">
-      Create Dispatch Account
-    </ion-button>
-  </form>
+  </div>
 </ion-content>

@@ -13,7 +13,7 @@
   padding: 16px;
   border-radius: 18px;
   color: #fff;
-  background: linear-gradient(135deg, #fe2c55 0%, #ff7b45 100%);
+  background: linear-gradient(135deg, #fe2c55 0%, #ff6b47 100%);
 }
 
 .hero h2 {
@@ -26,7 +26,7 @@
   opacity: 0.95;
 }
 
-.warning {
+.warning{
   width: calc(100% - 32px);
   margin: 0 16px 12px;
   padding: 10px 12px;
@@ -36,12 +36,17 @@
   font-size: 14px;
 }
 
-.reg-container {
+.userRegBTN{
+  margin-top: 14px;
+  min-height: 52px;
+}
+
+.reg-container{
   width: 100%;
   padding: 0 16px calc(20px + env(safe-area-inset-bottom, 0px));
 }
 
-.form-card {
+.form-card{
   background: #ffffff;
   border-radius: 20px;
   padding: 16px 14px;
@@ -76,7 +81,7 @@
   font-weight: 600;
 }
 
-.form-group {
+.form-group{
   margin-bottom: 12px;
 }
 
@@ -87,8 +92,7 @@ ion-label {
   color: #415066;
 }
 
-ion-input,
-ion-select {
+ion-input, ion-select{
   --background: #f6f8fc;
   --padding-start: 12px;
   --padding-end: 12px;
@@ -98,8 +102,7 @@ ion-select {
   min-height: 42px;
 }
 
-.regSubmitBTN {
-  margin-top: 10px;
+.regSubmitBTN{
   height: 42px;
   border-radius: 12px;
   font-size: 14px;
@@ -109,8 +112,35 @@ ion-select {
   animation: fadeIn 180ms ease;
 }
 
-.google-register {
+.google-register{
   margin-top: 10px;
+}
+
+
+.phone-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-prefix {
+  min-width: 58px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  background: #f6f8fc;
+  color: #415066;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 10px;
+}
+
+.phone-input-row ion-input {
+  min-height: 42px;
 }
 
 .phone-verify {

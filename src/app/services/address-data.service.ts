@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { City, State } from 'country-state-city';
+import { City, Country, State } from 'country-state-city';
 import { firstValueFrom, of } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -18,6 +18,7 @@ export interface AddressFieldConfig {
 
 interface CountryProfile {
   isoCode: string;
+  dialCode?: string;
   fields: AddressFieldConfig[];
 }
 
@@ -36,6 +37,7 @@ export class AddressDataService {
   private readonly fallbackProfiles: Record<string, CountryProfile> = {
     Nigeria: {
       isoCode: 'NG',
+      dialCode: '+234',
       fields: [
         { key: 'state', label: 'State', type: 'select' },
         { key: 'city', label: 'Town or City', type: 'select' },
@@ -44,6 +46,7 @@ export class AddressDataService {
     },
     'United States': {
       isoCode: 'US',
+      dialCode: '+1',
       fields: [
         { key: 'state', label: 'State', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
@@ -53,6 +56,7 @@ export class AddressDataService {
     },
     'United Kingdom': {
       isoCode: 'GB',
+      dialCode: '+44',
       fields: [
         { key: 'state', label: 'County / Nation', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
@@ -62,6 +66,7 @@ export class AddressDataService {
     },
     'South Africa': {
       isoCode: 'ZA',
+      dialCode: '+27',
       fields: [
         { key: 'state', label: 'Province', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
@@ -71,6 +76,7 @@ export class AddressDataService {
     },
     Ghana: {
       isoCode: 'GH',
+      dialCode: '+233',
       fields: [
         { key: 'region', label: 'Region', type: 'select' },
         { key: 'city', label: 'Town or City', type: 'select' }
@@ -78,6 +84,7 @@ export class AddressDataService {
     },
     Kenya: {
       isoCode: 'KE',
+      dialCode: '+254',
       fields: [
         { key: 'state', label: 'County', type: 'select' },
         { key: 'city', label: 'Town or City', type: 'select' },
@@ -86,6 +93,7 @@ export class AddressDataService {
     },
     France: {
       isoCode: 'FR',
+      dialCode: '+33',
       fields: [
         { key: 'region', label: 'Region', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
@@ -94,6 +102,7 @@ export class AddressDataService {
     },
     Italy: {
       isoCode: 'IT',
+      dialCode: '+39',
       fields: [
         { key: 'region', label: 'Region', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
@@ -138,6 +147,22 @@ export class AddressDataService {
     });
 
     return this.catalogBootPromise;
+  }
+
+
+  getDialCode(country: string): string {
+    const explicit = String(this.profiles[country]?.dialCode || '').trim();
+    if (explicit) {
+      return explicit;
+    }
+
+    const iso = this.profiles[country]?.isoCode;
+    if (!iso) {
+      return '';
+    }
+
+    const fromLibrary = Country.getAllCountries().find((entry) => entry.isoCode === iso)?.phonecode || '';
+    return fromLibrary ? `+${fromLibrary}` : '';
   }
 
   getRegions(country: string): string[] {

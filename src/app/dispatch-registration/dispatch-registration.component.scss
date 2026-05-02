@@ -1,31 +1,150 @@
-.dispatch-registration-content {
-  --padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+@import "/src/theme/variables.scss";
+
+.registration-content {
+  --padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
-.dispatch-registration-content::part(scroll) {
-  padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+.registration-content::part(scroll) {
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
-.dispatch-form {
-  display: grid;
-  gap: 10px;
-  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+.hero {
+  margin: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, #fe2c55 0%, #ff6b47 100%);
 }
 
-ion-item {
+.hero h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.hero p {
+  margin: 0;
+  opacity: 0.95;
+}
+
+.warning{
+  width: calc(100% - 32px);
+  margin: 0 16px 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: #ffe7cc;
+  color: #7a4b00;
+  font-size: 14px;
+}
+
+.userRegBTN{
+  margin-top: 14px;
+  min-height: 52px;
+}
+
+.reg-container{
+  width: 100%;
+  padding: 0 16px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.form-card{
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 16px 14px;
+  box-shadow: 0 12px 24px rgba(18, 35, 66, 0.08);
+  border: 1px solid rgba(17, 34, 68, 0.08);
+}
+
+.step-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.step-pill {
+  border: 0;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #46607d;
+}
+
+.step-pill.done {
+  background: #d9f7e6;
+  color: #16653b;
+}
+
+.step-pill.active {
+  background: #e4ecff;
+  color: #18469c;
+  font-weight: 600;
+}
+
+.form-group{
+  margin-bottom: 12px;
+}
+
+ion-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #415066;
+}
+
+ion-input, ion-select{
+  --background: #f6f8fc;
+  --padding-start: 12px;
+  --padding-end: 12px;
   --border-radius: 12px;
-  --background: rgba(247, 248, 252, 1);
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  min-height: 42px;
 }
 
-.dispatch-submit {
+.regSubmitBTN{
+  height: 42px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.step-panel {
+  animation: fadeIn 180ms ease;
+}
+
+.google-register{
   margin-top: 10px;
-  margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+
+.phone-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-prefix {
+  min-width: 58px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dbe2ef;
+  border-radius: 12px;
+  background: #f6f8fc;
+  color: #415066;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 10px;
+}
+
+.phone-input-row ion-input {
+  min-height: 42px;
 }
 
 .phone-verify {
-  display: grid;
-  gap: 6px;
-  margin-top: -2px;
+  margin-top: 8px;
 }
 
 .phone-verify-row {
@@ -56,7 +175,38 @@ ion-item {
 }
 
 .verify-ok {
+  display: inline-block;
+  margin-top: 4px;
   color: #18844d;
   font-size: 12px;
   font-weight: 700;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #627185;
+}
+
+.action-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 10px;
+  padding-top: 4px;
+}
+
+.back-btn {
+  height: 42px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

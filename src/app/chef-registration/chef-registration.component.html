@@ -1,7 +1,7 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="registration" icon="arrow-back"></ion-back-button>
+      <ion-back-button icon="arrow-back"></ion-back-button>
     </ion-buttons>
     <ion-title></ion-title>
   </ion-toolbar>
@@ -10,7 +10,7 @@
 <ion-content [fullscreen]="true" class="registration-content">
   <div class="hero">
     <h2>Chef Signup</h2>
-    <p>Choose your service area, then finish your chef account details.</p>
+    <p>Select your service area first, then finish your chef account with phone, email, and password.</p>
   </div>
 
   <div class="warning" *ngIf="invalidFormMessage">{{ invalidFormMessage }}</div>
@@ -20,7 +20,7 @@
     <div class="form-card">
       <div class="step-row">
         <button type="button" class="step-pill done">1. Role</button>
-        <button type="button" class="step-pill" [class.active]="currentStep === 2" (click)="goToStep(2)">2. Country</button>
+        <button type="button" class="step-pill" [class.active]="currentStep === 2" (click)="goToStep(2)">2. Location</button>
         <button type="button" class="step-pill" [class.active]="currentStep === 3" (click)="goToStep(3)">3. Account</button>
       </div>
 
@@ -58,32 +58,27 @@
           </div>
 
           <div class="form-group" *ngIf="isFieldActive('city') && isSelectField('city')">
-            <ion-label>{{ getFieldLabel('city', 'City') }}</ion-label>
+            <ion-label>{{ getFieldLabel('city', 'Town or City') }}</ion-label>
             <ion-select formControlName="city" interface="popover" (ionChange)="onCityChange()">
               <ion-select-option *ngFor="let city of cities" [value]="city">{{ city }}</ion-select-option>
             </ion-select>
           </div>
 
           <div class="form-group" *ngIf="isFieldActive('city') && !isSelectField('city')">
-            <ion-label>{{ getFieldLabel('city', 'City') }}</ion-label>
+            <ion-label>{{ getFieldLabel('city', 'Town or City') }}</ion-label>
             <ion-input formControlName="city" type="text"></ion-input>
           </div>
 
           <div class="form-group" *ngIf="isFieldActive('suburb') && isSelectField('suburb')">
-            <ion-label>{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
+            <ion-label>{{ getFieldLabel('suburb', 'Area / Neighborhood') }}</ion-label>
             <ion-select formControlName="suburb" interface="popover">
               <ion-select-option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</ion-select-option>
             </ion-select>
           </div>
 
           <div class="form-group" *ngIf="isFieldActive('suburb') && !isSelectField('suburb')">
-            <ion-label>{{ getFieldLabel('suburb', 'Suburb') }}</ion-label>
+            <ion-label>{{ getFieldLabel('suburb', 'Area / Neighborhood') }}</ion-label>
             <ion-input formControlName="suburb" type="text"></ion-input>
-          </div>
-
-          <div class="form-group" *ngIf="isFieldActive('street')">
-            <ion-label>{{ getFieldLabel('street', 'Street') }}</ion-label>
-            <ion-input formControlName="street" type="text"></ion-input>
           </div>
 
           <ion-button type="button" expand="block" class="regSubmitBTN" (click)="goToStep(3)">Continue</ion-button>
@@ -91,18 +86,16 @@
 
         <div class="step-panel" *ngIf="currentStep === 3">
           <div class="form-group">
-            <ion-label>Username</ion-label>
-            <ion-input formControlName="username" type="text" placeholder="Choose username"></ion-input>
-          </div>
-
-          <div class="form-group">
             <ion-label>Email</ion-label>
-            <ion-input formControlName="email" type="email" placeholder="you@example.com"></ion-input>
+            <ion-input type="email" formControlName="email" placeholder="you@example.com"></ion-input>
           </div>
 
           <div class="form-group">
             <ion-label>Phone Number</ion-label>
-            <ion-input formControlName="phoneNumber" type="tel" placeholder="+2348012345678" (ionInput)="onPhoneNumberChange()"></ion-input>
+            <div class="phone-input-row">
+              <span class="phone-prefix">{{ phoneDialCode || '+' }}</span>
+              <ion-input type="tel" formControlName="phoneNumber" placeholder="8012345678" (ionInput)="onPhoneNumberChange()"></ion-input>
+            </div>
             <div class="phone-verify" *ngIf="requiresPhoneVerification">
               <div class="phone-verify-row" *ngIf="phoneVerificationState !== 'codeSent' && phoneVerificationState !== 'verified'">
                 <button type="button" class="verify-btn" [disabled]="phoneVerificationState === 'sending'" (click)="startPhoneVerification()">
@@ -129,11 +122,7 @@
           </div>
 
           <div class="google-register">
-            <app-google-signin
-              [role]="'chef'"
-              [context]="'register'"
-              (authenticated)="onGoogleAuthenticated($event)">
-            </app-google-signin>
+            <app-google-signin [role]="'chef'" [context]="'register'" (authenticated)="onGoogleAuthenticated($event)"></app-google-signin>
           </div>
         </div>
       </form>
