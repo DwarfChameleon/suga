@@ -1,7 +1,18 @@
 .google-signin-wrapper {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   justify-content: center;
   width: 100%;
+}
+
+.google-divider-copy {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--suga-muted);
+  text-align: center;
 }
 
 .google-button-host {

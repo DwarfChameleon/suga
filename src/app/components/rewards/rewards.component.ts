@@ -89,7 +89,7 @@ export class RewardsComponent implements OnInit {
     return Math.max(1, ...this.activity.map((a) => a.points || 0));
   }
 
-  toggleSection(section: keyof typeof this.sections): void {
+  toggleSection(section: keyof RewardsComponent['sections']): void {
     this.sections[section] = !this.sections[section];
   }
 

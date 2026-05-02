@@ -35,6 +35,10 @@ export class AuthAlertService {
   private async openLoginModal(returnUrl?: string) {
     const modal = await this.modalCtrl.create({
       component: LoginModalComponent,
+            cssClass: 'login-modal-class',
+      handle: true,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.92, 1],
       componentProps: { returnUrl },
       backdropDismiss: false
     });

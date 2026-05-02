@@ -257,6 +257,10 @@ export class OrderModalComponent implements OnInit {
   private async openLoginModal(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: LoginModalComponent,
+            cssClass: 'login-modal-class',
+      handle: true,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.92, 1],
       backdropDismiss: false
     });
     await modal.present();

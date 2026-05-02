@@ -351,6 +351,15 @@ ion-modal.suga-order-fullsheet::part(content) {
   border-radius: 18px 18px 0 0;
 }
 
+ion-modal.login-modal-class::part(content) {
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
+  margin-top: var(--suga-safe-top);
+  margin-bottom: var(--suga-safe-bottom);
+  border-radius: 28px 28px 0 0;
+  overflow: hidden;
+}
+
 ion-modal.suga-profile-sheet::part(content) {
   height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 100px);
   max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 100px);

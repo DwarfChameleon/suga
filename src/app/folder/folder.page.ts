@@ -51,7 +51,10 @@ export class FolderPage implements OnInit {
   async openLoginModal() {
     const modal = await this.modalController.create({
       component: LoginModalComponent,
-      cssClass: 'login-modal-class', // Optional CSS class for styling the modal
+      cssClass: 'login-modal-class',
+      handle: true,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.92, 1]
     });
     return await modal.present();
   }

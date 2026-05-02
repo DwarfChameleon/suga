@@ -1,35 +1,45 @@
 @import "/src/theme/variables.scss";
 
+:host {
+  display: block;
+  height: 100%;
+}
+
 .login-content {
   --overflow: hidden;
 }
 
 .login-container {
+  --login-hero-height: clamp(104px, 23vh, 176px);
   min-height: 100vh !important;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   background-image: url(/assets/img/fstorybg.gif);
-  background-size: 100% 22%;
+  background-size: 100% var(--login-hero-height);
   background-position: center top;
   background-repeat: no-repeat;
-  padding: clamp(88px, 20vh, 144px) 0 calc(8px + env(safe-area-inset-bottom, 0px));
+  padding: var(--login-hero-height) 0 0;
 }
 
 .modal {
   width: 100%;
+  min-height: calc(100vh - var(--login-hero-height) - env(safe-area-inset-bottom, 0px));
   background-color: var(--ion-color-primary-modal);
   text-align: center;
   border-top-left-radius: 28px;
   border-top-right-radius: 28px;
-  padding: 8px 16px 14px;
+  padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   border-top: 4px solid rgba(254, 44, 85, 0.18);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 form {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .form-group {
@@ -44,14 +54,15 @@ ion-label {
 }
 
 ion-input {
-  --background: var(--suga-input-bg);
+  --background: #ffffff;
   --padding-start: 12px;
   --padding-end: 12px;
   width: 100%;
   margin-left: 0;
   height: 42px;
-  border: 1px solid rgba(17, 34, 68, 0.08);
+  border: 1px solid rgba(17, 34, 68, 0.09);
   border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 0 0 1px rgba(17, 24, 39, 0.02);
 }
 
 .modalBTN {
@@ -101,7 +112,7 @@ ion-input {
 
 .signIn {
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .signIn h2 {
@@ -118,10 +129,9 @@ ion-input {
 .close {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .close ion-icon {
   font-size: 28px;
 }
-   
