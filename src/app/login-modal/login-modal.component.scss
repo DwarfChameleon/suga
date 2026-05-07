@@ -44,12 +44,18 @@ form {
 
 .form-group {
   text-align: left;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 ion-label {
   display: block;
-  margin-bottom: 4px;
-  font-size: 11px;
+  margin: 0;
+  padding-left: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
   color: #4c5566;
 }
 
@@ -57,6 +63,8 @@ ion-input {
   --background: #ffffff;
   --padding-start: 12px;
   --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
   width: 100%;
   margin-left: 0;
   height: 42px;
