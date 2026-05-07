@@ -18,6 +18,7 @@ export interface UserSettings {
   uiTheme: 'light' | 'dark';
   isPrivateChef: boolean;
   hasTransactionPin?: boolean;
+  emailVerified?: boolean;
 }
 
 export interface EditableProfile {
@@ -40,7 +41,8 @@ export interface EditableProfile {
   profilePicture?: string;
   coverPicture?: string;
   uiTheme?: 'light' | 'dark';
-  themeColor?: string;
+  emailVerified?: boolean;
+  emailVerifiedAt?: string | null;
   phoneVerification?: {
     idToken: string;
     uid: string;
@@ -156,6 +158,10 @@ export class UserService {
 
   updateEditableProfile(payload: Partial<EditableProfile>): Observable<{ message: string; profile: EditableProfile }> {
     return this.http.put<{ message: string; profile: EditableProfile }>(`${this.apiUrl}/profile/edit`, payload);
+  }
+
+  sendEmailVerification(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/send-email-verification`, {});
   }
 
   updateSettings(payload: Partial<UserSettings>): Observable<{ message: string; settings: UserSettings }> {

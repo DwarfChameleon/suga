@@ -178,6 +178,12 @@ select {
   margin-top: 6px;
 }
 
+.email-verify {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
 .phone-verify-row {
   display: flex;
   gap: 8px;
@@ -200,6 +206,11 @@ select {
   font-size: 13px;
   font-weight: 700;
   padding: 0 12px;
+}
+
+.email-btn {
+  justify-self: start;
+  min-width: 132px;
 }
 
 .verify-ok {

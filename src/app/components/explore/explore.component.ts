@@ -63,7 +63,9 @@ export class ExploreComponent implements OnInit {
   categories: FoodCategory[] = [];
   isLoading = false;
   isOnline = true;
-  openComments: Record<string, boolean> = {};
+  showCommentsModal = false;
+  activeCommentFood: Food | null = null;
+  commentDraft = '';
   likedFoodIds = new Set<string>();
   foodHeartBursts: Record<string, number[]> = {};
   unreadNotifications = 0;
@@ -197,6 +199,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   async openModalFood(foodId: string) {
+    this.closeCommentsModal();
     this.fetchFood(foodId);
     const modal = await this.modalController.create({
       component: FoodProfileComponent,
@@ -206,6 +209,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   async openChefProfile(username: string) {
+    this.closeCommentsModal();
     const modal = await this.modalController.create({
       component: ProfileModalComponent,
       componentProps: { username },
@@ -218,6 +222,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   async openCategoryModal(categoryData: FoodCategory | string): Promise<void> {
+    this.closeCommentsModal();
     const categoryName = typeof categoryData === 'string' ? categoryData : categoryData?.name || '';
     const categoryImages = typeof categoryData === 'string'
       ? []
@@ -248,6 +253,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   async openOrderModal(food: Food) {
+    this.closeCommentsModal();
     const chefID = (food as any).chefID || (food as any).chefId || (food as any).createdBy;
     const modal = await this.modalController.create({
       component: OrderModalComponent,
@@ -421,6 +427,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   private async openLoginModal(): Promise<void> {
+    this.closeCommentsModal();
     const modal = await this.modalController.create({
       component: LoginModalComponent,
             cssClass: 'login-modal-class',
@@ -512,33 +519,41 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.likeEffects.applyHeartBurst(this.foodHeartBursts, foodId);
   }
 
-  submitComment(foodId: string, event: Event): void {
-    event.preventDefault();
+  openComments(food: Food): void {
+    this.activeCommentFood = this.allFoods.find((item) => item._id === food._id) || food;
+    this.commentDraft = '';
+    this.showCommentsModal = true;
+  }
+
+  closeCommentsModal(): void {
+    this.showCommentsModal = false;
+    this.activeCommentFood = null;
+    this.commentDraft = '';
+  }
+
+  submitActiveComment(event?: Event): void {
+    event?.preventDefault();
+    const activeFood = this.activeCommentFood;
+    if (!activeFood?._id) {
+      return;
+    }
     if (!this.tokenStorage.getAccessToken()) {
       this.uiFeedback.error('Please login to comment.');
       this.openLoginModal();
       return;
     }
-    const form = event.target as HTMLFormElement;
-    const input = form.querySelector('input.commentInput') as HTMLInputElement | null;
-    const text = input?.value?.trim();
+    const text = this.commentDraft.trim();
     if (!text) return;
-    this.foodService.addComment(foodId, text).subscribe({
+    this.foodService.addComment(activeFood._id, text).subscribe({
       next: (updatedFood) => {
-        this.allFoods = this.allFoods.map(f => f._id === foodId ? updatedFood : f);
-        if (input) input.value = '';
+        this.allFoods = this.allFoods.map((food) => food._id === updatedFood._id ? updatedFood : food);
+        this.foods = this.foods.map((food) => food._id === updatedFood._id ? updatedFood : food);
+        this.activeCommentFood = updatedFood;
+        this.commentDraft = '';
         this.uiFeedback.success('Comment posted.');
       },
       error: () => this.uiFeedback.error('Failed to post comment.')
     });
-  }
-
-  toggleComments(foodId: string): void {
-    this.openComments[foodId] = !this.openComments[foodId];
-  }
-
-  isCommentsOpen(foodId: string): boolean {
-    return !!this.openComments[foodId];
   }
 
   getImageUrl(image: string): string {

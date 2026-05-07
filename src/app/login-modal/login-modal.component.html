@@ -23,21 +23,21 @@
       <form [formGroup]="loginForm" (ngSubmit)="login()">
 
         <div class="form-group">
-          <ion-label>Username or Email</ion-label>
+          <label class="field-label" for="login-username">Username or Email</label>
           <ion-input
+            id="login-username"
             formControlName="username"
             [(ngModel)]="credentials.username"
-            labelPlacement="stacked"
             type="text">
           </ion-input>
         </div>
 
         <div class="form-group">
-          <ion-label>Password</ion-label>
+          <label class="field-label" for="login-password">Password</label>
           <ion-input
+            id="login-password"
             formControlName="password"
             [(ngModel)]="credentials.password"
-            labelPlacement="stacked"
             type="password">
           </ion-input>
         </div>

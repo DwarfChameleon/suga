@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdConfigService } from 'src/app/services/ad-config.service';
 import { PromotedAd, PromotedAdService } from 'src/app/services/promoted-ad.service';
@@ -8,13 +8,18 @@ import { PromotedAd, PromotedAdService } from 'src/app/services/promoted-ad.serv
   templateUrl: './ad-slot.component.html',
   styleUrls: ['./ad-slot.component.scss']
 })
-export class AdSlotComponent implements OnInit {
+export class AdSlotComponent implements OnInit, OnDestroy {
   @Input() placement = '';
   @Input() label = 'Sponsored';
   @Input() isCriticalFlow = false;
 
   ad: PromotedAd | null = null;
   visible = false;
+  private readonly handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      void this.loadAd(true);
+    }
+  };
 
   constructor(
     private readonly adConfig: AdConfigService,
@@ -22,8 +27,20 @@ export class AdSlotComponent implements OnInit {
     private readonly router: Router
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    await this.loadAd(true);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+  }
+
+  private async loadAd(forceRefreshConfig = false): Promise<void> {
+    await this.adConfig.warmConfig(forceRefreshConfig);
+
     if (!this.adConfig.canShowPlacement(this.placement, { isCriticalFlow: this.isCriticalFlow })) {
+      this.ad = null;
       this.visible = false;
       return;
     }

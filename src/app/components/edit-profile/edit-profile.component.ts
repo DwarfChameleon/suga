@@ -35,7 +35,8 @@ export class EditProfileComponent implements OnInit {
     country: '',
     locationInfo: '',
     uiTheme: 'light',
-    themeColor: '#2c6ac2'
+    emailVerified: false,
+    emailVerifiedAt: null
   };
   initialProfile: EditableProfile = this.getDefaultProfile();
   isSaving = false;
@@ -57,6 +58,7 @@ export class EditProfileComponent implements OnInit {
   phoneVerificationCode = '';
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
+  isSendingVerificationEmail = false;
 
   constructor(
     private readonly userService: UserService,
@@ -88,7 +90,6 @@ export class EditProfileComponent implements OnInit {
     return !this.getFieldError('username')
       && !this.getFieldError('email')
       && !this.getFieldError('phoneNumber')
-      && !this.getFieldError('themeColor')
       && !this.getFieldError('fullName')
       && !this.getFieldError('city')
       && !this.getFieldError('state')
@@ -126,10 +127,6 @@ export class EditProfileComponent implements OnInit {
       case 'phoneNumber':
         if (!value) return 'Phone number is required.';
         if (!/^\+?[0-9()\-\s]{7,20}$/.test(value)) return 'Enter a valid phone number.';
-        return null;
-      case 'themeColor':
-        if (!value) return null;
-        if (!/^#[0-9a-fA-F]{6}$/.test(value)) return 'Theme color must be a valid hex code.';
         return null;
       case 'fullName':
       case 'city':
@@ -271,7 +268,7 @@ export class EditProfileComponent implements OnInit {
   async save(): Promise<void> {
     if (!this.isFormValid) {
       [
-        'username', 'email', 'phoneNumber', 'themeColor', 'fullName',
+        'username', 'email', 'phoneNumber', 'fullName',
         'city', 'state', 'region', 'suburb', 'localGovernment', 'street', 'country', 'homeAddress', 'workAddress',
         'restaurantAddress', 'locationInfo'
       ].forEach((field) => this.markTouched(field));
@@ -285,12 +282,6 @@ export class EditProfileComponent implements OnInit {
     }
 
     const phoneNumberChanged = this.normalizePhone(this.profile.phoneNumber || '') !== this.normalizePhone(this.initialProfile.phoneNumber || '');
-    if (this.requiresPhoneVerification && phoneNumberChanged && !this.phoneVerificationProof) {
-      this.phoneVerificationError = 'Verify your new phone number before saving.';
-      this.uiFeedback.error(this.phoneVerificationError);
-      return;
-    }
-
     this.isSaving = true;
     try {
       const response = await firstValueFrom(this.userService.updateEditableProfile({
@@ -319,7 +310,7 @@ export class EditProfileComponent implements OnInit {
       if (this.profile.uiTheme) {
         this.themeService.apply(this.profile.uiTheme);
       }
-      this.uiFeedback.success('Profile updated successfully.');
+      this.uiFeedback.success(response?.message || 'Profile updated successfully.');
     } catch (err: any) {
       this.uiFeedback.error(err?.error?.message || 'Unable to update profile.');
     } finally {
@@ -364,7 +355,8 @@ export class EditProfileComponent implements OnInit {
       country: '',
       locationInfo: '',
       uiTheme: 'light',
-      themeColor: '#2c6ac2',
+      emailVerified: false,
+      emailVerifiedAt: null,
       profilePicture: '',
       coverPicture: ''
     };
@@ -377,6 +369,21 @@ export class EditProfileComponent implements OnInit {
       ...(data || {}),
       roles: Array.isArray(data?.roles) ? data!.roles : defaults.roles
     };
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    if (this.isSendingVerificationEmail || !this.profile.email || this.profile.emailVerified) {
+      return;
+    }
+    this.isSendingVerificationEmail = true;
+    try {
+      const response = await firstValueFrom(this.userService.sendEmailVerification());
+      this.uiFeedback.success(response?.message || 'Verification email sent.');
+    } catch (error: any) {
+      this.uiFeedback.error(error?.error?.message || 'Unable to send verification email right now.');
+    } finally {
+      this.isSendingVerificationEmail = false;
+    }
   }
 
   onCountryChanged(): void {

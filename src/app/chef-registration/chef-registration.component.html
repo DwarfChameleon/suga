@@ -97,6 +97,7 @@
               <ion-input type="tel" formControlName="phoneNumber" placeholder="8012345678" (ionInput)="onPhoneNumberChange()"></ion-input>
             </div>
             <div class="phone-verify" *ngIf="requiresPhoneVerification">
+              <small class="muted">Optional for now. You can keep going and verify by email.</small>
               <div class="phone-verify-row" *ngIf="phoneVerificationState !== 'codeSent' && phoneVerificationState !== 'verified'">
                 <button type="button" class="verify-btn" [disabled]="phoneVerificationState === 'sending'" (click)="startPhoneVerification()">
                   {{ phoneVerificationState === 'sending' ? 'Sending...' : 'Verify Number' }}

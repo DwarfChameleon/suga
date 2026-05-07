@@ -68,12 +68,6 @@ export class DispatchRegistrationComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (this.requiresPhoneVerification && !this.phoneVerificationProof) {
-      this.phoneVerificationError = 'Verify your phone number before creating your account.';
-      this.uiFeedback.error(this.phoneVerificationError);
-      return;
-    }
-
     if (this.registrationForm.invalid || this.isSubmitting) {
       this.registrationForm.markAllAsTouched();
       this.uiFeedback.error('Complete all required fields.');

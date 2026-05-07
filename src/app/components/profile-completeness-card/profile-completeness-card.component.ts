@@ -50,6 +50,7 @@ export class ProfileCompletenessCardComponent implements OnChanges {
     const baseChecks: CompletionItem[] = [
       { label: 'Username', complete: this.hasValue(profile.username) },
       { label: 'Email', complete: this.hasValue(profile.email) },
+      { label: 'Email verified', complete: !!profile.emailVerified },
       { label: 'Phone', complete: this.hasValue(profile.phoneNumber) },
       { label: 'Country', complete: this.hasValue(profile.country) },
       { label: 'State/Region', complete: this.hasValue(profile.state) || this.hasValue(profile.region) },

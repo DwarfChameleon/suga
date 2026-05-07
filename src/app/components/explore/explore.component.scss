@@ -806,6 +806,84 @@ font-size: 18px;
     opacity: 4.5;
 }
 
+:host ::ng-deep ion-modal.suga-comments-sheet::part(content) {
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 72px);
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 72px);
+  margin-top: calc(var(--suga-safe-top) + 36px);
+  margin-bottom: calc(var(--suga-safe-bottom) + 12px);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.comments-sheet-content {
+  --background: var(--suga-surface);
+}
+
+.comments-sheet-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px calc(16px + var(--suga-safe-bottom));
+}
+
+.sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sheet-meta h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--ion-color-primary-text);
+}
+
+.sheet-meta p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--suga-muted);
+}
+
+.sheet-close-btn {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--suga-input-bg);
+  color: var(--ion-color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheet-close-btn ion-icon {
+  font-size: 20px;
+}
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.sheet-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.sheet-input .commentInput {
+  width: 100%;
+}
+
+.sheet-input .sendComment[disabled] {
+  opacity: 0.45;
+}
+
 @media (max-width: 480px) {
   .food-info {
     grid-template-columns: repeat(3, minmax(0, 1fr));

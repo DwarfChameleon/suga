@@ -1,3 +1,4 @@
+/// <reference types="@capacitor-firebase/authentication" />
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
@@ -5,6 +6,10 @@ const config: CapacitorConfig = {
   appName: 'suga',
   webDir: 'www',
   plugins: {
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ['google.com', 'phone']
+    },
     SplashScreen: {
       launchAutoHide: false,
       launchShowDuration: 450,

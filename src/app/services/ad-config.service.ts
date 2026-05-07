@@ -77,17 +77,31 @@ const defaultConfig: AdConfig = {
 })
 export class AdConfigService {
   private config: AdConfig = defaultConfig;
+  private warmPromise: Promise<void> | null = null;
 
   constructor(private readonly http: HttpClient) {}
 
-  async warmConfig(): Promise<void> {
+  async warmConfig(forceRefresh = false): Promise<void> {
+    if (this.warmPromise && !forceRefresh) {
+      return this.warmPromise;
+    }
+
+    this.warmPromise = this.fetchConfig();
+    await this.warmPromise;
+  }
+
+  private async fetchConfig(): Promise<void> {
     try {
       const response = await firstValueFrom(this.http.get<{ ok: boolean; config?: AdConfig }>(`${environment.apiUrl}/ads/config`));
       if (response?.config) {
         this.config = response.config;
+        return;
       }
+      this.config = defaultConfig;
     } catch (_error) {
       this.config = defaultConfig;
+    } finally {
+      this.warmPromise = null;
     }
   }
 

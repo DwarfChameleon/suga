@@ -66,12 +66,6 @@ export class ChefRegistrationComponent implements OnInit {
       return;
     }
 
-    if (this.requiresPhoneVerification && !this.phoneVerificationProof) {
-      this.phoneVerificationError = 'Verify your phone number before creating your account.';
-      this.uiFeedback.error(this.phoneVerificationError);
-      return;
-    }
-
     if (!this.registrationForm.valid) {
       this.registrationForm.markAllAsTouched();
       this.invalidFormMessage = 'Please complete the required fields.';

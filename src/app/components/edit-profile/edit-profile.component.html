@@ -58,12 +58,24 @@
           <label>Email</label>
           <input type="email" [(ngModel)]="profile.email" (blur)="markTouched('email')" [class.input-invalid]="isFieldInvalid('email')" />
           <small class="field-error" *ngIf="isFieldInvalid('email')">{{ getFieldError('email') }}</small>
+          <div class="email-verify">
+            <small class="verify-ok" *ngIf="profile.emailVerified">Email verified.</small>
+            <small class="field-error" *ngIf="!profile.emailVerified">Email not verified yet.</small>
+            <button
+              type="button"
+              class="verify-btn email-btn"
+              [disabled]="isSendingVerificationEmail || !profile.email || !!profile.emailVerified"
+              (click)="sendVerificationEmail()">
+              {{ isSendingVerificationEmail ? 'Sending...' : (profile.emailVerified ? 'Verified' : 'Verify Email') }}
+            </button>
+          </div>
         </div>
         <div>
           <label>Phone Number</label>
           <input [(ngModel)]="profile.phoneNumber" (input)="onPhoneNumberChange()" (blur)="markTouched('phoneNumber')" [class.input-invalid]="isFieldInvalid('phoneNumber')" />
           <small class="field-error" *ngIf="isFieldInvalid('phoneNumber')">{{ getFieldError('phoneNumber') }}</small>
           <div class="phone-verify" *ngIf="requiresPhoneVerification">
+            <small class="muted">Optional for now.</small>
             <div class="phone-verify-row" *ngIf="phoneVerificationState !== 'codeSent' && phoneVerificationState !== 'verified'">
               <button type="button" class="verify-btn" [disabled]="phoneVerificationState === 'sending'" (click)="startPhoneVerification()">
                 {{ phoneVerificationState === 'sending' ? 'Sending...' : 'Verify Number' }}
@@ -177,19 +189,12 @@
       </div>
 
       <h2>Appearance</h2>
-      <div class="row two">
-        <div>
-          <label>Theme</label>
-          <select [(ngModel)]="profile.uiTheme">
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-        </div>
-        <div>
-          <label>Theme Color</label>
-          <input type="color" [(ngModel)]="profile.themeColor" (blur)="markTouched('themeColor')" [class.input-invalid]="isFieldInvalid('themeColor')" />
-          <small class="field-error" *ngIf="isFieldInvalid('themeColor')">{{ getFieldError('themeColor') }}</small>
-        </div>
+      <div class="row">
+        <label>Theme</label>
+        <select [(ngModel)]="profile.uiTheme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
       </div>
 
       <h2>Profile Media</h2>

@@ -52,6 +52,7 @@ export class PhoneVerificationService {
         await FirebaseAuthentication.signOut().catch(() => undefined);
         await FirebaseAuthentication.signInWithPhoneNumber({ phoneNumber });
       } catch (error: any) {
+        console.error('[PhoneVerification] startVerification failed', error);
         this.clearVerificationState();
         reject(this.normalizeError(error));
       }
@@ -82,6 +83,7 @@ export class PhoneVerificationService {
     }
 
     await FirebaseAuthentication.addListener('phoneCodeSent', async (event: any) => {
+      console.log('[PhoneVerification] code sent', event);
       this.verificationId = String(event?.verificationId || '');
       const resolve = this.startResolver;
       this.startResolver = undefined;
@@ -91,6 +93,7 @@ export class PhoneVerificationService {
 
     await FirebaseAuthentication.addListener('phoneVerificationCompleted', async (event: any) => {
       try {
+        console.log('[PhoneVerification] verification completed', event);
         const proof = await this.buildProof(event?.result?.user?.phoneNumber || this.pendingPhoneNumber);
         const resolve = this.startResolver;
         this.clearVerificationState();
@@ -103,6 +106,7 @@ export class PhoneVerificationService {
     });
 
     await FirebaseAuthentication.addListener('phoneVerificationFailed', async (event: any) => {
+      console.error('[PhoneVerification] verification failed', event);
       const reject = this.startRejecter;
       const error = this.normalizeError(event);
       this.clearVerificationState();
@@ -133,12 +137,15 @@ export class PhoneVerificationService {
   }
 
   private normalizeError(error: any): Error {
-    const message = String(
+    let message = String(
       error?.message ||
       error?.error?.message ||
       error?.localizedMessage ||
       'Phone verification failed.'
     ).trim();
+    if (/play integrity|sha-256|sha256|recaptcha|safetynet/i.test(message)) {
+      message += ' Check that Firebase Phone sign-in is enabled and that the Android app `com.suga.app` has both SHA-1 and SHA-256 fingerprints added in Firebase.';
+    }
     return new Error(message);
   }
 }

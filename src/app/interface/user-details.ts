@@ -32,6 +32,7 @@ export interface UserInfo {
   isPrivateChef?: boolean;
   profilePicture?: string;
   coverPicture?: string;
+  emailVerified?: boolean;
 
 }
 
@@ -57,4 +58,5 @@ export interface UserDetails {
   isPrivateChef?: boolean;
   profilePicture?: string;
   coverPicture?: string;
-}
+  emailVerified?: boolean;
+} 
