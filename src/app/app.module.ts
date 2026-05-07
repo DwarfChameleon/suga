@@ -52,9 +52,14 @@ import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './services/global-error-handler';
 import { ErrorLoggingInterceptor } from './services/error-logging.interceptor';
 import { AddressDataService } from './services/address-data.service';
+import { AdConfigService } from './services/ad-config.service';
 
 export function preloadAddressCatalog(addressDataService: AddressDataService): () => Promise<void> {
   return () => addressDataService.warmCatalog();
+}
+
+export function preloadAdConfig(adConfigService: AdConfigService): () => Promise<void> {
+  return () => adConfigService.warmConfig();
 }
 
 @NgModule({
@@ -68,6 +73,12 @@ export function preloadAddressCatalog(addressDataService: AddressDataService): (
       provide: APP_INITIALIZER,
       useFactory: preloadAddressCatalog,
       deps: [AddressDataService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: preloadAdConfig,
+      deps: [AdConfigService],
       multi: true
     },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
