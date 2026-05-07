@@ -213,6 +213,23 @@ select {
   min-width: 132px;
 }
 
+.email-code-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.email-code-row input {
+  width: 170px;
+  max-width: 100%;
+  letter-spacing: 0.18em;
+}
+
+.confirm-email-btn {
+  min-width: 132px;
+}
+
 .verify-ok {
   color: #18844d;
   font-size: 12px;

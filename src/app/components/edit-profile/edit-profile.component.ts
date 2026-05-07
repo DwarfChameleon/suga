@@ -59,6 +59,8 @@ export class EditProfileComponent implements OnInit {
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
   isSendingVerificationEmail = false;
+  isVerifyingEmailCode = false;
+  emailVerificationCode = '';
 
   constructor(
     private readonly userService: UserService,
@@ -297,6 +299,7 @@ export class EditProfileComponent implements OnInit {
           ...existingUser,
           username: this.profile.username,
           email: this.profile.email,
+          emailVerified: !!this.profile.emailVerified,
           profilePicture: this.profile.profilePicture,
           coverPicture: this.profile.coverPicture
         });
@@ -383,6 +386,38 @@ export class EditProfileComponent implements OnInit {
       this.uiFeedback.error(error?.error?.message || 'Unable to send verification email right now.');
     } finally {
       this.isSendingVerificationEmail = false;
+    }
+  }
+
+  async verifyEmailCode(): Promise<void> {
+    const code = this.emailVerificationCode.trim();
+    if (this.isVerifyingEmailCode || this.profile.emailVerified) {
+      return;
+    }
+    if (!/^[0-9]{6}$/.test(code)) {
+      this.uiFeedback.error('Enter the 6-digit code sent to your email.');
+      return;
+    }
+
+    this.isVerifyingEmailCode = true;
+    try {
+      const response = await firstValueFrom(this.userService.verifyEmailCode(code));
+      this.profile.emailVerified = !!response?.emailVerified;
+      this.profile.emailVerifiedAt = response?.emailVerifiedAt || new Date().toISOString();
+      this.initialProfile = this.normalizeProfile(this.profile);
+      this.emailVerificationCode = '';
+      const existingUser = this.tokenStorage.getUser();
+      if (existingUser) {
+        this.tokenStorage.saveUser({
+          ...existingUser,
+          emailVerified: !!this.profile.emailVerified
+        });
+      }
+      this.uiFeedback.success(response?.message || 'Email verified successfully.');
+    } catch (error: any) {
+      this.uiFeedback.error(error?.error?.message || 'Unable to verify email right now.');
+    } finally {
+      this.isVerifyingEmailCode = false;
     }
   }
 

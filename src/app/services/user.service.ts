@@ -164,6 +164,13 @@ export class UserService {
     return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/send-email-verification`, {});
   }
 
+  verifyEmailCode(code: string): Observable<{ message: string; emailVerified: boolean; emailVerifiedAt?: string | null; rewardPoints?: number }> {
+    return this.http.post<{ message: string; emailVerified: boolean; emailVerifiedAt?: string | null; rewardPoints?: number }>(
+      `${environment.apiUrl}/auth/verify-email-code`,
+      { code }
+    );
+  }
+
   updateSettings(payload: Partial<UserSettings>): Observable<{ message: string; settings: UserSettings }> {
     return this.http.put<{ message: string; settings: UserSettings }>(`${this.apiUrl}/settings`, payload);
   }

@@ -61,13 +61,29 @@
           <div class="email-verify">
             <small class="verify-ok" *ngIf="profile.emailVerified">Email verified.</small>
             <small class="field-error" *ngIf="!profile.emailVerified">Email not verified yet.</small>
+            <small class="muted" *ngIf="!profile.emailVerified">We’ll send a one-time 6-digit code to this email.</small>
             <button
               type="button"
               class="verify-btn email-btn"
               [disabled]="isSendingVerificationEmail || !profile.email || !!profile.emailVerified"
               (click)="sendVerificationEmail()">
-              {{ isSendingVerificationEmail ? 'Sending...' : (profile.emailVerified ? 'Verified' : 'Verify Email') }}
+              {{ isSendingVerificationEmail ? 'Sending...' : (profile.emailVerified ? 'Verified' : 'Send Code') }}
             </button>
+            <div class="email-code-row" *ngIf="!profile.emailVerified">
+              <input
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                [(ngModel)]="emailVerificationCode"
+                placeholder="Enter 6-digit code" />
+              <button
+                type="button"
+                class="verify-btn email-btn confirm-email-btn"
+                [disabled]="isVerifyingEmailCode || emailVerificationCode.trim().length !== 6"
+                (click)="verifyEmailCode()">
+                {{ isVerifyingEmailCode ? 'Checking...' : 'Confirm Code' }}
+              </button>
+            </div>
           </div>
         </div>
         <div>
