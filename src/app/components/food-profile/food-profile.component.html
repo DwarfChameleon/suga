@@ -39,6 +39,8 @@
 
       <ion-button (click)="openOrderModal(food)" class="primary-order-btn">Place order</ion-button>
       <ion-button fill="clear" (click)="addCurrentFoodToCart()" class="cart-link-btn">Add to cart</ion-button>
+
+      <app-ad-slot placement="foodProfileModal" label="Sponsored"></app-ad-slot>
     </div>
 
     <div class="more-section">

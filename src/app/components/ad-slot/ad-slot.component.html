@@ -1,0 +1,11 @@
+<div class="ad-slot" *ngIf="visible && ad">
+  <div class="ad-slot-label">{{ label }}</div>
+  <button type="button" class="ad-slot-card" (click)="openAd()">
+    <img *ngIf="ad.imageUrl" [src]="ad.imageUrl" [alt]="ad.title" class="ad-slot-image" />
+    <div class="ad-slot-copy">
+      <div class="ad-slot-sponsor">{{ ad.sponsorName }}</div>
+      <div class="ad-slot-title">{{ ad.title }}</div>
+      <div class="ad-slot-body" *ngIf="ad.body">{{ ad.body }}</div>
+    </div>
+  </button>
+</div>
