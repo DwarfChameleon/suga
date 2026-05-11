@@ -35,6 +35,8 @@ export class OrderInfoComponent  implements OnInit, OnDestroy {
   isDispatchUpdating = false;
   isScannerOpen = false;
   isScannerActive = false;
+  isReceiptPreviewOpen = false;
+  receiptPreviewUrl = '';
   scanError = '';
   manualDispatchToken = '';
   private changed = false;
@@ -414,32 +416,14 @@ export class OrderInfoComponent  implements OnInit, OnDestroy {
     URL.revokeObjectURL(link.href);
   }
 
-  async printReceipt(): Promise<void> {
+  openReceiptPreview(): void {
     const svg = this.buildReceiptSvg();
-    const printWindow = window.open('', '_blank', 'width=900,height=1100');
-    if (!printWindow) {
-      this.uiFeedback.error('Popup blocked. Allow popups to print the receipt.');
-      return;
-    }
+    this.receiptPreviewUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    this.isReceiptPreviewOpen = true;
+  }
 
-    printWindow.document.open();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${this.receiptBaseName()}</title>
-          <style>
-            html, body { margin: 0; padding: 0; background: #fff; }
-            svg { width: 100%; height: auto; display: block; }
-          </style>
-        </head>
-        <body>
-          ${svg}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
+  closeReceiptPreview(): void {
+    this.isReceiptPreviewOpen = false;
   }
 
   private buildReceiptSvg(): string {

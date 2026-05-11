@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { EditableProfile, UserService } from 'src/app/services/user.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
@@ -69,7 +70,8 @@ export class EditProfileComponent implements OnInit {
     private readonly themeService: ThemeService,
     private readonly addressData: AddressDataService,
     private readonly mapService: MapService,
-    private readonly phoneVerification: PhoneVerificationService
+    private readonly phoneVerification: PhoneVerificationService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +80,10 @@ export class EditProfileComponent implements OnInit {
 
   get isChef(): boolean {
     return (this.profile.roles || []).map((r) => r.toLowerCase()).includes('chef');
+  }
+
+  openSettings(): void {
+    this.router.navigate(['components/profile-update']);
   }
 
   get hasChanges(): boolean {

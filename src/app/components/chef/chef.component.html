@@ -11,6 +11,9 @@
       <ion-button fill="clear" (click)="goHome()" aria-label="Explore home">
         <ion-icon slot="icon-only" name="home-outline"></ion-icon>
       </ion-button>
+      <ion-button fill="clear" (click)="openSettings()" aria-label="Settings">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -53,7 +56,6 @@
     <button (click)="openWallet()" class="profile-btn" title="Wallet"><div class="roundIcon"><ion-icon name="wallet-outline" class="btn-icon"></ion-icon></div><br>Wallet</button>
     <button (click)="openRewards()" class="profile-btn" title="Rewards"><div class="roundIcon"><ion-icon name="sparkles-outline" class="btn-icon"></ion-icon></div><br>Rewards</button>
     <button (click)="updateProfile()" class="profile-btn" title="Edit Profile"><div class="roundIcon"><ion-icon name="person-circle-outline" class="btn-icon"></ion-icon></div><br>Edit Profile</button>
-    <button (click)="openSettings()" class="profile-btn" title="Settings"><div class="roundIcon"><ion-icon name="settings-outline" class="btn-icon"></ion-icon></div><br>Settings</button>
   </div>
  <br>
   <div class="stats-row">

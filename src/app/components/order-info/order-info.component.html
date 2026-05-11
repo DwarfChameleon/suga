@@ -10,8 +10,8 @@
   </div>
 
   <div class="receipt-actions">
+    <button type="button" class="receipt-btn primary" (click)="openReceiptPreview()">View receipt</button>
     <button type="button" class="receipt-btn" (click)="downloadReceiptImage()">Save image</button>
-    <button type="button" class="receipt-btn" (click)="printReceipt()">Print / Save PDF</button>
   </div>
 
   <div #receiptFrame class="receipt-frame">
@@ -124,3 +124,34 @@
     </div>
   </div>
 </div>
+
+<ion-modal
+  [isOpen]="isReceiptPreviewOpen"
+  (didDismiss)="closeReceiptPreview()"
+  [initialBreakpoint]="0.82"
+  [breakpoints]="[0, 0.55, 0.82, 0.96]"
+  handle="true"
+  cssClass="suga-receipt-sheet">
+  <ng-template>
+    <div class="receipt-preview-sheet">
+      <div class="receipt-preview-header">
+        <div>
+          <span>Receipt</span>
+          <h3>{{ order?.dishName || 'Order receipt' }}</h3>
+        </div>
+        <button class="close-btn small" (click)="closeReceiptPreview()" aria-label="Close receipt">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="receipt-preview-body">
+        <img *ngIf="receiptPreviewUrl" [src]="receiptPreviewUrl" alt="Order receipt preview" />
+      </div>
+
+      <div class="receipt-preview-actions">
+        <button type="button" class="receipt-btn primary" (click)="downloadReceiptImage()">Save image</button>
+        <button type="button" class="receipt-btn" (click)="closeReceiptPreview()">Done</button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

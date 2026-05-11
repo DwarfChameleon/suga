@@ -3,6 +3,12 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="components/explore" text="" icon="arrow-back"></ion-back-button>
     </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="openSettings()" aria-label="Settings">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -42,10 +48,6 @@
   <div class="section-divider"></div>
 
   <div class="control">
-    <button class="control-btn" (click)="openSettings()">
-      <div class="roundIcon"><ion-icon name="settings" class="btn-icon"></ion-icon></div>
-      <span>Settings</span>
-    </button>
     <button class="control-btn" (click)="openWallet()">
       <div class="roundIcon"><ion-icon name="wallet" class="btn-icon"></ion-icon></div>
       <span>Wallet</span>

@@ -351,6 +351,11 @@ ion-modal.suga-order-fullsheet::part(content) {
   border-radius: 18px 18px 0 0;
 }
 
+ion-modal.suga-receipt-sheet::part(content) {
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+}
+
 ion-modal.login-modal-class::part(content) {
   height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
   max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom));
