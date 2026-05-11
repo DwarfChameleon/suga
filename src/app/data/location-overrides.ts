@@ -144,5 +144,116 @@ export const LOCATION_OVERRIDES: Record<string, CountryLocationOverride> = {
         { name: 'Ikotu' }
       ]
     }
+  },
+  Zimbabwe: {
+    states: {
+      Harare: [
+        { name: 'Harare', suburbs: ['Avondale', 'Borrowdale', 'Highlands', 'Mbare', 'Glen View', 'Kuwadzana', 'Dzivarasekwa', 'Waterfalls', 'Hatfield', 'Mount Pleasant'] },
+        { name: 'Chitungwiza' },
+        { name: 'Epworth' }
+      ],
+      Bulawayo: [
+        { name: 'Bulawayo', suburbs: ['Luveve', 'Nkulumane', 'Pumula', 'Cowdray Park', 'Entumbane', 'Hillside', 'Mzilikazi', 'Famona'] }
+      ],
+      Manicaland: [
+        { name: 'Mutare' },
+        { name: 'Chipinge' },
+        { name: 'Rusape' },
+        { name: 'Nyanga' },
+        { name: 'Chimanimani' },
+        { name: 'Buhera' }
+      ],
+      'Mashonaland West': [
+        { name: 'Chinhoyi' },
+        { name: 'Kadoma' },
+        { name: 'Kariba' },
+        { name: 'Chegutu' },
+        { name: 'Norton' },
+        { name: 'Karoi' }
+      ],
+      'Mashonaland East': [
+        { name: 'Marondera' },
+        { name: 'Mutoko' },
+        { name: 'Murehwa' },
+        { name: 'Chivhu' },
+        { name: 'Goromonzi' }
+      ],
+      'Mashonaland Central': [
+        { name: 'Bindura' },
+        { name: 'Mazowe' },
+        { name: 'Shamva' },
+        { name: 'Guruve' },
+        { name: 'Mount Darwin' }
+      ],
+      Masvingo: [
+        { name: 'Masvingo' },
+        { name: 'Chiredzi' },
+        { name: 'Triangle' },
+        { name: 'Gutu' },
+        { name: 'Bikita' },
+        { name: 'Zaka' }
+      ],
+      Midlands: [
+        { name: 'Gweru' },
+        { name: 'Kwekwe' },
+        { name: 'Shurugwi' },
+        { name: 'Zvishavane' },
+        { name: 'Redcliff' },
+        { name: 'Mvuma' }
+      ],
+      'Matabeleland North': [
+        { name: 'Victoria Falls' },
+        { name: 'Hwange' },
+        { name: 'Lupane' },
+        { name: 'Binga' },
+        { name: 'Tsholotsho' }
+      ],
+      'Matabeleland South': [
+        { name: 'Gwanda' },
+        { name: 'Beitbridge' },
+        { name: 'Plumtree' },
+        { name: 'Esigodini' },
+        { name: 'Filabusi' }
+      ]
+    }
+  },
+  Malawi: {
+    states: {
+      'Northern Region': [
+        { name: 'Mzuzu', suburbs: ['Luwinga', 'Chibavi', 'Katoto', 'Mchengautuwa', 'Masasa'] },
+        { name: 'Karonga' },
+        { name: 'Nkhata Bay' },
+        { name: 'Rumphi' },
+        { name: 'Chitipa' },
+        { name: 'Mzimba' }
+      ],
+      'Central Region': [
+        { name: 'Lilongwe', suburbs: ['Area 3', 'Area 6', 'Area 10', 'Area 12', 'Area 18', 'Area 23', 'Area 25', 'Area 36', 'City Centre', 'Kanengo'] },
+        { name: 'Dedza' },
+        { name: 'Dowa' },
+        { name: 'Kasungu' },
+        { name: 'Mchinji' },
+        { name: 'Nkhotakota' },
+        { name: 'Ntcheu' },
+        { name: 'Ntchisi' },
+        { name: 'Salima' }
+      ],
+      'Southern Region': [
+        { name: 'Blantyre', suburbs: ['Limbe', 'Ndirande', 'Chilomoni', 'Soche', 'Manja', 'Nyambadwe', 'Sunnyside'] },
+        { name: 'Zomba' },
+        { name: 'Mangochi' },
+        { name: 'Mulanje' },
+        { name: 'Thyolo' },
+        { name: 'Chiradzulu' },
+        { name: 'Balaka' },
+        { name: 'Machinga' },
+        { name: 'Mwanza' },
+        { name: 'Nsanje' },
+        { name: 'Chikwawa' },
+        { name: 'Phalombe' },
+        { name: 'Neno' }
+      ]
+    }
   }
 };
+

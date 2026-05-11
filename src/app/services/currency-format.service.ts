@@ -12,6 +12,8 @@ export class CurrencyFormatService {
     Ghana: 'GHS',
     'South Africa': 'ZAR',
     Kenya: 'KES',
+    Zimbabwe: 'ZWG',
+    Malawi: 'MWK',
     France: 'EUR',
     Italy: 'EUR'
   };

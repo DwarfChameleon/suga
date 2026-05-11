@@ -66,6 +66,8 @@ export class FoodRegistrationComponent implements OnInit {
     ghana: 'GHS',
     'south africa': 'ZAR',
     kenya: 'KES',
+    zimbabwe: 'ZWG',
+    malawi: 'MWK',
     france: 'EUR',
     italy: 'EUR'
   };

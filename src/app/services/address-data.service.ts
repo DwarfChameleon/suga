@@ -33,7 +33,7 @@ interface AddressCatalogPayload {
   providedIn: 'root'
 })
 export class AddressDataService {
-  private static readonly CACHE_KEY = 'suga.address.catalog.v3';
+  private static readonly CACHE_KEY = 'suga.address.catalog.v4';
   private readonly fallbackProfiles: Record<string, CountryProfile> = {
     Nigeria: {
       isoCode: 'NG',
@@ -107,6 +107,24 @@ export class AddressDataService {
         { key: 'region', label: 'Region', type: 'select' },
         { key: 'city', label: 'City', type: 'select' },
         { key: 'street', label: 'Street (optional)', type: 'text', required: false }
+      ]
+    },
+    Zimbabwe: {
+      isoCode: 'ZW',
+      dialCode: '+263',
+      fields: [
+        { key: 'state', label: 'Province / City', type: 'select' },
+        { key: 'city', label: 'City or Town', type: 'select' },
+        { key: 'suburb', label: 'Suburb / Area (optional)', type: 'select', required: false }
+      ]
+    },
+    Malawi: {
+      isoCode: 'MW',
+      dialCode: '+265',
+      fields: [
+        { key: 'region', label: 'Region', type: 'select' },
+        { key: 'city', label: 'City or Town', type: 'select' },
+        { key: 'suburb', label: 'Area / Neighborhood (optional)', type: 'select', required: false }
       ]
     }
   };
