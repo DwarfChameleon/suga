@@ -39,7 +39,7 @@
         <div class="food-meta">
           <h3>{{ food.dishName }}</h3>
           <p class="chef">@{{ food.chef }}</p>
-          <p class="price"><span class="naira">&#8358;</span>{{ food.price }}</p>
+          <p class="price">{{ food.price | money:food.priceCurrency:'1.0-0' }}</p>
           <button class="view-btn" type="button">View & Order</button>
         </div>
       </div>

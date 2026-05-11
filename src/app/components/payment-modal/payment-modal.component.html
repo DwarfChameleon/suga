@@ -14,27 +14,27 @@
       </div>
       <div class="row">
         <span>Price</span>
-        <strong>{{ price | number:'1.2-2' }}</strong>
+        <strong>{{ price | money:undefined:'1.2-2' }}</strong>
       </div>
       <div class="row">
         <span>Fee (10%)</span>
-        <strong>{{ feeAmount | number:'1.2-2' }}</strong>
+        <strong>{{ feeAmount | money:undefined:'1.2-2' }}</strong>
       </div>
       <div class="row" *ngIf="deliveryFee !== undefined">
         <span>Delivery</span>
-        <strong>{{ deliveryFee | number:'1.2-2' }}</strong>
+        <strong>{{ deliveryFee | money:undefined:'1.2-2' }}</strong>
       </div>
       <div class="row total">
         <span>Total</span>
-        <strong>{{ totalAmount | number:'1.2-2' }}</strong>
+        <strong>{{ totalAmount | money:undefined:'1.2-2' }}</strong>
       </div>
     </div>
 
     <div class="local-pay" [class.disabled]="localPayDisabled">
       <div class="section-title">Pay with Wallet / Tokens</div>
       <div class="balances">
-        <div>Wallet: <strong>{{ walletBalance | number:'1.2-2' }}</strong></div>
-        <div>Tokens: <strong>{{ tokenBalance }}</strong> ({{ tokenNairaValue | number:'1.2-2' }})</div>
+        <div>Wallet: <strong>{{ walletBalance | money:undefined:'1.2-2' }}</strong></div>
+        <div>Tokens: <strong>{{ tokenBalance }}</strong> ({{ tokenNairaValue | money:undefined:'1.2-2' }})</div>
       </div>
       <div class="method-options">
         <label>

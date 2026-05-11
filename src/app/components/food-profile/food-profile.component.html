@@ -19,8 +19,7 @@
           <span>{{ food?.preparationTime }}</span>
         </div>
         <div class="chip price">
-          <span class="naira">&#8358;</span>
-          <span>{{ food?.price }}</span>
+          <span>{{ food?.price | money:food?.priceCurrency:'1.0-0' }}</span>
         </div>
         <div class="chip">
           <ion-icon name="list-outline"></ion-icon>
@@ -50,7 +49,7 @@
           <img [src]="getImageUrl(dish.image)" alt="{{ dish?.dishName }}" class="img-fluid" />
           <div class="mini-meta">
             <span class="mini-name">{{ dish?.dishName | titlecase }}</span>
-            <span class="mini-price"><span class="naira">&#8358;</span>{{ dish?.price }}</span>
+            <span class="mini-price">{{ dish?.price | money:dish?.priceCurrency:'1.0-0' }}</span>
           </div>
         </div>
       </div>
@@ -63,7 +62,7 @@
           <img [src]="getImageUrl(dish.image)" alt="{{ dish?.dishName }}" class="img-fluid" />
           <div class="mini-meta">
             <span class="mini-name">{{ dish?.dishName | titlecase }}</span>
-            <span class="mini-price"><span class="naira">&#8358;</span>{{ dish?.price }}</span>
+            <span class="mini-price">{{ dish?.price | money:dish?.priceCurrency:'1.0-0' }}</span>
           </div>
         </div>
       </div>

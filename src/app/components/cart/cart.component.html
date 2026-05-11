@@ -27,15 +27,15 @@
             <span>{{ item.quantity }}</span>
             <button type="button" (click)="increase(item)">+</button>
           </div>
-          <div class="line-price">₦{{ item.price * item.quantity | number:'1.0-0' }}</div>
+          <div class="line-price">{{ item.price * item.quantity | money:undefined:'1.0-0' }}</div>
           <button class="remove" type="button" (click)="remove(item)">Remove</button>
         </div>
       </div>
 
       <div class="summary">
-        <div><span>Subtotal</span><strong>₦{{ subtotal | number:'1.0-0' }}</strong></div>
-        <div><span>Fee (10%)</span><strong>₦{{ feeAmount | number:'1.0-0' }}</strong></div>
-        <div class="total"><span>Total</span><strong>₦{{ totalAmount | number:'1.0-0' }}</strong></div>
+        <div><span>Subtotal</span><strong>{{ subtotal | money:undefined:'1.0-0' }}</strong></div>
+        <div><span>Fee (10%)</span><strong>{{ feeAmount | money:undefined:'1.0-0' }}</strong></div>
+        <div class="total"><span>Total</span><strong>{{ totalAmount | money:undefined:'1.0-0' }}</strong></div>
       </div>
 
       <ion-button expand="block" color="danger" fill="outline" (click)="clearCart()" [disabled]="isSubmitting">

@@ -22,6 +22,7 @@ interface WalletTx {
   _id?: string;
   type: string;
   amount: number;
+  currency?: string;
   status: string;
   createdAt: string;
   description?: string;
@@ -297,7 +298,7 @@ export class WalletComponent implements OnInit {
 
   async loadBanks(): Promise<void> {
     try {
-      const data = await firstValueFrom(this.http.get<any>(`${environment.apiUrl}/wallet/payout-banks?currency=NGN`));
+      const data = await firstValueFrom(this.http.get<any>(`${environment.apiUrl}/wallet/payout-banks?currency=${encodeURIComponent(this.wallet.currency || 'NGN')}`));
       this.banks = (data?.banks || []).map((b: any) => ({ name: b.name, code: b.code }));
     } catch {
       this.banks = [];

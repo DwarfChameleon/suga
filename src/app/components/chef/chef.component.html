@@ -104,7 +104,7 @@
           <span>{{ order.orderTime | date:'MMM d, h:mm a' }}</span>
         </div>
         <div class="order-card-foot">
-          <div class="order-price">&#8358;{{ order.price }}</div>
+          <div class="order-price">{{ order.price | money:order.currency:'1.0-0' }}</div>
         </div>
         <div class="order-card-actions">
           <button *ngIf="order.status === 'placed'" (click)="updateOrderStatus(order, 'confirmed')" class="orderAction accept">Accept</button>
@@ -130,7 +130,7 @@
         <div *ngFor="let food of chefFoods" class="chef-my-food-item">
           <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" (click)="openModalFood(food._id)" class="chef-my-food-image"/>
           <div class="food-info">
-            <p><b>{{ food.dishName | titlecase }}</b>  <span class="naira"> &#8358;</span> {{ food.price }}</p>
+            <p><b>{{ food.dishName | titlecase }}</b> {{ food.price | money:food.priceCurrency:'1.0-0' }}</p>
           </div>
           <div class="edit-icon" (click)="openModalFood(food._id)">
             <ion-icon name="create-outline"></ion-icon>

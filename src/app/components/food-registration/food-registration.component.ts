@@ -61,26 +61,13 @@ export class FoodRegistrationComponent implements OnInit {
   currencySymbol = '₦';
   private readonly countryCurrencyMap: Record<string, string> = {
     nigeria: 'NGN',
-    ghana: 'GHS',
-    kenya: 'KES',
-    'south africa': 'ZAR',
-    uganda: 'UGX',
-    tanzania: 'TZS',
-    rwanda: 'RWF',
-    egypt: 'EGP',
-    india: 'INR',
     'united states': 'USD',
-    usa: 'USD',
-    canada: 'CAD',
-    uk: 'GBP',
     'united kingdom': 'GBP',
+    ghana: 'GHS',
+    'south africa': 'ZAR',
+    kenya: 'KES',
     france: 'EUR',
-    germany: 'EUR',
-    italy: 'EUR',
-    spain: 'EUR',
-    netherlands: 'EUR',
-    australia: 'AUD',
-    'new zealand': 'NZD'
+    italy: 'EUR'
   };
 
   constructor(

@@ -13,6 +13,7 @@ export interface Food {
   dishName: string;
   preparationTime: string;
   price: number;
+  priceCurrency?: string;
   category: string;
   availability: string;
   image: string;

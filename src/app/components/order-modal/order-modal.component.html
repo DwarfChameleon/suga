@@ -13,7 +13,7 @@
       <div class="modal-header">
         <h2>
           {{ dishName | titlecase }}
-          <span class="naira">&#8358;</span>{{ price }}
+          {{ price | money:undefined:'1.0-0' }}
         </h2>
       </div>
 
@@ -41,9 +41,9 @@
                 <td>
                   <p>
                     <strong>
-                      <span class="naira">&#8358;</span> Price:
+                      Price:
                     </strong><br>
-                    {{ price }}
+                    {{ price | money:undefined:'1.0-0' }}
                   </p>
                 </td>
               </tr>
@@ -120,7 +120,7 @@
           <app-ad-slot placement="orderModal" label="Sponsored" [isCriticalFlow]="true"></app-ad-slot>
 
           <div class="cart-summary" *ngIf="cartCount > 0">
-            <p>{{ cartCount }} item(s) in cart &middot; <span class="naira">&#8358;</span>{{ cartSubtotal | number:'1.0-0' }}</p>
+            <p>{{ cartCount }} item(s) in cart &middot; {{ cartSubtotal | money:undefined:'1.0-0' }}</p>
 
             <ion-button
               class="subtle-action-btn"

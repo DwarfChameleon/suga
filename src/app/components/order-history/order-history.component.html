@@ -27,7 +27,7 @@
     >
       <div class="line">
         <h4>{{ order.dishName | titlecase }}</h4>
-        <span class="price">&#8358;{{ order.price }}</span>
+        <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
       </div>
       <div class="line muted">
         <span>{{ order.orderTime | date:'medium' }}</span>

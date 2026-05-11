@@ -85,7 +85,7 @@
 
         <select *ngIf="orderEnabled" [(ngModel)]="linkedFoodId" class="descInput">
           <option value="">Select dish for order</option>
-          <option *ngFor="let dish of myDishes" [value]="dish._id">{{ dish.dishName }} - NGN {{ dish.price }}</option>
+          <option *ngFor="let dish of myDishes" [value]="dish._id">{{ dish.dishName }} - {{ dish.price | money:dish.priceCurrency:'1.0-0' }}</option>
         </select>
 
         <select [(ngModel)]="visibility" class="descInput">

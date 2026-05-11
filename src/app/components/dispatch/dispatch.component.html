@@ -53,7 +53,7 @@
     </div>
     <div class="stat-card wallet">
       <div class="stat-label">Wallet</div>
-      <div class="stat-value">{{ walletBalance | number:'1.0-0' }} {{ walletCurrency }}</div>
+      <div class="stat-value">{{ walletBalance | money:walletCurrency:'1.0-0' }}</div>
     </div>
   </section>
 
@@ -94,7 +94,7 @@
           </div>
 
           <div class="order-meta">
-            <span>{{ order.price | number:'1.0-0' }} {{ walletCurrency }}</span>
+            <span>{{ order.price | money:(order.currency || walletCurrency):'1.0-0' }}</span>
             <span>{{ order.deliveryCity || order.deliveryState || 'Delivery route' }}</span>
             <span>{{ order.orderTime | date:'short' }}</span>
             <span *ngIf="order.deliveryQrReadableCode">Code: {{ order.deliveryQrReadableCode }}</span>
@@ -126,7 +126,7 @@
           </div>
 
           <div class="order-meta">
-            <span>{{ order.price | number:'1.0-0' }} {{ walletCurrency }}</span>
+            <span>{{ order.price | money:(order.currency || walletCurrency):'1.0-0' }}</span>
             <span>{{ order.deliveryCity || order.deliveryState || 'Delivery route' }}</span>
             <span>{{ order.orderTime | date:'short' }}</span>
             <span *ngIf="order.deliveryQrReadableCode">Code: {{ order.deliveryQrReadableCode }}</span>
@@ -151,7 +151,7 @@
           </div>
 
           <div class="order-meta">
-            <span>{{ order.deliveryFee | number:'1.0-0' }} {{ walletCurrency }}</span>
+            <span>{{ order.deliveryFee | money:(order.currency || walletCurrency):'1.0-0' }}</span>
             <span>{{ order.deliveryCity || order.deliveryState || 'Delivery route' }}</span>
             <span>{{ order.deliveredAt | date:'short' }}</span>
           </div>
@@ -199,7 +199,7 @@
         </div>
         <div class="analytics-item">
           <span>Total Earnings</span>
-          <strong>{{ analytics.totalEarnings | number:'1.0-0' }} {{ walletCurrency }}</strong>
+          <strong>{{ analytics.totalEarnings | money:walletCurrency:'1.0-0' }}</strong>
         </div>
         <div class="analytics-item">
           <span>Avg Distance</span>
@@ -232,7 +232,7 @@
             <div class="history-meta">@{{ order.chefUsername }} ? {{ order.deliveryCity || order.deliveryState || 'Delivery' }}</div>
           </div>
           <div class="history-right">
-            <div class="history-fee">{{ order.deliveryFee | number:'1.0-0' }} {{ walletCurrency }}</div>
+            <div class="history-fee">{{ order.deliveryFee | money:(order.currency || walletCurrency):'1.0-0' }}</div>
             <div class="history-date">{{ order.deliveredAt | date:'short' }}</div>
           </div>
         </button>
@@ -258,7 +258,7 @@
             <div class="payout-type">{{ displayWalletTxLabel(tx.type) }}</div>
             <div class="payout-date">{{ tx.createdAt | date:'short' }}</div>
           </div>
-          <div class="payout-amount">{{ tx.amount | number:'1.0-0' }} {{ walletCurrency }}</div>
+          <div class="payout-amount">{{ tx.amount | money:(tx.currency || walletCurrency):'1.0-0' }}</div>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ export interface Order {
     chefId: string;
     chefUsername: string;
     price: number;
+    currency?: string;
     preparationTime: string;
     userId: string;
     username: string;

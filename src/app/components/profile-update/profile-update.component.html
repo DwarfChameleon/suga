@@ -31,16 +31,14 @@
 
       <div class="row">
         <label>Country</label>
-        <ion-select [(ngModel)]="settings.country" interface="action-sheet">
+        <ion-select [(ngModel)]="settings.country" interface="action-sheet" (ionChange)="onCountryChanged()">
           <ion-select-option *ngFor="let country of countries" [value]="country">{{ country }}</ion-select-option>
         </ion-select>
       </div>
 
       <div class="row">
         <label>Currency</label>
-        <ion-select [(ngModel)]="settings.preferredCurrency" interface="popover">
-          <ion-select-option *ngFor="let currency of currencies" [value]="currency">{{ currency }}</ion-select-option>
-        </ion-select>
+        <div class="readonly-value">{{ preferredCurrencyLabel }}</div>
       </div>
 
       <div class="row toggle-row" *ngIf="isChef">

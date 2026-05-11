@@ -22,8 +22,7 @@
       <div class="card-body" *ngIf="sections.balance">
         <div class="wallet-balance">
           <div class="amount">
-            <span class="currency">{{ wallet.currency }}</span>
-            <span class="value">{{ wallet.isHidden ? '*****' : (wallet.balance | number:'1.2-2') }}</span>
+            <span class="value">{{ wallet.isHidden ? '*****' : (wallet.balance | money:wallet.currency:'1.2-2') }}</span>
             <button class="eye" (click)="toggleBalance()">
               <ion-icon [name]="wallet.isHidden ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
             </button>
@@ -73,7 +72,7 @@
             Rewards Activity
           </button>
         </div>
-        <p class="rewards-note">100 points = 10 tokens. 10 tokens = ₦100.</p>
+        <p class="rewards-note">100 points = 10 tokens. 10 tokens = {{ 100 | money:wallet.currency:'1.0-0' }}.</p>
       </div>
     </div>
 
@@ -184,7 +183,7 @@
               <div class="tx-date">{{ tx.createdAt | date:'medium' }}</div>
             </div>
             <div class="tx-amount" [class.debit]="(tx.type || '').includes('debit') || (tx.type || '').includes('withdraw')">
-              {{ tx.amount | number:'1.2-2' }} {{ wallet.currency }}
+              {{ tx.amount | money:(tx.currency || wallet.currency):'1.2-2' }}
             </div>
           </button>
         </div>

@@ -111,7 +111,7 @@
           <div class="food-details">
             <h3>{{ food.dishName }}</h3>
             <p>{{ food.preparationTime }}</p>
-            <p><span class="naira">&#8358;</span> {{ food.price }}</p>
+            <p>{{ food.price | money:food.priceCurrency:'1.0-0' }}</p>
           </div>
         </div>
       </div>

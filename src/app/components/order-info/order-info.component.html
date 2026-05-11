@@ -34,7 +34,7 @@
       </div>
       <div class="detail-card">
         <span>Price</span>
-        <strong>{{ order?.price | number:'1.0-0' }}</strong>
+        <strong>{{ order?.price | money:order?.currency:'1.0-0' }}</strong>
       </div>
       <div class="detail-card">
         <span>Order time</span>
@@ -91,7 +91,7 @@
       </div>
       <div class="info-row" *ngIf="order?.deliveryFee">
         <span>Delivery fee</span>
-        <strong>{{ order?.deliveryFee | number:'1.0-0' }}</strong>
+        <strong>{{ order?.deliveryFee | money:order?.currency:'1.0-0' }}</strong>
       </div>
       <div class="info-row" *ngIf="order?.deliveryDistanceKm">
         <span>Distance</span>

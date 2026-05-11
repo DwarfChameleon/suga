@@ -94,7 +94,7 @@
           >
             <div class="order-card-top">
               <h4>{{ order.dishName | titlecase }}</h4>
-              <span class="price">&#8358;{{ order.price }}</span>
+              <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
             </div>
             <div class="order-card-meta">
               <span class="liveOrderTime"><ion-icon name="timer-outline"></ion-icon> {{ order.preparationTime }} - {{ timeAgo(order.orderTime) }}</span>
@@ -135,7 +135,7 @@
           >
             <div class="order-card-top">
               <h4>{{ order.dishName | titlecase }}</h4>
-              <span class="price">&#8358;{{ order.price }}</span>
+              <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
             </div>
             <div class="order-card-meta">
               <span class="liveOrderTime"><ion-icon name="calendar-outline"></ion-icon> {{ timeAgo(order.orderTime) }}</span>

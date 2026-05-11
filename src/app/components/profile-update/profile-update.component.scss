@@ -48,6 +48,18 @@
   color: var(--ion-text-color);
 }
 
+.readonly-value {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--suga-border, #d9deea);
+  background: var(--suga-surface-muted, #f8faff);
+  color: var(--ion-text-color);
+  font-weight: 700;
+}
+
 .toggle-row {
   display: flex;
   align-items: center;

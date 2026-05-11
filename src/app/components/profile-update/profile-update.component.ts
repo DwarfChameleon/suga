@@ -5,6 +5,9 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AddressDataService } from 'src/app/services/address-data.service';
+import { CurrencyFormatService } from 'src/app/services/currency-format.service';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
 
 @Component({
   selector: 'app-profile-update',
@@ -42,17 +45,15 @@ export class ProfileUpdateComponent implements OnInit {
   isChef = false;
   hasExistingPin = false;
   followRequests: Array<{ requesterId: string; username: string; profilePicture: string; country?: string; requestedAt: string }> = [];
-  countries = [
-    'Nigeria', 'United States', 'United Kingdom', 'Canada', 'Ghana', 'South Africa', 'Kenya', 'Uganda',
-    'India', 'Pakistan', 'Bangladesh', 'Philippines', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands',
-    'Australia', 'New Zealand', 'UAE'
-  ];
-  currencies = ['NGN', 'USD', 'GBP', 'EUR', 'CAD', 'GHS', 'ZAR', 'KES', 'UGX', 'INR', 'PKR', 'BDT', 'PHP', 'AUD', 'NZD', 'AED'];
+  countries = this.addressData.getCountries();
 
   constructor(
     private userService: UserService,
     private uiFeedback: UiFeedbackService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private addressData: AddressDataService,
+    private currencyFormat: CurrencyFormatService,
+    private tokenStorage: TokenStorageService
   ) {}
 
   ngOnInit(): void {
@@ -120,11 +121,12 @@ export class ProfileUpdateComponent implements OnInit {
         isOnline: this.settings.isOnline,
         uiTheme: this.settings.uiTheme,
         country: this.settings.country,
-        preferredCurrency: this.settings.preferredCurrency,
+        countryVerification: this.getCountryVerificationHints(),
         isPrivateChef: this.isChef ? this.settings.isPrivateChef : undefined
       };
       const response = await firstValueFrom(this.userService.updateSettings(payload));
       this.settings = response.settings;
+      this.syncStoredUserCurrency();
       this.themeService.apply(this.settings.uiTheme || 'light');
       this.uiFeedback.success('Settings updated.');
     } catch (error: any) {
@@ -142,6 +144,35 @@ export class ProfileUpdateComponent implements OnInit {
     } catch (error: any) {
       this.uiFeedback.error(error?.error?.message || 'Unable to persist theme preference.');
     }
+  }
+
+  onCountryChanged(): void {
+    this.settings.preferredCurrency = this.currencyFormat.getCurrencyForCountry(this.settings.country);
+  }
+
+  get preferredCurrencyLabel(): string {
+    const currency = this.settings.preferredCurrency || this.currencyFormat.getCurrencyForCountry(this.settings.country);
+    return `${currency} (${this.currencyFormat.format(100, currency, '1.0-0')})`;
+  }
+
+  private getCountryVerificationHints(): Record<string, any> {
+    return {
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+      language: navigator.language || '',
+      languages: navigator.languages || [],
+      userAgent: navigator.userAgent || '',
+      dialCode: this.addressData.getDialCode(this.settings.country || '')
+    };
+  }
+
+  private syncStoredUserCurrency(): void {
+    const user = this.tokenStorage.getUser();
+    if (!user) return;
+    this.tokenStorage.saveUser({
+      ...user,
+      country: this.settings.country,
+      preferredCurrency: this.settings.preferredCurrency
+    });
   }
 
   async updatePassword(): Promise<void> {
