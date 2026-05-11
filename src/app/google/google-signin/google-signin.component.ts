@@ -5,6 +5,7 @@ import { SocialLogin } from '@capgo/capacitor-social-login';
 import { AuthService } from 'src/app/services/authservice.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
+import { AccountReadinessService } from 'src/app/services/account-readiness.service';
 import { environment } from 'src/environments/environment';
 
 declare global {
@@ -35,7 +36,8 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
     private readonly loadingService: LoadingService,
     private readonly uiFeedback: UiFeedbackService,
     private readonly router: Router,
-    private readonly zone: NgZone
+    private readonly zone: NgZone,
+    private readonly accountReadiness: AccountReadinessService
   ) {}
 
   ngAfterViewInit(): void {
@@ -138,6 +140,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
           await this.loadingService.hide();
           this.authenticated.emit(response);
           if (this.authenticated.observers.length === 0) {
+            this.accountReadiness.promptIfNeeded(response?.user, 'login');
             this.redirectAfterLogin(response);
           }
           resolve();

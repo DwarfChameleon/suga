@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../services/authservice.service';
 import { LoadingService } from '../services/loading.service';
 import { UiFeedbackService } from '../services/ui-feedback.service';
+import { AccountReadinessService } from '../services/account-readiness.service';
 
 @Component({
   selector: 'app-success',
@@ -27,7 +28,8 @@ export class SuccessPage implements OnInit, OnDestroy {
     private modalController: ModalController,
     private authService: AuthService,
     private loadingService: LoadingService,
-    private uiFeedback: UiFeedbackService
+    private uiFeedback: UiFeedbackService,
+    private accountReadiness: AccountReadinessService
   ) {}
 
   ngOnInit(): void {
@@ -58,7 +60,8 @@ export class SuccessPage implements OnInit, OnDestroy {
           this.authService.login(this.autoLoginPrefill.username, this.autoLoginPrefill.password)
         );
         await this.loadingService.hide();
-        await this.modalController.dismiss();
+        this.accountReadiness.promptIfNeeded(response?.user, 'registration');
+        await this.dismissSelf();
         this.redirectAfterLogin(response);
       } catch (error) {
         await this.loadingService.hide();
@@ -76,12 +79,21 @@ export class SuccessPage implements OnInit, OnDestroy {
   }
 
   private async navigateTo(url: string): Promise<void> {
+    await this.dismissSelf();
+    this.router.navigateByUrl(url, { replaceUrl: true });
+  }
+
+  private async dismissSelf(): Promise<void> {
     try {
-      await this.modalController.dismiss();
+      const top = await this.modalController.getTop();
+      if (top) {
+        await top.dismiss();
+      } else {
+        await this.modalController.dismiss();
+      }
     } catch (err) {
       // ignore if not opened as a modal
     }
-    this.router.navigateByUrl(url, { replaceUrl: true });
   }
 
   private redirectAfterLogin(response: any): void {

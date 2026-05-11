@@ -1,5 +1,5 @@
 <div class="ad-slot" *ngIf="visible && ad">
-  <div class="ad-slot-label">{{ label }}</div>
+  <div class="ad-slot-label">Featured</div>
   <button type="button" class="ad-slot-card" (click)="openAd()">
     <img *ngIf="ad.imageUrl" [src]="ad.imageUrl" [alt]="ad.title" class="ad-slot-image" />
     <div class="ad-slot-copy">

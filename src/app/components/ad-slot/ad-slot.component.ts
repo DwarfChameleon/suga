@@ -10,7 +10,7 @@ import { PromotedAd, PromotedAdService } from 'src/app/services/promoted-ad.serv
 })
 export class AdSlotComponent implements OnInit, OnDestroy {
   @Input() placement = '';
-  @Input() label = 'Sponsored';
+  @Input() label = 'Featured';
   @Input() isCriticalFlow = false;
 
   ad: PromotedAd | null = null;

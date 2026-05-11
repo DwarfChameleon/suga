@@ -117,7 +117,7 @@
             Add To Cart
           </ion-button>
 
-          <app-ad-slot placement="orderModal" label="Sponsored" [isCriticalFlow]="true"></app-ad-slot>
+          <app-ad-slot placement="orderModal" label="Featured" [isCriticalFlow]="true"></app-ad-slot>
 
           <div class="cart-summary" *ngIf="cartCount > 0">
             <p>{{ cartCount }} item(s) in cart &middot; {{ cartSubtotal | money:undefined:'1.0-0' }}</p>

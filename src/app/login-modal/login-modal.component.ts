@@ -6,6 +6,7 @@ import { AuthService } from '../services/authservice.service';
 import { TokenStorageService } from '../services/token-storage.service';
 import { UiFeedbackService } from '../services/ui-feedback.service';
 import { LoadingService } from '../services/loading.service';
+import { AccountReadinessService } from '../services/account-readiness.service';
 
 @Component({
   selector: 'app-login-modal',
@@ -29,7 +30,8 @@ export class LoginModalComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder,
     private uiFeedback: UiFeedbackService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private accountReadiness: AccountReadinessService
   ) {}
 
   ngOnInit() {
@@ -85,6 +87,7 @@ export class LoginModalComponent implements OnInit {
         await this.loadingService.hide();
         await this.modalCtrl.dismiss();
 
+        this.accountReadiness.promptIfNeeded(response?.user, 'login');
         this.redirectAfterLogin(response);
         this.isSubmitting = false;
       },
@@ -99,6 +102,7 @@ export class LoginModalComponent implements OnInit {
 
   async onGoogleAuthenticated(response: any): Promise<void> {
     await this.modalCtrl.dismiss();
+    this.accountReadiness.promptIfNeeded(response?.user, 'login');
     this.redirectAfterLogin(response);
   }
 

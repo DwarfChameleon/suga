@@ -296,8 +296,8 @@ ion-content {
   height: auto;
   overflow-x: auto;
   display: flex;
-  gap: 12px;
-  padding: 4px 8px 20px 8px;
+  gap: 9px;
+  padding: 4px 8px 16px 8px;
 }
 
 .story-empty{
@@ -307,10 +307,10 @@ ion-content {
 }
 
 .story-chef-card{
-  min-width: 138px;
-  max-width: 138px;
-  height: 220px;
-  border-radius: 14px;
+  min-width: 108px;
+  max-width: 108px;
+  height: 164px;
+  border-radius: 12px;
   padding: 0;
   background: var(--suga-surface);
   border: 1px solid var(--suga-border);
@@ -332,40 +332,40 @@ ion-content {
   inset: 0;
   display: grid;
   place-items: center;
-  padding: 18px;
+  padding: 12px;
   text-align: center;
   color: rgba(255, 255, 255, 0.92);
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.22), rgba(15, 23, 42, 0.82)),
     radial-gradient(circle at top, rgba(251, 146, 60, 0.32), transparent 56%);
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .story-chef-overlay{
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 6px;
+  left: 6px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: 6px;
+  padding: 5px 6px;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.45);
 }
 
 .story-ring{
-  width: 58px;
-  height: 58px;
+  width: 42px;
+  height: 42px;
   position: relative;
 }
 
 .story-ring img{
-  width: 46px;
-  height: 46px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
   position: absolute;
-  inset: 6px;
+  inset: 4px;
   border: 2px solid var(--ion-background-color);
   z-index: 2;
 }
@@ -380,9 +380,9 @@ ion-content {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 5px;
-  height: 14px;
-  margin-left: -2.5px;
+  width: 4px;
+  height: 10px;
+  margin-left: -2px;
   border-radius: 999px;
 }
 
@@ -395,10 +395,14 @@ ion-content {
 }
 
 .story-chef-name{
-  font-size: 12px;
+  max-width: 46px;
+  font-size: 10px;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .story-chef-meta{
@@ -408,7 +412,7 @@ ion-content {
 }
 
 .story-counter{
-  font-size: 11px;
+  font-size: 9px;
   color: #fb923c;
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0,0,0,0.55);

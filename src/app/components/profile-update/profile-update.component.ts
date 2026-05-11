@@ -152,7 +152,7 @@ export class ProfileUpdateComponent implements OnInit {
 
   get preferredCurrencyLabel(): string {
     const currency = this.settings.preferredCurrency || this.currencyFormat.getCurrencyForCountry(this.settings.country);
-    return `${currency} (${this.currencyFormat.format(100, currency, '1.0-0')})`;
+    return currency;
   }
 
   private getCountryVerificationHints(): Record<string, any> {
