@@ -117,6 +117,21 @@ ion-content {
   z-index: 0;
 }
 
+.image-shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(100deg, transparent 20%, rgba(255,255,255,0.34) 42%, transparent 64%),
+    linear-gradient(135deg, rgba(254,44,85,0.18), rgba(83,234,143,0.2));
+  background-size: 220% 100%, 100% 100%;
+  animation: imageShimmer 1.15s linear infinite;
+}
+
+.image-loading img {
+  opacity: 0;
+}
+
 .foodCategoryTitle{
   position: relative;
   z-index: 1;
@@ -607,6 +622,29 @@ ion-content {
   display: block;
   object-fit: contain;
   background: var(--suga-surface-alt);
+}
+
+.food-image-shell {
+  position: relative;
+  width: 100%;
+  min-height: 52vh;
+  background: var(--suga-surface-alt);
+  overflow: hidden;
+}
+
+.food-image-shell .image-shimmer {
+  z-index: 0;
+}
+
+.food-image-shell .food-image {
+  position: relative;
+  z-index: 1;
+  transition: opacity 180ms ease;
+}
+
+@keyframes imageShimmer {
+  from { background-position: 220% 0, 0 0; }
+  to { background-position: -220% 0, 0 0; }
 }
 
 .story-food-image {

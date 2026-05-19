@@ -8,6 +8,7 @@ import { LoadingService } from '../services/loading.service';
 import { ModalControlService } from '../services/modal-control.service';
 import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
 import { PhoneVerificationProof, PhoneVerificationService } from '../services/phone-verification.service';
+import { isValidInternationalPhone, normalizeInternationalPhone, phoneDigits, stripDialCode } from '../utils/phone-number';
 
 @Component({
   selector: 'app-dispatch-registration',
@@ -31,7 +32,6 @@ export class DispatchRegistrationComponent implements OnInit {
   phoneVerificationCode = '';
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
-  private lastDialCode = '';
 
   constructor(
     private readonly fb: FormBuilder,
@@ -77,7 +77,7 @@ export class DispatchRegistrationComponent implements OnInit {
     this.isSubmitting = true;
     await this.loadingService.show('Creating dispatch account...');
     const value = this.registrationForm.value;
-    const normalizedPhoneNumber = this.normalizeInternationalPhone(value.phoneNumber);
+    const normalizedPhoneNumber = this.toInternationalPhone(value.phoneNumber);
 
     const payload = {
       email: value.email,
@@ -130,7 +130,7 @@ export class DispatchRegistrationComponent implements OnInit {
       suburb: ''
     });
     this.applyFieldRules();
-    this.seedDialCode();
+    this.keepPhoneLocal();
   }
 
   onRegionOrStateChange(): void {
@@ -158,18 +158,19 @@ export class DispatchRegistrationComponent implements OnInit {
   }
 
   onPhoneNumberChange(): void {
+    this.keepPhoneLocal();
     if (!this.phoneVerificationProof) {
       return;
     }
-    const currentPhone = this.normalizePhone(this.registrationForm.get('phoneNumber')?.value || '');
-    if (currentPhone !== this.normalizePhone(this.phoneVerificationProof.phoneNumber)) {
+    const currentPhone = this.toInternationalPhone(this.registrationForm.get('phoneNumber')?.value || '');
+    if (phoneDigits(currentPhone) !== phoneDigits(this.phoneVerificationProof.phoneNumber)) {
       this.resetPhoneVerification();
     }
   }
 
   async startPhoneVerification(): Promise<void> {
-    const phoneNumber = this.normalizeInternationalPhone(this.registrationForm.get('phoneNumber')?.value || '');
-    if (!/^\+[0-9]{7,15}$/.test(phoneNumber)) {
+    const phoneNumber = this.toInternationalPhone(this.registrationForm.get('phoneNumber')?.value || '');
+    if (!isValidInternationalPhone(phoneNumber)) {
       this.phoneVerificationError = 'Enter a valid phone number before verification.';
       this.uiFeedback.error(this.phoneVerificationError);
       return;
@@ -182,11 +183,11 @@ export class DispatchRegistrationComponent implements OnInit {
       if (result.status === 'verified' && result.proof) {
         this.phoneVerificationProof = result.proof;
         this.phoneVerificationState = 'verified';
-        this.registrationForm.patchValue({ phoneNumber: result.proof.phoneNumber });
+        this.registrationForm.patchValue({ phoneNumber: stripDialCode(result.proof.phoneNumber, this.phoneDialCode) });
         this.uiFeedback.success('Phone number verified.');
       } else {
         this.phoneVerificationState = 'codeSent';
-        this.registrationForm.patchValue({ phoneNumber });
+        this.registrationForm.patchValue({ phoneNumber: stripDialCode(phoneNumber, this.phoneDialCode) });
         this.uiFeedback.success('Verification code sent to your phone.');
       }
     } catch (error: any) {
@@ -202,7 +203,7 @@ export class DispatchRegistrationComponent implements OnInit {
       const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
       this.phoneVerificationProof = proof;
       this.phoneVerificationState = 'verified';
-      this.registrationForm.patchValue({ phoneNumber: proof.phoneNumber });
+      this.registrationForm.patchValue({ phoneNumber: stripDialCode(proof.phoneNumber, this.phoneDialCode) });
       this.uiFeedback.success('Phone number verified.');
     } catch (error: any) {
       this.phoneVerificationError = error?.message || 'Verification code is invalid.';
@@ -281,18 +282,14 @@ export class DispatchRegistrationComponent implements OnInit {
     return map[tz] || '';
   }
 
-  private seedDialCode(): void {
+  private keepPhoneLocal(): void {
     const control = this.registrationForm.get('phoneNumber');
-    const nextDialCode = this.phoneDialCode;
-    const current = String(control?.value || '').trim();
-    if (!control || !nextDialCode) {
-      this.lastDialCode = nextDialCode;
-      return;
+    if (!control) return;
+    const current = String(control.value || '');
+    const local = stripDialCode(current, this.phoneDialCode);
+    if (current !== local) {
+      control.setValue(local, { emitEvent: false });
     }
-    if (!current || current === this.lastDialCode) {
-      control.setValue(nextDialCode);
-    }
-    this.lastDialCode = nextDialCode;
   }
 
   private resetPhoneVerification(): void {
@@ -303,29 +300,7 @@ export class DispatchRegistrationComponent implements OnInit {
     this.phoneVerification.clearVerificationState();
   }
 
-  private normalizePhone(value: string): string {
-    return String(value || '').replace(/\D/g, '');
-  }
-
-  private normalizeInternationalPhone(value: string): string {
-    const raw = String(value || '').trim();
-    if (!raw) {
-      return '';
-    }
-    if (raw.startsWith('+')) {
-      return `+${this.normalizePhone(raw)}`;
-    }
-
-    const digits = this.normalizePhone(raw);
-    const dialDigits = this.normalizePhone(this.phoneDialCode);
-    if (!digits) {
-      return this.phoneDialCode;
-    }
-    if (dialDigits && digits.startsWith(dialDigits)) {
-      return `+${digits}`;
-    }
-
-    const localDigits = digits.startsWith('0') ? digits.slice(1) : digits;
-    return `${this.phoneDialCode}${localDigits}`;
+  private toInternationalPhone(value: string): string {
+    return normalizeInternationalPhone(value, this.phoneDialCode);
   }
 }

@@ -8,6 +8,7 @@ import { ThemeService } from 'src/app/services/theme.service';
 import { AddressDataService, AddressFieldConfig, AddressFieldKey } from 'src/app/services/address-data.service';
 import { MapService } from 'src/app/services/map.service';
 import { PhoneVerificationProof, PhoneVerificationService } from 'src/app/services/phone-verification.service';
+import { isValidInternationalPhone, normalizeInternationalPhone, phoneDigits, stripDialCode } from 'src/app/utils/phone-number';
 
 @Component({
   selector: 'app-edit-profile',
@@ -82,6 +83,10 @@ export class EditProfileComponent implements OnInit {
     return (this.profile.roles || []).map((r) => r.toLowerCase()).includes('chef');
   }
 
+  get phoneDialCode(): string {
+    return this.addressData.getDialCode(this.profile.country || '');
+  }
+
   openSettings(): void {
     this.router.navigate(['components/profile-update']);
   }
@@ -134,7 +139,7 @@ export class EditProfileComponent implements OnInit {
         return null;
       case 'phoneNumber':
         if (!value) return 'Phone number is required.';
-        if (!/^\+?[0-9()\-\s]{7,20}$/.test(value)) return 'Enter a valid phone number.';
+        if (!isValidInternationalPhone(this.toInternationalPhone(value))) return 'Enter a valid phone number.';
         return null;
       case 'fullName':
       case 'city':
@@ -216,19 +221,20 @@ export class EditProfileComponent implements OnInit {
   }
 
   onPhoneNumberChange(): void {
+    this.keepPhoneLocal();
     if (!this.phoneVerificationProof) {
       return;
     }
-    const currentPhone = this.normalizePhone(this.profile.phoneNumber || '');
-    if (currentPhone !== this.normalizePhone(this.phoneVerificationProof.phoneNumber)) {
+    const currentPhone = this.toInternationalPhone(this.profile.phoneNumber || '');
+    if (phoneDigits(currentPhone) !== phoneDigits(this.phoneVerificationProof.phoneNumber)) {
       this.resetPhoneVerification();
     }
   }
 
   async startPhoneVerification(): Promise<void> {
-    const phoneNumber = String(this.profile.phoneNumber || '').trim();
-    if (!phoneNumber) {
-      this.phoneVerificationError = 'Enter your phone number first.';
+    const phoneNumber = this.toInternationalPhone(this.profile.phoneNumber || '');
+    if (!isValidInternationalPhone(phoneNumber)) {
+      this.phoneVerificationError = 'Enter a valid phone number first.';
       this.uiFeedback.error(this.phoneVerificationError);
       return;
     }
@@ -240,9 +246,11 @@ export class EditProfileComponent implements OnInit {
       if (result.status === 'verified' && result.proof) {
         this.phoneVerificationProof = result.proof;
         this.phoneVerificationState = 'verified';
+        this.profile.phoneNumber = stripDialCode(result.proof.phoneNumber, this.phoneDialCode);
         this.uiFeedback.success('Phone number verified.');
       } else {
         this.phoneVerificationState = 'codeSent';
+        this.profile.phoneNumber = stripDialCode(phoneNumber, this.phoneDialCode);
         this.uiFeedback.success('Verification code sent to your phone.');
       }
     } catch (error: any) {
@@ -258,6 +266,7 @@ export class EditProfileComponent implements OnInit {
       const proof = await this.phoneVerification.confirmCode(this.phoneVerificationCode);
       this.phoneVerificationProof = proof;
       this.phoneVerificationState = 'verified';
+      this.profile.phoneNumber = stripDialCode(proof.phoneNumber, this.phoneDialCode);
       this.uiFeedback.success('Phone number verified.');
     } catch (error: any) {
       this.phoneVerificationError = error?.message || 'Verification code is invalid.';
@@ -289,11 +298,12 @@ export class EditProfileComponent implements OnInit {
       return;
     }
 
-    const phoneNumberChanged = this.normalizePhone(this.profile.phoneNumber || '') !== this.normalizePhone(this.initialProfile.phoneNumber || '');
+    const phoneNumberChanged = phoneDigits(this.toInternationalPhone(this.profile.phoneNumber || '')) !== phoneDigits(this.toInternationalPhone(this.initialProfile.phoneNumber || ''));
     this.isSaving = true;
     try {
       const response = await firstValueFrom(this.userService.updateEditableProfile({
         ...this.profile,
+        phoneNumber: this.toInternationalPhone(this.profile.phoneNumber || ''),
         phoneVerification: phoneNumberChanged ? (this.phoneVerificationProof || undefined) : undefined
       }));
       this.profile = this.normalizeProfile(response.profile);
@@ -376,6 +386,7 @@ export class EditProfileComponent implements OnInit {
     return {
       ...defaults,
       ...(data || {}),
+      phoneNumber: stripDialCode(data?.phoneNumber || '', this.addressData.getDialCode(data?.country || '')),
       roles: Array.isArray(data?.roles) ? data!.roles : defaults.roles
     };
   }
@@ -435,6 +446,7 @@ export class EditProfileComponent implements OnInit {
     this.profile.suburb = '';
     this.profile.localGovernment = '';
     this.profile.street = '';
+    this.keepPhoneLocal();
     this.markTouched('country');
   }
 
@@ -481,7 +493,14 @@ export class EditProfileComponent implements OnInit {
     this.phoneVerification.clearVerificationState();
   }
 
-  private normalizePhone(value: string): string {
-    return String(value || '').replace(/\D/g, '');
+  private keepPhoneLocal(): void {
+    const local = stripDialCode(this.profile.phoneNumber || '', this.phoneDialCode);
+    if (this.profile.phoneNumber !== local) {
+      this.profile.phoneNumber = local;
+    }
+  }
+
+  private toInternationalPhone(value: string): string {
+    return normalizeInternationalPhone(value, this.phoneDialCode);
   }
 }

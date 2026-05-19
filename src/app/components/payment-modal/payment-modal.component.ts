@@ -5,6 +5,7 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { environment } from 'src/environments/environment';
 import { Browser } from '@capacitor/browser';
+import { timeout } from 'rxjs/operators';
 
 @Component({
   selector: 'app-payment-modal',
@@ -129,7 +130,7 @@ export class PaymentModalComponent implements OnInit {
     }
     this.isSubmitting = true;
     await this.loading.show('Verifying...');
-    this.http.post(`${environment.apiUrl}/auth/reauth`, { password: this.password }).subscribe({
+    this.http.post(`${environment.apiUrl}/auth/reauth`, { password: this.password }).pipe(timeout(20000)).subscribe({
       next: () => this.initiatePayment(),
       error: (err) => {
         this.loading.hide();
@@ -138,7 +139,7 @@ export class PaymentModalComponent implements OnInit {
           this.uiFeedback.error('Account locked. Please contact admin.');
           return;
         }
-        this.uiFeedback.error('Password incorrect.');
+        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Password check timed out. Try again.' : 'Password incorrect.');
       }
     });
   }
@@ -167,7 +168,7 @@ export class PaymentModalComponent implements OnInit {
       amount: this.totalAmount,
       walletAccount: this.walletAccount.trim(),
       payMethod: this.payMethod
-    }).subscribe({
+    }).pipe(timeout(30000)).subscribe({
       next: (resp) => {
         this.loading.hide();
         this.isSubmitting = false;
@@ -184,10 +185,10 @@ export class PaymentModalComponent implements OnInit {
         }
         this.uiFeedback.success('OPay payment initiated.');
       },
-      error: () => {
+      error: (err) => {
         this.loading.hide();
         this.isSubmitting = false;
-        this.uiFeedback.error('Payment initiation failed.');
+        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Payment setup timed out. Try again.' : 'Payment initiation failed.');
       }
     });
   }
@@ -199,7 +200,7 @@ export class PaymentModalComponent implements OnInit {
       orderIds: this.orderIds,
       amount: this.totalAmount,
       email: this.paystackEmail.trim()
-    }).subscribe({
+    }).pipe(timeout(30000)).subscribe({
       next: (resp) => {
         this.loading.hide();
         this.isSubmitting = false;
@@ -221,10 +222,10 @@ export class PaymentModalComponent implements OnInit {
         }
         this.uiFeedback.success('Paystack payment initiated.');
       },
-      error: () => {
+      error: (err) => {
         this.loading.hide();
         this.isSubmitting = false;
-        this.uiFeedback.error('Payment initiation failed.');
+        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Payment setup timed out. Try again.' : 'Payment initiation failed.');
       }
     });
   }
@@ -248,17 +249,17 @@ export class PaymentModalComponent implements OnInit {
     this.http.post(`${environment.apiUrl}/wallet/topup/confirm`, {
       transactionId,
       paidAmount: this.totalAmount
-    }).subscribe({
+    }).pipe(timeout(30000)).subscribe({
       next: () => {
         this.loading.hide();
         this.isSubmitting = false;
         this.uiFeedback.success('Payment successful. Order placed.');
         this.close(true);
       },
-      error: () => {
+      error: (err) => {
         this.loading.hide();
         this.isSubmitting = false;
-        this.uiFeedback.error('Payment verification failed. Confirm reference and try again.');
+        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Verification timed out. Confirm payment and try Verify Payment again.' : 'Payment verification failed. Confirm reference and try again.');
       }
     });
   }
@@ -267,7 +268,7 @@ export class PaymentModalComponent implements OnInit {
     this.http.post(`${environment.apiUrl}/wallet/topup/verify-paystack`, {
       transactionId,
       reference: this.paymentReference
-    }).subscribe({
+    }).pipe(timeout(30000)).subscribe({
       next: () => {
         try {
           sessionStorage.removeItem('suga:pendingPaystackRef');
@@ -281,7 +282,7 @@ export class PaymentModalComponent implements OnInit {
       error: (err) => {
         this.loading.hide();
         this.isSubmitting = false;
-        this.uiFeedback.error('Payment verification failed. Confirm payment was completed and try again.');
+        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Verification timed out. Confirm payment and try Verify Payment again.' : 'Payment verification failed. Confirm payment was completed and try again.');
       }
     });
   }
@@ -314,7 +315,7 @@ export class PaymentModalComponent implements OnInit {
 
     this.isSubmitting = true;
     this.loading.show('Processing payment...');
-    this.http.post(`${environment.apiUrl}/order/pay`, payload).subscribe({
+    this.http.post(`${environment.apiUrl}/order/pay`, payload).pipe(timeout(30000)).subscribe({
       next: () => {
         this.loading.hide();
         this.isSubmitting = false;
@@ -324,7 +325,7 @@ export class PaymentModalComponent implements OnInit {
       error: (err) => {
         this.loading.hide();
         this.isSubmitting = false;
-        this.uiFeedback.error(err?.error?.message || 'Payment failed.');
+        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Payment is taking too long. Try again.' : (err?.error?.message || 'Payment failed.'));
       }
     });
   }

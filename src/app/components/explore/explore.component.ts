@@ -86,6 +86,8 @@ export class ExploreComponent implements OnInit {
   private brokenStoryThumbChefs = new Set<string>();
   private brokenViewerStoryIds = new Set<string>();
   private brokenFoodImages = new Set<string>();
+  private loadedCategoryImages = new Set<string>();
+  private loadedFoodImages = new Set<string>();
 
   
   constructor(
@@ -599,9 +601,29 @@ getBackgroundImageStyle(imageUrl:string): any{
     if (normalized) this.brokenCategoryImages.add(normalized);
   }
 
+  onCategoryImageLoad(image?: string): void {
+    const normalized = this.normalizeMediaPath(image);
+    if (normalized) this.loadedCategoryImages.add(normalized);
+  }
+
+  isCategoryImageLoading(image?: string): boolean {
+    const normalized = this.normalizeMediaPath(image);
+    return !!normalized && !this.loadedCategoryImages.has(normalized) && !this.brokenCategoryImages.has(normalized);
+  }
+
   onFoodImageError(image?: string): void {
     const normalized = this.normalizeMediaPath(image);
     if (normalized) this.brokenFoodImages.add(normalized);
+  }
+
+  onFoodImageLoad(image?: string): void {
+    const normalized = this.normalizeMediaPath(image);
+    if (normalized) this.loadedFoodImages.add(normalized);
+  }
+
+  isFoodImageLoading(image?: string): boolean {
+    const normalized = this.normalizeMediaPath(image);
+    return !!normalized && !this.loadedFoodImages.has(normalized) && !this.brokenFoodImages.has(normalized);
   }
 
   onStoryThumbError(group: StoryChefGroup): void {

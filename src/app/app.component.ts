@@ -43,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private authSub?: Subscription;
   private suggestedChefsModalOpen = false;
   private suggestedChefsShownForUserId?: string;
+  isBooting = true;
 
   constructor(
     private userService: UserService,
@@ -61,6 +62,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     void this.nativeUi.initialize();
+    window.setTimeout(() => {
+      this.isBooting = false;
+    }, 2800);
     this.themeService.apply(this.themeService.getSavedTheme());
     this.refreshUserState();
     this.authSub = this.tokenStorage.authState$.subscribe(() => {

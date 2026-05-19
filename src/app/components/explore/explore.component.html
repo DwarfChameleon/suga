@@ -42,8 +42,9 @@
 
       <div class="topCategory">
         <div *ngFor="let category of categories">
-          <div class="foodCategory" (click)="openCategoryModal(category)">
-            <img [src]="getCategoryImage(category.image)" [alt]="category.name" (error)="onCategoryImageError(category.image)" />
+          <div class="foodCategory" [class.image-loading]="isCategoryImageLoading(category.image)" (click)="openCategoryModal(category)">
+            <div class="image-shimmer" *ngIf="isCategoryImageLoading(category.image)"></div>
+            <img [src]="getCategoryImage(category.image)" [alt]="category.name" loading="eager" decoding="async" (load)="onCategoryImageLoad(category.image)" (error)="onCategoryImageError(category.image)" />
             <div class="foodCategoryTitle">{{ category.name }}</div>
           </div>
         </div>
@@ -121,7 +122,10 @@
              </div>
        </div>
 </div>
-          <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" class="food-image" (error)="onFoodImageError(food.image)"/>
+          <div class="food-image-shell" [class.image-loading]="isFoodImageLoading(food.image)">
+            <div class="image-shimmer" *ngIf="isFoodImageLoading(food.image)"></div>
+            <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" class="food-image" loading="lazy" decoding="async" (load)="onFoodImageLoad(food.image)" (error)="onFoodImageError(food.image)"/>
+          </div>
           <div class="food-info">
             <button class="metric-pill metric-price" (click)="openModalFood(food._id)">
               <ion-icon name="cash-outline"></ion-icon>

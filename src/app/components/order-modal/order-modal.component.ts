@@ -11,6 +11,7 @@ import { CartService } from 'src/app/services/cart.service';
 import { Router } from '@angular/router';
 import { GiftRecipientSuggestion, UserService } from 'src/app/services/user.service';
 import { firstValueFrom } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 
 @Component({
   selector: 'app-order-modal',
@@ -149,12 +150,12 @@ export class OrderModalComponent implements OnInit {
         })
       : this.orderService.createOrder(payload);
 
-    orderRequest.subscribe({
+    orderRequest.pipe(timeout(30000)).subscribe({
       next: async (order: any) => {
         this.successMessage = null;
         this.errorMessage = null;
         this.isSubmitting = false;
-        this.loadingService.hide();
+        await this.loadingService.hide();
         const modal = await this.modalCtrl.create({
           component: PaymentModalComponent,
           componentProps: {
@@ -173,12 +174,14 @@ export class OrderModalComponent implements OnInit {
           await this.modalCtrl.dismiss();
         }
       },
-      error: (error) => {
-        this.errorMessage = error?.error?.message || 'Failed to place order. Please try again.';
+      error: async (error) => {
+        this.errorMessage = error?.name === 'TimeoutError'
+          ? 'Order is taking too long. Check your connection and try again.'
+          : (error?.error?.message || 'Failed to place order. Please try again.');
         this.uiFeedback.error(this.errorMessage || 'Failed to place order. Please try again.');
         this.successMessage = null;
         this.isSubmitting = false;
-        this.loadingService.hide();
+        await this.loadingService.hide();
       }
     });
   }
@@ -221,7 +224,7 @@ export class OrderModalComponent implements OnInit {
       locationPayload.chefLat = this.chefCoords.lat;
       locationPayload.chefLng = this.chefCoords.lng;
     }
-    this.orderService.createBulkOrdersWithLocation(cartItems, locationPayload).subscribe({
+    this.orderService.createBulkOrdersWithLocation(cartItems, locationPayload).pipe(timeout(30000)).subscribe({
       next: async (result: BulkOrderResponse) => {
         await this.loadingService.hide();
         this.isSubmitting = false;
@@ -246,10 +249,10 @@ export class OrderModalComponent implements OnInit {
           await this.modalCtrl.dismiss();
         }
       },
-      error: async () => {
+      error: async (error) => {
         await this.loadingService.hide();
         this.isSubmitting = false;
-        this.uiFeedback.error('Could not checkout cart.');
+        this.uiFeedback.error(error?.name === 'TimeoutError' ? 'Cart checkout is taking too long. Try again.' : 'Could not checkout cart.');
       }
     });
   }
@@ -298,7 +301,7 @@ export class OrderModalComponent implements OnInit {
       navigator.geolocation.getCurrentPosition(
         (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => resolve(null),
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
       );
     });
   }

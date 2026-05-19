@@ -1,4 +1,9 @@
 <ion-app>
+  <div class="boot-loader" *ngIf="isBooting">
+    <div class="boot-brand">SUGA</div>
+    <div class="boot-line"><span></span></div>
+    <div class="boot-copy">Opening your kitchen feed...</div>
+  </div>
   <div class="network-banner" *ngIf="!isInternetOnline">
     <ion-icon name="wifi-outline"></ion-icon>
     <span>No internet connection. Check your network.</span>

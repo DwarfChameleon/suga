@@ -33,7 +33,7 @@ interface AddressCatalogPayload {
   providedIn: 'root'
 })
 export class AddressDataService {
-  private static readonly CACHE_KEY = 'suga.address.catalog.v4';
+  private static readonly CACHE_KEY = 'suga.address.catalog.v5';
   private readonly fallbackProfiles: Record<string, CountryProfile> = {
     Nigeria: {
       isoCode: 'NG',
@@ -225,10 +225,10 @@ export class AddressDataService {
 
   private applyCatalog(payload: AddressCatalogPayload): void {
     this.profiles = Object.keys(payload.profiles || {}).length
-      ? payload.profiles
+      ? { ...this.fallbackProfiles, ...payload.profiles }
       : { ...this.fallbackProfiles };
     this.coverage = Object.keys(payload.coverage || {}).length
-      ? payload.coverage
+      ? { ...LOCATION_OVERRIDES, ...payload.coverage }
       : LOCATION_OVERRIDES;
     this.writeCache(payload);
   }
@@ -240,10 +240,10 @@ export class AddressDataService {
       if (!raw) return;
       const cached = JSON.parse(raw) as AddressCatalogPayload;
       if (cached?.profiles) {
-        this.profiles = Object.keys(cached.profiles).length ? cached.profiles : { ...this.fallbackProfiles };
+        this.profiles = Object.keys(cached.profiles).length ? { ...this.fallbackProfiles, ...cached.profiles } : { ...this.fallbackProfiles };
       }
       if (cached?.coverage) {
-        this.coverage = Object.keys(cached.coverage).length ? cached.coverage : LOCATION_OVERRIDES;
+        this.coverage = Object.keys(cached.coverage).length ? { ...LOCATION_OVERRIDES, ...cached.coverage } : LOCATION_OVERRIDES;
       }
     } catch {
       // Ignore invalid cache and continue with bundled fallback data.

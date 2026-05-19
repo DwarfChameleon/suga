@@ -93,7 +93,10 @@
         </div>
         <div>
           <label>Phone Number</label>
-          <input [(ngModel)]="profile.phoneNumber" (input)="onPhoneNumberChange()" (blur)="markTouched('phoneNumber')" [class.input-invalid]="isFieldInvalid('phoneNumber')" />
+          <div class="phone-input-row">
+            <span class="phone-prefix">{{ phoneDialCode || '+' }}</span>
+            <input type="tel" [(ngModel)]="profile.phoneNumber" (input)="onPhoneNumberChange()" (blur)="markTouched('phoneNumber')" [class.input-invalid]="isFieldInvalid('phoneNumber')" placeholder="8012345678" />
+          </div>
           <small class="field-error" *ngIf="isFieldInvalid('phoneNumber')">{{ getFieldError('phoneNumber') }}</small>
           <div class="phone-verify" *ngIf="requiresPhoneVerification">
             <small class="muted">Optional for now.</small>
