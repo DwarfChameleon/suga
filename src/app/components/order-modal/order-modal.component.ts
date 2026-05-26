@@ -22,6 +22,7 @@ export class OrderModalComponent implements OnInit {
 
   @Input() dishName?: string;
   @Input() price?: number;
+  @Input() priceCurrency?: string;
   @Input() preparationTime?: string;
   @Input() chefName?: string;
   @Input() user?: UserDetails;
@@ -121,6 +122,7 @@ export class OrderModalComponent implements OnInit {
     const payload: any = {
       dishName: this.dishName,
       price: this.price,
+      priceCurrency: this.priceCurrency,
       preparationTime: this.preparationTime,
       chefId: this.chefID,
       chefUsername: this.chefName,
@@ -198,6 +200,7 @@ export class OrderModalComponent implements OnInit {
       food_id: this.food_id,
       dishName: this.dishName,
       price: this.price,
+      priceCurrency: this.priceCurrency,
       preparationTime: this.preparationTime,
       chefId: this.chefID,
       chefUsername: this.chefName,

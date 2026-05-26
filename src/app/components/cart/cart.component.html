@@ -27,7 +27,7 @@
             <span>{{ item.quantity }}</span>
             <button type="button" (click)="increase(item)">+</button>
           </div>
-          <div class="line-price">{{ item.price * item.quantity | money:undefined:'1.0-0' }}</div>
+          <div class="line-price">{{ item.price * item.quantity | convertedMoney:item.priceCurrency:'1.0-0' }}</div>
           <button class="remove" type="button" (click)="remove(item)">Remove</button>
         </div>
       </div>

@@ -262,6 +262,7 @@ getBackgroundImageStyle(imageUrl:string): any{
       componentProps: {
         dishName: food.dishName,
         price: food.price,
+        priceCurrency: food.priceCurrency,
         preparationTime: food.preparationTime,
         chefName: food.chefName,
         chefID,

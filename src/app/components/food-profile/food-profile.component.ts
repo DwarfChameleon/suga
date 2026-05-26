@@ -92,6 +92,7 @@ async openOrderModal(food: Food) {
       componentProps: {
         dishName: food.dishName,
         price: food.price,
+        priceCurrency: food.priceCurrency,
         preparationTime: food.preparationTime,
         chefName: food.chefName,
         chefID,
@@ -113,6 +114,7 @@ async openOrderModal(food: Food) {
         componentProps: {
           dishName: food.dishName,
           price: food.price,
+          priceCurrency: food.priceCurrency,
           preparationTime: food.preparationTime,
           chefName: food.chefName,
           chefID,
@@ -132,6 +134,7 @@ async openOrderModal(food: Food) {
         componentProps: {
           dishName: food.dishName,
           price: food.price,
+          priceCurrency: food.priceCurrency,
           preparationTime: food.preparationTime,
           chefName: food.chefName,
           chefID,
@@ -189,6 +192,7 @@ async openOrderModal(food: Food) {
       food_id: this.food._id,
       dishName: this.food.dishName,
       price: this.food.price,
+      priceCurrency: this.food.priceCurrency,
       preparationTime: this.food.preparationTime,
       chefId: chefID,
       chefUsername: this.food.chefName,

@@ -19,7 +19,7 @@
           <span>{{ food?.preparationTime }}</span>
         </div>
         <div class="chip price">
-          <span>{{ food?.price | money:food?.priceCurrency:'1.0-0' }}</span>
+          <span>{{ food?.price | convertedMoney:food?.priceCurrency:'1.0-0' }}</span>
         </div>
         <div class="chip">
           <ion-icon name="list-outline"></ion-icon>
@@ -49,7 +49,7 @@
           <img [src]="getImageUrl(dish.image)" alt="{{ dish?.dishName }}" class="img-fluid" />
           <div class="mini-meta">
             <span class="mini-name">{{ dish?.dishName | titlecase }}</span>
-            <span class="mini-price">{{ dish?.price | money:dish?.priceCurrency:'1.0-0' }}</span>
+            <span class="mini-price">{{ dish?.price | convertedMoney:dish?.priceCurrency:'1.0-0' }}</span>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
           <img [src]="getImageUrl(dish.image)" alt="{{ dish?.dishName }}" class="img-fluid" />
           <div class="mini-meta">
             <span class="mini-name">{{ dish?.dishName | titlecase }}</span>
-            <span class="mini-price">{{ dish?.price | money:dish?.priceCurrency:'1.0-0' }}</span>
+            <span class="mini-price">{{ dish?.price | convertedMoney:dish?.priceCurrency:'1.0-0' }}</span>
           </div>
         </div>
       </div>

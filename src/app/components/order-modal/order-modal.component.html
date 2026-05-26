@@ -13,7 +13,7 @@
       <div class="modal-header">
         <h2>
           {{ dishName | titlecase }}
-          {{ price | money:undefined:'1.0-0' }}
+          {{ price | convertedMoney:priceCurrency:'1.0-0' }}
         </h2>
       </div>
 
@@ -43,7 +43,7 @@
                     <strong>
                       Price:
                     </strong><br>
-                    {{ price | money:undefined:'1.0-0' }}
+                    {{ price | convertedMoney:priceCurrency:'1.0-0' }}
                   </p>
                 </td>
               </tr>

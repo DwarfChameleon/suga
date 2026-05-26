@@ -111,7 +111,7 @@
           <div class="food-details">
             <h3>{{ food.dishName }}</h3>
             <p>{{ food.preparationTime }}</p>
-            <p>{{ food.price | money:food.priceCurrency:'1.0-0' }}</p>
+            <p>{{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</p>
           </div>
         </div>
       </div>

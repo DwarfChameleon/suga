@@ -5,6 +5,7 @@ export interface CartItem {
   food_id: string;
   dishName: string;
   price: number;
+  priceCurrency?: string;
   preparationTime: string;
   chefId: string;
   chefUsername: string;

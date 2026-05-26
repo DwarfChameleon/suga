@@ -38,6 +38,7 @@ export class CartComponent implements OnInit {
       food_id: item.food_id,
       dishName: item.dishName,
       price: item.price,
+      priceCurrency: item.priceCurrency,
       preparationTime: item.preparationTime,
       chefId: item.chefId,
       chefUsername: item.chefUsername,

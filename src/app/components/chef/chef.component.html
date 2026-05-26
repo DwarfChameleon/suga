@@ -130,7 +130,7 @@
         <div *ngFor="let food of chefFoods" class="chef-my-food-item">
           <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" (click)="openModalFood(food._id)" class="chef-my-food-image"/>
           <div class="food-info">
-            <p><b>{{ food.dishName | titlecase }}</b> {{ food.price | money:food.priceCurrency:'1.0-0' }}</p>
+            <p><b>{{ food.dishName | titlecase }}</b> {{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</p>
           </div>
           <div class="edit-icon" (click)="openModalFood(food._id)">
             <ion-icon name="create-outline"></ion-icon>

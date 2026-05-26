@@ -129,7 +129,7 @@
           <div class="food-info">
             <button class="metric-pill metric-price" (click)="openModalFood(food._id)">
               <ion-icon name="cash-outline"></ion-icon>
-              <span>{{ food.price | money:food.priceCurrency:'1.0-0' }}</span>
+              <span>{{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</span>
             </button>
 
             <div class="metric-pill">
