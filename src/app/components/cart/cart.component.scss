@@ -61,6 +61,12 @@
   font-weight: 600;
 }
 
+.checkout-btn {
+  --background: var(--ion-color-primary-food);
+  --background-hover: var(--ion-color-primary-food);
+  --background-activated: var(--ion-color-primary-food);
+}
+
 .remove {
   border: none;
   background: transparent;

@@ -358,6 +358,15 @@ export class WalletComponent implements OnInit {
     return humanizeHistoryLabel(tx?.type);
   }
 
+  displayTransactionCurrency(tx: WalletTx): string {
+    const txCurrency = String(tx?.currency || '').toUpperCase();
+    const walletCurrency = String(this.wallet.currency || 'NGN').toUpperCase();
+    if (!txCurrency || (txCurrency === 'USD' && walletCurrency !== 'USD')) {
+      return walletCurrency;
+    }
+    return txCurrency;
+  }
+
   async openTransactionDetails(tx: WalletTx): Promise<void> {
     if (!tx?.orderId) {
       this.uiFeedback.error('No linked order found for this transaction.');

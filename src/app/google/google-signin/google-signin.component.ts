@@ -49,7 +49,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
   }
 
   private async initializeGoogleButton(): Promise<void> {
-    if (this.isNativeApp) {
+    if (this.isNativeApp || !this.googleButtonContainer?.nativeElement) {
       await this.initializeNativeGoogle();
       return;
     }

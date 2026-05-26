@@ -91,7 +91,7 @@
         <div class="wallet-form-grid">
           <div class="wallet-form">
             <div class="form-title">Bank</div>
-            <select [(ngModel)]="payoutAccount.bankCode">
+            <select class="bank-select" [(ngModel)]="payoutAccount.bankCode" size="6">
               <option value="">Select bank</option>
               <option *ngFor="let bank of banks" [value]="bank.code">{{ bank.name }}</option>
             </select>
@@ -185,7 +185,7 @@
               <div class="tx-date">{{ tx.createdAt | date:'medium' }}</div>
             </div>
             <div class="tx-amount" [class.debit]="(tx.type || '').includes('debit') || (tx.type || '').includes('withdraw')">
-              {{ tx.amount | money:(tx.currency || wallet.currency):'1.2-2' }}
+              {{ tx.amount | money:displayTransactionCurrency(tx):'1.2-2' }}
             </div>
           </button>
         </div>

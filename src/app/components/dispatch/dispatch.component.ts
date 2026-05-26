@@ -89,6 +89,7 @@ export class DispatchComponent implements OnInit, OnDestroy {
         'dispatch:delivery_code_ready',
         'dispatch:status',
         'dispatch:delivered',
+        'order:new',
         'order:status',
         'order:dispatch_payout_released',
         'order:dispatch_payout_auto_released'

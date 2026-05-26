@@ -55,8 +55,8 @@
 }
 
 .step-pill.done {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.2);
+  border-color: var(--ion-color-primary-food);
+  background: rgba(254, 44, 85, 0.16);
 }
 
 .card-section {

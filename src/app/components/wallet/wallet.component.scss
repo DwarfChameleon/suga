@@ -49,6 +49,10 @@
   margin-top: 14px;
 }
 
+.payout-card {
+  margin-top: 18px;
+}
+
 .wallet-balance .value.token {
   font-size: 18px;
   font-weight: 600;
@@ -215,7 +219,7 @@
 }
 
 .form-message.success {
-  color: #18a957;
+  color: var(--ion-color-primary-food);
 }
 
 .wallet-form select {
@@ -226,6 +230,11 @@
   font-size: 14px;
   background: var(--suga-input-bg);
   color: var(--ion-text-color);
+}
+
+.wallet-form select.bank-select {
+  min-height: 180px;
+  overflow-y: auto;
 }
 
 .form-actions {
@@ -296,7 +305,7 @@
 
 .tx-amount {
   font-weight: 700;
-  color: #18a957;
+  color: var(--ion-color-primary-food);
 }
 
 .tx-amount.debit {

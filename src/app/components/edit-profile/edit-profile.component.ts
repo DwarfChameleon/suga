@@ -514,10 +514,14 @@ export class EditProfileComponent implements OnInit {
   }
 
   private getUploadedImageUrl(value: string | undefined, folder: string): string {
-    const cleaned = String(value || '').trim().replace(/\\/g, '/');
+    let cleaned = String(value || '').trim().replace(/\\/g, '/');
     if (!cleaned) return '';
     if (/^https?:\/\//i.test(cleaned) || cleaned.startsWith('data:') || cleaned.startsWith('blob:')) {
       return cleaned;
+    }
+    const uploadsIndex = cleaned.toLowerCase().indexOf(`uploads/${folder}/`);
+    if (uploadsIndex >= 0) {
+      cleaned = cleaned.slice(uploadsIndex);
     }
     if (cleaned.startsWith('uploads/')) {
       return `${environment.baseUrl}/${cleaned}`;
