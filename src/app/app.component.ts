@@ -64,7 +64,7 @@ export class AppComponent implements OnInit, OnDestroy {
     void this.nativeUi.initialize();
     window.setTimeout(() => {
       this.isBooting = false;
-    }, 2800);
+    }, 4500);
     this.themeService.apply(this.themeService.getSavedTheme());
     this.refreshUserState();
     this.authSub = this.tokenStorage.authState$.subscribe(() => {

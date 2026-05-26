@@ -12,9 +12,10 @@ const config: CapacitorConfig = {
     },
     SplashScreen: {
       launchAutoHide: false,
-      launchShowDuration: 450,
+      launchShowDuration: 3000,
       backgroundColor: '#ffffffff',
-      showSpinner: false,
+      showSpinner: true,
+      spinnerColor: '#fe2c55',
       androidScaleType: 'CENTER_CROP'
     },
     StatusBar: {
@@ -43,7 +44,7 @@ const config: CapacitorConfig = {
       FadeSplashScreenDuration: '120',
       SplashShowOnlyFirstTime: 'false',
       SplashScreen: 'screen',
-      SplashScreenDelay: '450'
+      SplashScreenDelay: '3000'
     }
   }
 };

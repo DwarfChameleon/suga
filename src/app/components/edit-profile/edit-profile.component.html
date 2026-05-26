@@ -25,11 +25,11 @@
 
       <div class="profile-summary" *ngIf="isLoaded">
         <div class="media-preview">
-          <img *ngIf="profile.profilePicture; else avatarFallback" class="avatar-preview" [src]="profile.profilePicture" alt="Profile" />
+          <img *ngIf="profile.profilePicture; else avatarFallback" class="avatar-preview" [src]="getProfileImageUrl(profile.profilePicture)" alt="Profile" />
           <ng-template #avatarFallback>
             <div class="avatar-preview avatar-fallback">{{ (profile.username || 'U').charAt(0).toUpperCase() }}</div>
           </ng-template>
-          <img *ngIf="profile.coverPicture; else coverFallback" class="cover-preview" [src]="profile.coverPicture" alt="Cover" />
+          <img *ngIf="profile.coverPicture; else coverFallback" class="cover-preview" [src]="getCoverImageUrl(profile.coverPicture)" alt="Cover" />
           <ng-template #coverFallback>
             <div class="cover-preview cover-fallback">No cover image</div>
           </ng-template>

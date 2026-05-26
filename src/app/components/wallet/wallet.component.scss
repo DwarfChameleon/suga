@@ -201,6 +201,23 @@
   color: var(--ion-text-color);
 }
 
+.wallet-form input.input-error {
+  border-color: #e24b4b;
+  color: #e24b4b;
+  box-shadow: 0 0 0 3px rgba(226, 75, 75, 0.12);
+}
+
+.form-message {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e24b4b;
+}
+
+.form-message.success {
+  color: #18a957;
+}
+
 .wallet-form select {
   width: 100%;
   border: 1px solid var(--suga-input-border);
@@ -232,6 +249,10 @@
 .form-btn.submit {
   background: var(--ion-color-primary);
   color: #fff;
+}
+
+.form-btn[disabled] {
+  opacity: 0.55;
 }
 
 .form-btn.cancel {

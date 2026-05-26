@@ -72,6 +72,7 @@
             Rewards Activity
           </button>
         </div>
+        <p *ngIf="rewardsMessage" class="form-message" [class.success]="rewardsMessageType === 'success'">{{ rewardsMessage }}</p>
         <p class="rewards-note">100 points = 10 tokens. 10 tokens = {{ 100 | money:wallet.currency:'1.0-0' }}.</p>
       </div>
     </div>
@@ -148,9 +149,10 @@
 
           <div class="wallet-form" *ngIf="activeForm === 'withdraw' && canWithdraw">
             <div class="form-title">Withdraw</div>
-            <input type="number" [(ngModel)]="withdrawAmount" placeholder="Amount" min="0" />
+            <input type="number" [(ngModel)]="withdrawAmount" (ngModelChange)="onWithdrawAmountChange()" [class.input-error]="withdrawalError && withdrawAmount" placeholder="Amount" min="0" />
+            <p *ngIf="withdrawMessage" class="form-message" [class.success]="withdrawMessageType === 'success'">{{ withdrawMessage }}</p>
             <div class="form-actions">
-              <button class="form-btn submit" (click)="openPinPad('withdraw')">Submit Withdrawal</button>
+              <button class="form-btn submit" [disabled]="!!withdrawalError" (click)="openPinPad('withdraw')">Submit Withdrawal</button>
               <button class="form-btn cancel" (click)="closeForm()">Cancel</button>
             </div>
           </div>

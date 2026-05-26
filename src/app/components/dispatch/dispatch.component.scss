@@ -439,6 +439,10 @@ ion-segment-button {
   font-size: 13px;
 }
 
+.page-end-spacer {
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
 @media (max-width: 768px) {
   .dispatch-hero,
   .profile-summary-card {

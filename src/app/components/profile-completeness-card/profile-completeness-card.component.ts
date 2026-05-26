@@ -21,6 +21,7 @@ export class ProfileCompletenessCardComponent implements OnChanges {
   percent = 0;
   missingItems: string[] = [];
   completedItems: CompletionItem[] = [];
+  showAllMissing = false;
 
   constructor(private readonly router: Router) {}
 
@@ -32,6 +33,14 @@ export class ProfileCompletenessCardComponent implements OnChanges {
     if (this.ctaRoute) {
       this.router.navigate([this.ctaRoute]);
     }
+  }
+
+  get visibleMissingItems(): string[] {
+    return this.showAllMissing ? this.missingItems : this.missingItems.slice(0, 4);
+  }
+
+  toggleMissingList(): void {
+    this.showAllMissing = !this.showAllMissing;
   }
 
   private computeCompleteness(): void {
@@ -77,6 +86,9 @@ export class ProfileCompletenessCardComponent implements OnChanges {
     this.percent = checks.length ? Math.round((completed / checks.length) * 100) : 0;
     this.missingItems = checks.filter((item) => !item.complete).map((item) => item.label);
     this.completedItems = checks;
+    if (this.missingItems.length <= 4) {
+      this.showAllMissing = false;
+    }
   }
 
   private hasValue(value: any): boolean {

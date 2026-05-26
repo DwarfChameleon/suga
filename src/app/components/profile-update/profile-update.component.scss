@@ -48,6 +48,16 @@
   color: var(--ion-text-color);
 }
 
+.row ion-select {
+  min-height: 44px;
+  border: 1px solid var(--suga-border, #d9deea);
+  border-radius: 10px;
+  background: var(--suga-surface-muted, #f8faff);
+  color: var(--ion-text-color);
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
 .readonly-value {
   min-height: 44px;
   display: flex;

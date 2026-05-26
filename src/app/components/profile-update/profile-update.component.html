@@ -38,7 +38,12 @@
 
       <div class="row">
         <label>Currency</label>
-        <div class="readonly-value">{{ preferredCurrencyLabel }}</div>
+        <ion-select *ngIf="isZimbabweUser; else readonlyCurrency" [(ngModel)]="settings.preferredCurrency" interface="action-sheet">
+          <ion-select-option *ngFor="let currency of currencyOptions" [value]="currency">{{ currency }}</ion-select-option>
+        </ion-select>
+        <ng-template #readonlyCurrency>
+          <div class="readonly-value">{{ preferredCurrencyLabel }}</div>
+        </ng-template>
       </div>
 
       <div class="row toggle-row" *ngIf="isChef">

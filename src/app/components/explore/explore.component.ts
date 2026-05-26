@@ -405,6 +405,7 @@ getBackgroundImageStyle(imageUrl:string): any{
     }
     this.userService.toggleFollowChef(chefId).subscribe(
       (res) => {
+        const wasFollowing = this.followedChefIds.has(chefId);
         if (res.pending) {
           this.uiFeedback.success('Follow request sent. Awaiting chef approval.');
         } else if (res.following) {
@@ -413,6 +414,19 @@ getBackgroundImageStyle(imageUrl:string): any{
         } else {
           this.followedChefIds.delete(chefId);
           this.uiFeedback.success('Chef unfollowed.');
+        }
+        if (!res.pending) {
+          const delta = res.following && !wasFollowing ? 1 : (!res.following && wasFollowing ? -1 : 0);
+          this.chefs = this.chefs.map((chef) =>
+            String(chef._id) === String(chefId)
+              ? {
+                  ...chef,
+                  followersCount: Number.isFinite(Number(res.followersCount))
+                    ? Number(res.followersCount)
+                    : Math.max(0, Number(chef.followersCount || 0) + delta)
+                }
+              : chef
+          );
         }
         this.loadFollowingChefs();
         this.getAllFoods();
@@ -449,6 +463,7 @@ getBackgroundImageStyle(imageUrl:string): any{
             ? { name: item, image: '', images: [] }
             : { name: item?.name || '', image: item?.image || '', images: Array.isArray(item?.images) ? item.images : [] }
         ).filter((item: FoodCategory) => !!item.name);
+        this.preloadCategoryImages();
       },
       error: () => {
         this.foodService.getAllFoods().subscribe(
@@ -458,6 +473,7 @@ getBackgroundImageStyle(imageUrl:string): any{
               if (f.category) set.add(f.category);
             });
             this.categories = Array.from(set).map((name) => ({ name, image: '', images: [] }));
+            this.preloadCategoryImages();
           },
           err => {
             console.error('Error fetching categories:', err);
@@ -606,6 +622,10 @@ getBackgroundImageStyle(imageUrl:string): any{
     if (normalized) this.loadedCategoryImages.add(normalized);
   }
 
+  getCategoryFetchPriority(index: number): 'high' | 'auto' {
+    return index < 4 ? 'high' : 'auto';
+  }
+
   isCategoryImageLoading(image?: string): boolean {
     const normalized = this.normalizeMediaPath(image);
     return !!normalized && !this.loadedCategoryImages.has(normalized) && !this.brokenCategoryImages.has(normalized);
@@ -739,6 +759,7 @@ getBackgroundImageStyle(imageUrl:string): any{
         }).sort((a, b) => b.unseenCount - a.unseenCount);
 
         this.storyGroups = groups;
+        this.preloadStoryThumbs(groups);
         this.missedStoriesCount = groups.reduce((sum, g) => sum + g.unseenCount, 0);
       },
       error: () => {
@@ -757,6 +778,28 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.activeStoryPaused = false;
     this.showStoryViewer = true;
     this.markStorySeen(this.currentStory?._id || '');
+  }
+
+  private preloadCategoryImages(): void {
+    this.categories.slice(0, 6).forEach((category) => this.preloadImage(this.getCategoryImage(category.image)));
+  }
+
+  private preloadStoryThumbs(groups: StoryChefGroup[]): void {
+    groups.slice(0, 4).forEach((group) => {
+      const url = this.getStoryVideoUrl(group.latestThumb);
+      if (!url) return;
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      video.src = url;
+    });
+  }
+
+  private preloadImage(url: string): void {
+    if (!url) return;
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = url;
   }
 
   closeStoryViewer(): void {

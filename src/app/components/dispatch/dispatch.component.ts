@@ -44,6 +44,7 @@ export class DispatchComponent implements OnInit, OnDestroy {
   private completedSeen = new Set<string>();
   private notificationSub?: Subscription;
   private seenNotificationIds = new Set<string>();
+  private liveRefreshTimer?: ReturnType<typeof setInterval>;
   sections = {
     orders: true,
     profile: true,
@@ -66,6 +67,11 @@ export class DispatchComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadAll();
     this.refreshMap();
+    this.liveRefreshTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        this.loadAvailableOrders();
+      }
+    }, 20000);
     this.notificationSub = this.notificationSocket.notifications$.subscribe((notification: any) => {
       const type = String(notification?.type || '');
       const orderId = String(notification?.data?.orderId || '');
@@ -73,7 +79,7 @@ export class DispatchComponent implements OnInit, OnDestroy {
       if (!orderId || this.seenNotificationIds.has(notificationKey)) {
         return;
       }
-      if (!type.startsWith('dispatch:') && !type.startsWith('order:dispatch_payout')) {
+      if (!type.startsWith('dispatch:') && !type.startsWith('order:dispatch_payout') && type !== 'order:new') {
         return;
       }
 
@@ -97,6 +103,9 @@ export class DispatchComponent implements OnInit, OnDestroy {
       navigator.geolocation.clearWatch(this.watchId);
     }
     this.notificationSub?.unsubscribe();
+    if (this.liveRefreshTimer) {
+      clearInterval(this.liveRefreshTimer);
+    }
   }
 
   loadAll(): void {

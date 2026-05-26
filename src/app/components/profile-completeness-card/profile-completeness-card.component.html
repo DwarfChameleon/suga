@@ -14,8 +14,10 @@
   </div>
 
   <div class="missing-list" *ngIf="missingItems.length > 0; else allDone">
-    <span *ngFor="let item of missingItems.slice(0, 4)" class="missing-chip">{{ item }}</span>
-    <span *ngIf="missingItems.length > 4" class="missing-chip more">+{{ missingItems.length - 4 }} more</span>
+    <button type="button" *ngFor="let item of visibleMissingItems" class="missing-chip" (click)="toggleMissingList()">{{ item }}</button>
+    <button type="button" *ngIf="missingItems.length > 4" class="missing-chip more" (click)="toggleMissingList()">
+      {{ showAllMissing ? 'Show less' : ('+' + (missingItems.length - 4) + ' more') }}
+    </button>
   </div>
 
   <ng-template #allDone>

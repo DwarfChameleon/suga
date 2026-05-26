@@ -32,6 +32,8 @@ export class ConsumerComponent implements OnInit {
   private promptedRatingIds = new Set<string>();
   private ratingsInitialized = false;
   private completedSeen = new Set<string>();
+  private pendingOpenOrderId = '';
+  private openedStateOrder = false;
 
   constructor(
     private authService: AuthService,
@@ -50,6 +52,11 @@ export class ConsumerComponent implements OnInit {
     this.selectedSegment = event.detail.value;
   }
   ngOnInit(): void {
+    const stateOrderId = String(history?.state?.activeOrderId || '');
+    if (stateOrderId) {
+      this.pendingOpenOrderId = stateOrderId;
+      this.selectedSegment = 'liveOrder';
+    }
     this.loadUserProfile();
     this.loadProfileDetails();
     this.fetchUserOrders();
@@ -74,6 +81,7 @@ export class ConsumerComponent implements OnInit {
         this.categorizeOrders();
         this.promptDeliveryConfirmationForPending();
         this.promptRatingIfNeeded();
+        this.openPendingOrderFromState();
         this.isLoadingOrders = false;
       },
       (error) => {
@@ -232,6 +240,15 @@ export class ConsumerComponent implements OnInit {
       cssClass: 'suga-order-fullsheet'
     });
     await modal.present();
+  }
+
+  private async openPendingOrderFromState(): Promise<void> {
+    if (!this.pendingOpenOrderId || this.openedStateOrder) return;
+    const order = this.orders.find((item) => String(item?._id || '') === this.pendingOpenOrderId);
+    if (!order) return;
+    this.openedStateOrder = true;
+    this.uiFeedback.success('Payment confirmed. Opening your active order status.');
+    await this.viewOrderDetails(order);
   }
 
   trackByOrder(_index: number, order: Order): string {

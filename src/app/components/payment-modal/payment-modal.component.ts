@@ -288,7 +288,7 @@ export class PaymentModalComponent implements OnInit {
   }
 
   async close(paid = false): Promise<void> {
-    await this.modalCtrl.dismiss({ paid });
+    await this.modalCtrl.dismiss({ paid, orderId: this.orderId, orderIds: this.orderIds || [] });
   }
 
   payWithWalletOrTokens(): void {

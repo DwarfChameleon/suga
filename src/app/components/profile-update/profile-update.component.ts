@@ -121,6 +121,7 @@ export class ProfileUpdateComponent implements OnInit {
         isOnline: this.settings.isOnline,
         uiTheme: this.settings.uiTheme,
         country: this.settings.country,
+        preferredCurrency: this.settings.preferredCurrency,
         countryVerification: this.getCountryVerificationHints(),
         isPrivateChef: this.isChef ? this.settings.isPrivateChef : undefined
       };
@@ -148,6 +149,14 @@ export class ProfileUpdateComponent implements OnInit {
 
   onCountryChanged(): void {
     this.settings.preferredCurrency = this.currencyFormat.getCurrencyForCountry(this.settings.country);
+  }
+
+  get isZimbabweUser(): boolean {
+    return String(this.settings.country || '').trim().toLowerCase() === 'zimbabwe';
+  }
+
+  get currencyOptions(): string[] {
+    return this.isZimbabweUser ? ['ZWG', 'USD'] : [this.currencyFormat.getCurrencyForCountry(this.settings.country)];
   }
 
   get preferredCurrencyLabel(): string {

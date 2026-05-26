@@ -15,6 +15,11 @@
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
+.page-end-spacer {
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+  flex: 0 0 auto;
+}
+
 .hero-card {
   border-radius: 28px;
   padding: 22px;

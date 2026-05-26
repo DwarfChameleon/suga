@@ -57,6 +57,10 @@ export class WalletComponent implements OnInit {
   banks: Array<{ name: string; code: string }> = [];
   payoutAccount = { bankCode: '', accountNumber: '', accountName: '' };
   isSavingPayout = false;
+  withdrawMessage = '';
+  withdrawMessageType: 'success' | 'error' = 'error';
+  rewardsMessage = '';
+  rewardsMessageType: 'success' | 'error' = 'error';
   sections = {
     balance: true,
     rewards: true,
@@ -141,6 +145,7 @@ export class WalletComponent implements OnInit {
     this.pin = '';
     this.pinPurpose = null;
     this.showPinPad = false;
+    this.withdrawMessage = '';
   }
 
   async requestDeposit(): Promise<void> {
@@ -224,7 +229,11 @@ export class WalletComponent implements OnInit {
     }
     const amount = Number(this.withdrawAmount || 0);
     if (!amount || amount <= 0) {
-      this.uiFeedback.error('Enter a valid withdrawal amount.');
+      this.setWithdrawError('Enter a valid withdrawal amount.');
+      return;
+    }
+    if (amount > Number(this.wallet.balance || 0)) {
+      this.setWithdrawError('Insufficient balance for this withdrawal.');
       return;
     }
 
@@ -232,18 +241,23 @@ export class WalletComponent implements OnInit {
     try {
       await firstValueFrom(this.http.post<any>(`${environment.apiUrl}/wallet/withdraw/request`, { amount, pin: this.pin }));
       this.withdrawAmount = null;
-      this.activeForm = null;
       this.pin = '';
-      this.uiFeedback.success('Withdrawal request submitted for review.');
+      this.withdrawMessageType = 'success';
+      this.withdrawMessage = 'Withdrawal request submitted for review.';
+      this.uiFeedback.success(this.withdrawMessage);
       await this.loadWallet();
     } catch (error: any) {
-      this.uiFeedback.error(error?.error?.message || 'Withdrawal request failed.');
+      this.setWithdrawError(error?.error?.message || 'Withdrawal request failed.');
     } finally {
       await this.loading.hide();
     }
   }
 
   openPinPad(purpose: 'transfer' | 'withdraw'): void {
+    if (purpose === 'withdraw' && this.withdrawalError) {
+      this.setWithdrawError(this.withdrawalError);
+      return;
+    }
     this.pinPurpose = purpose;
     this.pin = '';
     this.showPinPad = true;
@@ -280,20 +294,55 @@ export class WalletComponent implements OnInit {
   }
 
   async convertTokens(): Promise<void> {
+    this.rewardsMessage = '';
+    if (this.rewards.pointsBalance < 100 && this.rewards.tokenBalance <= 0) {
+      this.rewardsMessageType = 'error';
+      this.rewardsMessage = 'You need at least 100 points before converting to tokens.';
+      return;
+    }
     if (this.rewards.tokenBalance <= 0) {
-      this.uiFeedback.error('No tokens available to convert.');
+      this.rewardsMessageType = 'error';
+      this.rewardsMessage = 'No tokens available to convert yet.';
       return;
     }
     await this.loading.show('Converting tokens...');
     try {
       await firstValueFrom(this.http.post<any>(`${environment.apiUrl}/wallet/rewards/convert-tokens`, { tokens: this.rewards.tokenBalance }));
+      this.rewardsMessageType = 'success';
+      this.rewardsMessage = 'Tokens converted to wallet balance.';
       this.uiFeedback.success('Tokens converted to wallet balance.');
       await this.loadWallet();
     } catch (error: any) {
-      this.uiFeedback.error(error?.error?.message || 'Token conversion failed.');
+      this.rewardsMessageType = 'error';
+      this.rewardsMessage = error?.error?.message || 'Token conversion failed.';
+      this.uiFeedback.error(this.rewardsMessage);
     } finally {
       await this.loading.hide();
     }
+  }
+
+  get withdrawalError(): string {
+    const amount = Number(this.withdrawAmount || 0);
+    if (!amount || amount <= 0) return 'Enter a valid withdrawal amount.';
+    if (amount > Number(this.wallet.balance || 0)) return 'Insufficient balance for this withdrawal.';
+    return '';
+  }
+
+  onWithdrawAmountChange(): void {
+    const error = this.withdrawalError;
+    if (error && Number(this.withdrawAmount || 0) > Number(this.wallet.balance || 0)) {
+      this.setWithdrawError(error);
+      return;
+    }
+    if (this.withdrawMessageType === 'error') {
+      this.withdrawMessage = '';
+    }
+  }
+
+  private setWithdrawError(message: string): void {
+    this.withdrawMessageType = 'error';
+    this.withdrawMessage = message;
+    this.uiFeedback.error(message);
   }
 
   async loadBanks(): Promise<void> {

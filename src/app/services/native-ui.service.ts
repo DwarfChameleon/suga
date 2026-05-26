@@ -49,7 +49,7 @@ export class NativeUiService {
 
     window.setTimeout(() => {
       void this.hideSplash();
-    }, 180);
+    }, 1200);
   }
 
   async syncPushRegistration(): Promise<void> {

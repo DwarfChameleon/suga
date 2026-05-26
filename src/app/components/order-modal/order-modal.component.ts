@@ -168,10 +168,13 @@ export class OrderModalComponent implements OnInit {
           }
         });
         await modal.present();
-        const result = await modal.onDidDismiss<{ paid?: boolean }>();
+        const result = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[] }>();
         if (result?.data?.paid) {
           this.uiFeedback.success('Order payment confirmed.');
           await this.modalCtrl.dismiss();
+          await this.router.navigate(['/components/consumer'], {
+            state: { activeOrderId: result.data.orderId || order?._id }
+          });
         }
       },
       error: async (error) => {
@@ -242,11 +245,14 @@ export class OrderModalComponent implements OnInit {
           }
         });
         await modal.present();
-        const payment = await modal.onDidDismiss<{ paid?: boolean }>();
+        const payment = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[] }>();
         if (payment?.data?.paid) {
           this.cartService.clear();
           this.uiFeedback.success('Cart payment confirmed.');
           await this.modalCtrl.dismiss();
+          await this.router.navigate(['/components/consumer'], {
+            state: { activeOrderId: payment.data.orderId || payment.data.orderIds?.[0] || result?.orderIds?.[0] }
+          });
         }
       },
       error: async (error) => {

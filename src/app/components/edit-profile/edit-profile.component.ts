@@ -9,6 +9,7 @@ import { AddressDataService, AddressFieldConfig, AddressFieldKey } from 'src/app
 import { MapService } from 'src/app/services/map.service';
 import { PhoneVerificationProof, PhoneVerificationService } from 'src/app/services/phone-verification.service';
 import { isValidInternationalPhone, normalizeInternationalPhone, phoneDigits, stripDialCode } from 'src/app/utils/phone-number';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-edit-profile',
@@ -282,6 +283,14 @@ export class EditProfileComponent implements OnInit {
     this.coverImageInput?.nativeElement.click();
   }
 
+  getProfileImageUrl(value?: string): string {
+    return this.getUploadedImageUrl(value, 'profile-pictures');
+  }
+
+  getCoverImageUrl(value?: string): string {
+    return this.getUploadedImageUrl(value, 'cover-pictures');
+  }
+
   async save(): Promise<void> {
     if (!this.isFormValid) {
       [
@@ -502,5 +511,23 @@ export class EditProfileComponent implements OnInit {
 
   private toInternationalPhone(value: string): string {
     return normalizeInternationalPhone(value, this.phoneDialCode);
+  }
+
+  private getUploadedImageUrl(value: string | undefined, folder: string): string {
+    const cleaned = String(value || '').trim().replace(/\\/g, '/');
+    if (!cleaned) return '';
+    if (/^https?:\/\//i.test(cleaned) || cleaned.startsWith('data:') || cleaned.startsWith('blob:')) {
+      return cleaned;
+    }
+    if (cleaned.startsWith('uploads/')) {
+      return `${environment.baseUrl}/${cleaned}`;
+    }
+    if (cleaned.startsWith(`${folder}/`)) {
+      return `${environment.uploadUrl}/${cleaned}`;
+    }
+    if (cleaned.includes(`uploads/${folder}/`)) {
+      return `${environment.baseUrl}/${cleaned}`;
+    }
+    return `${environment.uploadUrl}/${folder}/${cleaned}`;
   }
 }
