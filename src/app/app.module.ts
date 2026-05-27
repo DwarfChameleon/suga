@@ -36,6 +36,7 @@ import { CategoryModalComponent } from './components/category-modal/category-mod
 import { SearchComponent } from './components/search/search.component';
 import { WalletComponent } from './components/wallet/wallet.component';
 import { PaymentModalComponent } from './components/payment-modal/payment-modal.component';
+import { PaymentSuccessSheetComponent } from './components/payment-success-sheet/payment-success-sheet.component';
 import { GoogleSigninComponent } from './google/google-signin/google-signin.component';
 import { CartComponent } from './components/cart/cart.component';
 import { OrderHistoryComponent } from './components/order-history/order-history.component';
@@ -66,7 +67,7 @@ export function preloadAdConfig(adConfigService: AdConfigService): () => Promise
 }
 
 @NgModule({
-  declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
+  declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, PaymentSuccessSheetComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
   imports: [BrowserModule, HttpClientModule, FormsModule, IonicModule.forRoot(), LoginPageModule, AppRoutingModule, ReactiveFormsModule],
 
   providers: [

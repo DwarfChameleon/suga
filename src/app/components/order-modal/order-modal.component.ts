@@ -7,6 +7,7 @@ import { LoginModalComponent } from '../../login-modal/login-modal.component';
 import { UiFeedbackService } from '../../services/ui-feedback.service';
 import { LoadingService } from '../../services/loading.service';
 import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
+import { PaymentSuccessSheetComponent } from '../payment-success-sheet/payment-success-sheet.component';
 import { CartService } from 'src/app/services/cart.service';
 import { Router } from '@angular/router';
 import { GiftRecipientSuggestion, UserService } from 'src/app/services/user.service';
@@ -170,13 +171,11 @@ export class OrderModalComponent implements OnInit {
           }
         });
         await modal.present();
-        const result = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[] }>();
+        const result = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[]; paymentProvider?: string }>();
         if (result?.data?.paid) {
           this.uiFeedback.success('Order payment confirmed.');
           await this.modalCtrl.dismiss();
-          await this.router.navigate(['/components/consumer'], {
-            state: { activeOrderId: result.data.orderId || order?._id }
-          });
+          await this.openPaymentSuccessSheet(result.data.orderId || order?._id, result.data.orderIds || [], result.data.paymentProvider || '');
         }
       },
       error: async (error) => {
@@ -248,14 +247,16 @@ export class OrderModalComponent implements OnInit {
           }
         });
         await modal.present();
-        const payment = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[] }>();
+        const payment = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[]; paymentProvider?: string }>();
         if (payment?.data?.paid) {
           this.cartService.clear();
           this.uiFeedback.success('Cart payment confirmed.');
           await this.modalCtrl.dismiss();
-          await this.router.navigate(['/components/consumer'], {
-            state: { activeOrderId: payment.data.orderId || payment.data.orderIds?.[0] || result?.orderIds?.[0] }
-          });
+          await this.openPaymentSuccessSheet(
+            payment.data.orderId || payment.data.orderIds?.[0] || result?.orderIds?.[0],
+            payment.data.orderIds || result?.orderIds || [],
+            payment.data.paymentProvider || ''
+          );
         }
       },
       error: async (error) => {
@@ -280,6 +281,18 @@ export class OrderModalComponent implements OnInit {
 
   async closeModal(): Promise<void> {
     await this.modalCtrl.dismiss();
+  }
+
+  private async openPaymentSuccessSheet(orderId: string, orderIds: string[] = [], paymentProvider = ''): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: PaymentSuccessSheetComponent,
+      componentProps: { orderId, orderIds, paymentProvider },
+      cssClass: 'suga-payment-success-sheet',
+      handle: true,
+      initialBreakpoint: 0.58,
+      breakpoints: [0, 0.42, 0.58, 0.9]
+    });
+    await modal.present();
   }
 
   private refreshCartState(): void {

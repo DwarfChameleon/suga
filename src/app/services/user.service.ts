@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { TokenStorageService } from './token-storage.service';
 import { UserInfo, UserDetails } from '../interface/user-details';
 import { Observable, throwError, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
@@ -58,6 +59,10 @@ export interface FollowToggleResponse {
   followingChefs?: string[];
 }
 
+export interface FollowChangeEvent extends FollowToggleResponse {
+  chefId: string;
+}
+
 export interface GiftRecipientSuggestion {
   _id: string;
   username: string;
@@ -80,7 +85,7 @@ export class UserService {
   private uploadAPI = `${environment.apiUrl}`;
   private userEmail: string | undefined;
   private userName: string | undefined;
-  private followChangedSubject = new Subject<void>();
+  private followChangedSubject = new Subject<FollowChangeEvent | void>();
   followChanged$ = this.followChangedSubject.asObservable();
 
   constructor(private tokenStorageService: TokenStorageService, private http: HttpClient) {}
@@ -113,11 +118,13 @@ export class UserService {
     return this.http.post<FollowToggleResponse>(
       `${this.apiUrl}/follow/${chefId}`,
       {}
+    ).pipe(
+      tap((response) => this.notifyFollowChanged({ chefId, ...response }))
     );
   }
 
-  notifyFollowChanged(): void {
-    this.followChangedSubject.next();
+  notifyFollowChanged(change?: FollowChangeEvent): void {
+    this.followChangedSubject.next(change);
   }
 
   getChefSummaries(): Observable<Array<{ _id: string; username: string; profilePicture: string; dishCount: number; followersCount: number; score: number }>> {

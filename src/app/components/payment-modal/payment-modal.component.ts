@@ -250,11 +250,11 @@ export class PaymentModalComponent implements OnInit {
       transactionId,
       paidAmount: this.totalAmount
     }).pipe(timeout(30000)).subscribe({
-      next: () => {
+      next: (resp: any) => {
         this.loading.hide();
         this.isSubmitting = false;
         this.uiFeedback.success('Payment successful. Order placed.');
-        this.close(true);
+        this.close(true, resp);
       },
       error: (err) => {
         this.loading.hide();
@@ -269,7 +269,7 @@ export class PaymentModalComponent implements OnInit {
       transactionId,
       reference: this.paymentReference
     }).pipe(timeout(30000)).subscribe({
-      next: () => {
+      next: (resp: any) => {
         try {
           sessionStorage.removeItem('suga:pendingPaystackRef');
           sessionStorage.removeItem('suga:pendingPaystackTx');
@@ -277,7 +277,7 @@ export class PaymentModalComponent implements OnInit {
         this.loading.hide();
         this.isSubmitting = false;
         this.uiFeedback.success('Payment successful. Order placed.');
-        this.close(true);
+        this.close(true, resp);
       },
       error: (err) => {
         this.loading.hide();
@@ -287,8 +287,15 @@ export class PaymentModalComponent implements OnInit {
     });
   }
 
-  async close(paid = false): Promise<void> {
-    await this.modalCtrl.dismiss({ paid, orderId: this.orderId, orderIds: this.orderIds || [] });
+  async close(paid = false, response?: any): Promise<void> {
+    await this.modalCtrl.dismiss({
+      paid,
+      orderId: this.orderId,
+      orderIds: this.orderIds || [],
+      paymentProvider: this.paymentProvider,
+      paymentReference: this.paymentReference,
+      response
+    });
   }
 
   payWithWalletOrTokens(): void {
@@ -316,11 +323,11 @@ export class PaymentModalComponent implements OnInit {
     this.isSubmitting = true;
     this.loading.show('Processing payment...');
     this.http.post(`${environment.apiUrl}/order/pay`, payload).pipe(timeout(30000)).subscribe({
-      next: () => {
+      next: (resp: any) => {
         this.loading.hide();
         this.isSubmitting = false;
         this.uiFeedback.success('Payment confirmed.');
-        this.close(true);
+        this.close(true, resp);
       },
       error: (err) => {
         this.loading.hide();

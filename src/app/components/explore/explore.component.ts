@@ -118,6 +118,13 @@ export class ExploreComponent implements OnInit {
     this.notificationService.getUnreadCount().subscribe((count) => {
       this.unreadNotifications = count || 0;
     });
+    this.userService.followChanged$.subscribe((change) => {
+      if (change?.chefId) {
+        this.applyFollowChange(change);
+      }
+      this.loadMissedStoriesCount();
+      this.loadStoryGroups();
+    });
     this.loadMissedStoriesCount();
     this.hydrateSeenStoryIds();
     this.loadStoryGroups();
@@ -431,7 +438,6 @@ getBackgroundImageStyle(imageUrl:string): any{
         }
         this.loadFollowingChefs();
         this.getAllFoods();
-        this.userService.notifyFollowChanged();
       },
       (error) => {
         this.uiFeedback.error(error?.error?.message || 'Unable to update follow status.');
@@ -441,6 +447,24 @@ getBackgroundImageStyle(imageUrl:string): any{
 
   isFollowing(chefId: string): boolean {
     return this.followedChefIds.has(chefId);
+  }
+
+  private applyFollowChange(change: { chefId: string; following: boolean; pending?: boolean; followersCount?: number; followingChefs?: string[] }): void {
+    const chefId = String(change.chefId || '');
+    if (!chefId || change.pending) return;
+    if (change.following) {
+      this.followedChefIds.add(chefId);
+    } else {
+      this.followedChefIds.delete(chefId);
+    }
+    if (Array.isArray(change.followingChefs)) {
+      this.followedChefIds = new Set(change.followingChefs.map((id) => String(id)));
+    }
+    this.chefs = this.chefs.map((chef) =>
+      String(chef._id) === chefId && Number.isFinite(Number(change.followersCount))
+        ? { ...chef, followersCount: Number(change.followersCount) }
+        : chef
+    );
   }
 
   private async openLoginModal(): Promise<void> {

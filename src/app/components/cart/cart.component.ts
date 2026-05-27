@@ -6,6 +6,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { BulkOrderResponse, OrderService } from 'src/app/services/order.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
+import { PaymentSuccessSheetComponent } from '../payment-success-sheet/payment-success-sheet.component';
 
 @Component({
   selector: 'app-cart',
@@ -94,11 +95,15 @@ export class CartComponent implements OnInit {
         });
 
         await modal.present();
-        const payment = await modal.onDidDismiss<{ paid?: boolean }>();
+        const payment = await modal.onDidDismiss<{ paid?: boolean; orderId?: string; orderIds?: string[]; paymentProvider?: string }>();
         if (payment?.data?.paid) {
           this.cartService.clear();
           this.uiFeedback.success('Order payment confirmed.');
-          this.router.navigate(['/components/consumer']);
+          await this.openPaymentSuccessSheet(
+            payment.data.orderId || payment.data.orderIds?.[0] || result?.orderIds?.[0],
+            payment.data.orderIds || result?.orderIds || [],
+            payment.data.paymentProvider || ''
+          );
         }
       },
       error: async () => {
@@ -128,5 +133,17 @@ export class CartComponent implements OnInit {
     this.subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     this.feeAmount = Math.round(this.subtotal * 0.1);
     this.totalAmount = this.subtotal + this.feeAmount;
+  }
+
+  private async openPaymentSuccessSheet(orderId: string, orderIds: string[] = [], paymentProvider = ''): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: PaymentSuccessSheetComponent,
+      componentProps: { orderId, orderIds, paymentProvider },
+      cssClass: 'suga-payment-success-sheet',
+      handle: true,
+      initialBreakpoint: 0.58,
+      breakpoints: [0, 0.42, 0.58, 0.9]
+    });
+    await modal.present();
   }
 }
