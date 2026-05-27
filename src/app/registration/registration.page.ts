@@ -7,12 +7,13 @@ import { Router } from '@angular/router';
 })
 export class RegistrationPage implements OnInit {
   constructor(private router: Router) { }
-  activeRole: 'intro' | 'consumer' | 'chef' | 'dispatch' = 'intro';
+  activeInfoRole: 'consumer' | 'chef' | 'dispatch' | null = null;
 
-  onSelectionChange(event: any) {
-    const selectedValue = event?.detail?.value ?? event?.target?.value;
-    this.selectRole(selectedValue);
-  }
+  readonly roleInfo: Record<'consumer' | 'chef' | 'dispatch', string> = {
+    consumer: 'For food lovers who want to discover nearby dishes, follow chefs, watch food stories, and place orders.',
+    chef: 'For cooks, restaurants, and food brands who want to post dishes, share stories, receive orders, and build a following.',
+    dispatch: 'For riders or delivery companies who want to receive open delivery jobs, update order progress, and earn from completed deliveries.'
+  };
 
   selectRole(role: 'chef' | 'consumer' | 'dispatch') {
     if (role === 'chef') {
@@ -27,12 +28,9 @@ export class RegistrationPage implements OnInit {
   ngOnInit() {
   }
 
-  onCarouselScroll(event: Event): void {
-    const target = event.target as HTMLElement | null;
-    if (!target) return;
-    const cardWidth = target.clientWidth * 0.82 + 16; // 82vw + gap
-    const index = Math.round(target.scrollLeft / cardWidth);
-    this.activeRole = (['intro', 'consumer', 'chef', 'dispatch'][index] as any) || 'intro';
+  toggleRoleInfo(role: 'consumer' | 'chef' | 'dispatch', event?: Event): void {
+    event?.stopPropagation();
+    this.activeInfoRole = this.activeInfoRole === role ? null : role;
   }
 
   refresh(event: any): void {
