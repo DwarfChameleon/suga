@@ -286,7 +286,7 @@ export class OrderModalComponent implements OnInit {
   private async openPaymentSuccessSheet(orderId: string, orderIds: string[] = [], paymentProvider = ''): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: PaymentSuccessSheetComponent,
-      componentProps: { orderId, orderIds, paymentProvider },
+      componentProps: { orderId, orderIds, paymentProvider, dashboardRole: 'consumer' },
       cssClass: 'suga-payment-success-sheet',
       handle: true,
       initialBreakpoint: 0.58,

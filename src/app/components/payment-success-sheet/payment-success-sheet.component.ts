@@ -14,6 +14,7 @@ export class PaymentSuccessSheetComponent implements OnInit {
   @Input() orderId = '';
   @Input() orderIds: string[] = [];
   @Input() paymentProvider = '';
+  @Input() dashboardRole: 'consumer' | 'chef' | 'dispatch' | '' = '';
 
   order: Order | null = null;
   isLoading = false;
@@ -48,19 +49,24 @@ export class PaymentSuccessSheetComponent implements OnInit {
     const status = String(this.order?.status || 'placed').replace(/_/g, ' ');
     const dispatch = String(this.order?.dispatchStatus || '');
     if (dispatch && dispatch !== 'unassigned') {
-      return `${status} · dispatch ${dispatch.replace(/_/g, ' ')}`;
+      return `${status} - dispatch ${dispatch.replace(/_/g, ' ')}`;
     }
     return status;
   }
 
   async viewDashboard(): Promise<void> {
     const roles = (this.tokenStorage.getRoles() || []).map((role) => String(role || '').toLowerCase());
-    const route = roles.includes('chef')
-      ? '/components/chef'
+    const preferredRole = this.dashboardRole || (roles.includes('chef')
+      ? 'chef'
       : roles.includes('dispatch')
+        ? 'dispatch'
+        : 'consumer');
+    const route = preferredRole === 'chef'
+      ? '/components/chef'
+      : preferredRole === 'dispatch'
         ? '/components/dispatch'
         : '/components/consumer';
-    const queryParams = roles.includes('chef') ? { tab: 'orders' } : undefined;
+    const queryParams = preferredRole === 'chef' ? { tab: 'orders' } : undefined;
     await this.modalController.dismiss({ viewDashboard: true });
     await this.router.navigate([route], {
       queryParams,
