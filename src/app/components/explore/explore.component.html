@@ -44,13 +44,38 @@
         <div *ngFor="let category of categories; let i = index">
           <div class="foodCategory" [class.image-loading]="isCategoryImageLoading(category.image)" (click)="openCategoryModal(category)">
             <div class="image-shimmer" *ngIf="isCategoryImageLoading(category.image)"></div>
-            <img [src]="getCategoryImage(category.image)" [attr.fetchpriority]="getCategoryFetchPriority(i)" [alt]="category.name" loading="eager" decoding="async" (load)="onCategoryImageLoad(category.image)" (error)="onCategoryImageError(category.image)" />
+            <img [src]="getCategoryImage(category.image)" [attr.fetchpriority]="getCategoryFetchPriority(i)" [alt]="category.name" [attr.loading]="i < 4 ? 'eager' : 'lazy'" decoding="async" (load)="onCategoryImageLoad(category.image)" (error)="onCategoryImageError(category.image)" />
             <div class="foodCategoryTitle">{{ category.name }}</div>
           </div>
         </div>
       </div>
       <div class="section-text color">
-        <span>Chefs</span>
+        <span>Food Story</span>
+      </div>
+      <div class="foodStory top-story">
+        <div *ngIf="storyGroups.length === 0" class="story-empty">No story yet from followed chefs.</div>
+        <div *ngFor="let group of storyGroups" class="story-chef-card" (click)="openStoryViewer(group)">
+          <video *ngIf="!isStoryThumbBroken(group)" class="story-thumb" [src]="getStoryVideoUrl(group.latestThumb)" muted autoplay loop playsinline preload="metadata" (error)="onStoryThumbError(group)"></video>
+          <div *ngIf="isStoryThumbBroken(group)" class="story-thumb-fallback">
+            <span>Story preview unavailable</span>
+          </div>
+          <div class="story-chef-overlay">
+            <div class="story-ring">
+              <span
+                *ngFor="let video of group.videos; let i = index"
+                class="story-segment"
+                [style.transform]="'rotate(' + ((360 / group.videos.length) * i) + 'deg)'"
+                [class.unwatched]="!isStorySegmentWatched(video._id)"
+                [class.watched]="isStorySegmentWatched(video._id)"
+              ></span>
+              <img [src]="getChefImage(group.profilePicture)" alt="{{ group.username }}" />
+            </div>
+            <div class="story-chef-meta">
+              <div class="story-chef-name">@{{ group.username }}</div>
+              <div class="story-counter">{{ group.unseenCount }} new</div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="chef-scroll">
         <div class="chef-card" *ngFor="let chef of chefs">

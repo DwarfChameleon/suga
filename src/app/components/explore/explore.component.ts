@@ -106,7 +106,6 @@ export class ExploreComponent implements OnInit {
 
   ngOnInit() {
     this.loadCategories();
-    this.loadChefSummaries();
     this.refreshAuthDependentData();
     this.tokenStorage.authState$.subscribe(() => {
       this.refreshAuthDependentData();
@@ -140,7 +139,6 @@ export class ExploreComponent implements OnInit {
 
   refresh(event: any): void {
     this.loadCategories();
-    this.loadChefSummaries();
     this.refreshAuthDependentData();
     this.loadMissedStoriesCount();
     this.loadStoryGroups();
@@ -483,12 +481,21 @@ getBackgroundImageStyle(imageUrl:string): any{
   loadCategories(): void {
     this.foodService.getCategoryList().subscribe({
       next: (list) => {
-        this.categories = (list || []).map((item: any) =>
+        const categoryList = (list || []).map((item: any) =>
           typeof item === 'string'
             ? { name: item, image: '', images: [] }
             : { name: item?.name || '', image: item?.image || '', images: Array.isArray(item?.images) ? item.images : [] }
         ).filter((item: FoodCategory) => !!item.name);
-        this.preloadCategoryImages();
+        this.foodService.getAllFoods().subscribe({
+          next: (foods) => {
+            this.categories = this.getCategoriesWithFoods(categoryList, foods || []);
+            this.preloadCategoryImages();
+          },
+          error: () => {
+            this.categories = this.getCategoriesWithFoods(categoryList, this.allFoods || []);
+            this.preloadCategoryImages();
+          }
+        });
       },
       error: () => {
         this.foodService.getAllFoods().subscribe(
@@ -566,6 +573,16 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.activeCommentFood = this.allFoods.find((item) => item._id === food._id) || food;
     this.commentDraft = '';
     this.showCommentsModal = true;
+  }
+
+  private getCategoriesWithFoods(categories: FoodCategory[], foods: Food[]): FoodCategory[] {
+    const available = new Set(
+      (foods || [])
+        .map((food) => String((food as any)?.category || '').trim().toLowerCase())
+        .filter(Boolean)
+    );
+    if (!available.size) return [];
+    return (categories || []).filter((category) => available.has(String(category?.name || '').trim().toLowerCase()));
   }
 
   closeCommentsModal(): void {

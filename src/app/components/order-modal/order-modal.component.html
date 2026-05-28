@@ -114,6 +114,7 @@
             fill="clear"
             [disabled]="isSubmitting"
             (click)="addCurrentItemToCart()">
+            <ion-icon slot="start" name="cart-outline"></ion-icon>
             Add To Cart
           </ion-button>
 
@@ -123,12 +124,12 @@
             <p>{{ cartCount }} item(s) in cart &middot; {{ cartSubtotal | money:undefined:'1.0-0' }}</p>
 
             <ion-button
-              class="subtle-action-btn"
+              class="view-cart-btn"
               expand="block"
-              fill="clear"
               [disabled]="isSubmitting"
               (click)="goToCart()">
-              Open Cart Page
+              <ion-icon slot="start" name="cart-outline"></ion-icon>
+              View Cart
             </ion-button>
 
             <ion-button

@@ -124,6 +124,9 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 284px;
 }
 
 .food-card:hover {
@@ -140,11 +143,20 @@
 
 .food-meta {
   padding: 8px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .food-meta h3 {
   margin: 0;
   font-size: var(--font-strong);
+  min-height: 40px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .food-meta .chef {
@@ -160,7 +172,7 @@
 }
 
 .view-btn {
-  margin-top: 8px;
+  margin-top: auto;
   border: none;
   border-radius: 10px;
   padding: 6px 10px;
@@ -168,4 +180,6 @@
   color: #fff;
   font-size: 12px;
   font-weight: 600;
+  min-height: 34px;
+  width: 100%;
 }

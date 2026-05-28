@@ -8,6 +8,7 @@ import { UiFeedbackService } from '../../services/ui-feedback.service';
 import { LoadingService } from '../../services/loading.service';
 import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
 import { PaymentSuccessSheetComponent } from '../payment-success-sheet/payment-success-sheet.component';
+import { CartComponent } from '../cart/cart.component';
 import { CartService } from 'src/app/services/cart.service';
 import { Router } from '@angular/router';
 import { GiftRecipientSuggestion, UserService } from 'src/app/services/user.service';
@@ -330,6 +331,13 @@ export class OrderModalComponent implements OnInit {
 
   async goToCart(): Promise<void> {
     await this.modalCtrl.dismiss();
-    this.router.navigate(['/components/cart']);
+    const modal = await this.modalCtrl.create({
+      component: CartComponent,
+      cssClass: 'suga-cart-sheet',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.72, 0.92, 1]
+    });
+    await modal.present();
   }
 }

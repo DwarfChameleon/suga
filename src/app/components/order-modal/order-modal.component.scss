@@ -52,7 +52,8 @@
     }
     .primary-order-btn,
     .cart-link-btn,
-    .subtle-action-btn{
+    .subtle-action-btn,
+    .view-cart-btn{
       width: 100%;
       box-shadow: none;
     }
@@ -120,6 +121,24 @@
       border: none;
       background: transparent;
       box-shadow: none;
+    }
+    .view-cart-btn{
+      --background: var(--suga-input-bg);
+      --background-hover: var(--suga-input-bg);
+      --background-activated: var(--suga-input-bg);
+      --border-radius: 14px;
+      --box-shadow: none;
+      --color: var(--ion-color-primary-food);
+      --padding-top: 0;
+      --padding-bottom: 0;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .view-cart-btn::part(native){
+      min-height: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 112, 67, 0.2);
     }
     .cart-summary{
       margin-top: 10px;
