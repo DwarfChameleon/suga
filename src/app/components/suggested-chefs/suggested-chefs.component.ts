@@ -1,18 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { UserService } from 'src/app/services/user.service';
+import { FollowChangeEvent, UserService } from 'src/app/services/user.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { environment } from 'src/environments/environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-suggested-chefs',
   templateUrl: './suggested-chefs.component.html',
   styleUrls: ['./suggested-chefs.component.scss']
 })
-export class SuggestedChefsComponent implements OnInit {
+export class SuggestedChefsComponent implements OnInit, OnDestroy {
   chefs: Array<{ _id: string; username: string; profilePicture: string; dishCount: number; followersCount: number }> = [];
   dontShowAgain = false;
   followedChefIds = new Set<string>();
+  private followSub?: Subscription;
 
   constructor(
     private modalController: ModalController,
@@ -21,6 +23,11 @@ export class SuggestedChefsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.followSub = this.userService.followChanged$.subscribe((change) => {
+      if (change?.chefId) {
+        this.applyFollowChange(change);
+      }
+    });
     this.userService.getFollowingChefIds().subscribe(
       data => {
         this.followedChefIds = new Set(data.followingChefs || []);
@@ -31,6 +38,10 @@ export class SuggestedChefsComponent implements OnInit {
         this.loadChefs();
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    this.followSub?.unsubscribe();
   }
 
   private loadChefs(): void {
@@ -82,6 +93,7 @@ export class SuggestedChefsComponent implements OnInit {
         } else {
           this.followedChefIds.delete(chefId);
         }
+        this.applyFollowChange({ chefId, ...res });
       },
       (error) => {
         this.uiFeedback.error(error?.error?.message || 'Unable to update follow.');
@@ -91,5 +103,28 @@ export class SuggestedChefsComponent implements OnInit {
 
   isFollowing(chefId: string): boolean {
     return this.followedChefIds.has(chefId);
+  }
+
+  private applyFollowChange(change: FollowChangeEvent): void {
+    const chefId = String(change.chefId || '');
+    if (!chefId || change.pending) return;
+    if (change.following) {
+      this.followedChefIds.add(chefId);
+    } else {
+      this.followedChefIds.delete(chefId);
+    }
+    if (Array.isArray(change.followingChefs)) {
+      this.followedChefIds = new Set(change.followingChefs.map((id) => String(id)));
+    }
+    this.chefs = this.chefs.map((chef) =>
+      String(chef._id) === chefId
+        ? {
+            ...chef,
+            followersCount: Number.isFinite(Number(change.followersCount))
+              ? Number(change.followersCount)
+              : Math.max(0, Number(chef.followersCount || 0) + (change.following ? 1 : -1))
+          }
+        : chef
+    );
   }
 }
