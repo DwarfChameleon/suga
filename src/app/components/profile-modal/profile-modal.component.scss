@@ -5,17 +5,23 @@
 
 .profile-content {
   --background: transparent;
+  --overflow: hidden;
   height: 100%;
 }
 
 .profile-sheet {
   min-height: 100%;
-  height: auto;
-  padding: 10px 14px calc(18px + var(--suga-safe-bottom));
+  height: 100%;
+  padding: 10px 14px 0;
   background: var(--suga-surface);
   color: var(--ion-text-color);
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+.profile-end-spacer {
+  min-height: calc(88px + var(--suga-safe-bottom));
+  width: 100%;
 }
 
 .drag-handle {

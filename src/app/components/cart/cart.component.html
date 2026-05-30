@@ -1,7 +1,9 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <app-back-button></app-back-button>
+      <ion-button fill="clear" (click)="goBack()" aria-label="Back">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title>Your Cart</ion-title>
   </ion-toolbar>
@@ -10,8 +12,9 @@
 <ion-content>
   <div class="cart-page">
     <div class="empty-state" *ngIf="!items.length">
+      <ion-icon class="empty-cart-icon" name="cart-outline"></ion-icon>
       <p>Your cart is empty.</p>
-      <ion-button routerLink="/components/explore">Browse Dishes</ion-button>
+      <ion-button class="browse-btn" fill="clear" (click)="browseDishes()">Browse Dishes</ion-button>
     </div>
 
     <div *ngIf="items.length">

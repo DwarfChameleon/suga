@@ -1,24 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { CartItem, CartService } from 'src/app/services/cart.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { BulkOrderResponse, OrderService } from 'src/app/services/order.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
 import { PaymentSuccessSheetComponent } from '../payment-success-sheet/payment-success-sheet.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   items: CartItem[] = [];
   subtotal = 0;
   feeAmount = 0;
   totalAmount = 0;
   isSubmitting = false;
+  private cartSub?: Subscription;
 
   constructor(
     private readonly cartService: CartService,
@@ -26,12 +29,17 @@ export class CartComponent implements OnInit {
     private readonly modalCtrl: ModalController,
     private readonly loadingService: LoadingService,
     private readonly uiFeedback: UiFeedbackService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly location: Location
   ) {}
 
   ngOnInit(): void {
     this.refresh();
-    this.cartService.cart$.subscribe(() => this.refresh());
+    this.cartSub = this.cartService.cart$.subscribe(() => this.refresh());
+  }
+
+  ngOnDestroy(): void {
+    this.cartSub?.unsubscribe();
   }
 
   increase(item: CartItem): void {
@@ -64,6 +72,24 @@ export class CartComponent implements OnInit {
   clearCart(): void {
     this.cartService.clear();
     this.uiFeedback.success('Cart cleared.');
+  }
+
+  async goBack(): Promise<void> {
+    const top = await this.modalCtrl.getTop();
+    if (top) {
+      await this.modalCtrl.dismiss();
+      return;
+    }
+    this.location.back();
+  }
+
+  async browseDishes(): Promise<void> {
+    try {
+      const top = await this.modalCtrl.getTop();
+      if (top) await this.modalCtrl.dismiss();
+    } catch {}
+    await this.router.navigateByUrl('/components/explore', { replaceUrl: true });
+    setTimeout(() => window.location.reload(), 80);
   }
 
   async checkout(): Promise<void> {

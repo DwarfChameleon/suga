@@ -1,3 +1,12 @@
+.cart-page ion-toolbar,
+:host ion-toolbar {
+  --min-height: 44px;
+}
+
+:host ion-title {
+  font-size: 16px;
+}
+
 .cart-page {
   padding: 16px;
 }
@@ -15,7 +24,29 @@
 
 .empty-state {
   text-align: center;
-  padding: 24px 8px;
+  padding: 42px 8px 24px;
+}
+
+.empty-cart-icon {
+  font-size: 76px;
+  color: #9ca3af;
+  opacity: 0.78;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  margin: 0 0 10px;
+  color: var(--suga-muted);
+}
+
+.browse-btn {
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: transparent;
+  --box-shadow: none;
+  --border-color: transparent;
+  --color: var(--ion-color-primary-food);
+  font-weight: 700;
 }
 
 .cart-item {
