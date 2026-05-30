@@ -37,7 +37,18 @@
       </div>
 
       <ion-button (click)="openOrderModal(food)" class="primary-order-btn">Place order</ion-button>
-      <ion-button fill="clear" (click)="addCurrentFoodToCart()" class="cart-link-btn">Add to cart</ion-button>
+      <ion-button fill="clear" (click)="addCurrentFoodToCart()" class="cart-link-btn">
+        <ion-icon slot="start" name="cart-outline"></ion-icon>
+        Add to cart
+      </ion-button>
+
+      <div class="cart-summary" *ngIf="cartCount > 0">
+        <p>{{ cartCount }} item(s) in cart &middot; {{ cartSubtotal | money:undefined:'1.0-0' }}</p>
+        <ion-button class="view-cart-btn" expand="block" (click)="goToCart()">
+          <ion-icon slot="start" name="cart-outline"></ion-icon>
+          View Cart
+        </ion-button>
+      </div>
 
       <app-ad-slot placement="foodProfileModal" label="Featured"></app-ad-slot>
     </div>

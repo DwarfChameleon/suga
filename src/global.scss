@@ -366,11 +366,22 @@ ion-modal.login-modal-class::part(content) {
 }
 
 ion-modal.suga-profile-sheet::part(content) {
-  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 100px);
-  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 100px);
-  margin-top: calc(var(--suga-safe-top) + 50px);
-  margin-bottom: calc(var(--suga-safe-bottom) + 50px);
-  border-radius: 26px;
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 52px);
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 52px);
+  margin-top: calc(var(--suga-safe-top) + 26px);
+  margin-bottom: calc(var(--suga-safe-bottom) + 12px);
+  border-radius: 26px 26px 0 0;
+  overflow: hidden;
+}
+
+ion-modal.suga-food-profile-sheet::part(content),
+ion-modal.suga-cart-sheet::part(content) {
+  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 28px);
+  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 28px);
+  margin-top: calc(var(--suga-safe-top) + 14px);
+  margin-bottom: calc(var(--suga-safe-bottom) + 6px);
+  border-radius: 26px 26px 0 0;
+  overflow: hidden;
 }
 
 body.suga-dark-theme input,

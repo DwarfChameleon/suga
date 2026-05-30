@@ -115,7 +115,11 @@ export class CategoryModalComponent implements OnInit {
 
     const foodProfileModal = await this.modalController.create({
       component: FoodProfileComponent,
-      componentProps: { foodId }
+      componentProps: { foodId },
+      cssClass: 'suga-food-profile-sheet',
+      handle: true,
+      initialBreakpoint: 0.9,
+      breakpoints: [0, 0.58, 0.9, 1]
     });
 
     await this.modalController.dismiss();

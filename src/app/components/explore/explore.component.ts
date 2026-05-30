@@ -210,7 +210,11 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.fetchFood(foodId);
     const modal = await this.modalController.create({
       component: FoodProfileComponent,
-      componentProps: { foodId }
+      componentProps: { foodId },
+      cssClass: 'suga-food-profile-sheet',
+      handle: true,
+      initialBreakpoint: 0.9,
+      breakpoints: [0, 0.58, 0.9, 1]
     });
     await modal.present();
   }
@@ -222,8 +226,8 @@ getBackgroundImageStyle(imageUrl:string): any{
       componentProps: { username },
       cssClass: 'suga-profile-sheet',
       handle: true,
-      initialBreakpoint: 0.76,
-      breakpoints: [0, 0.76, 0.94]
+      initialBreakpoint: 0.82,
+      breakpoints: [0, 0.58, 0.82, 0.96]
     });
     await modal.present();
   }

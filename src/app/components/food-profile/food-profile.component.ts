@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FoodService } from 'src/app/services/food.service';
 import { OrderModalComponent } from '../order-modal/order-modal.component';
 import { Food } from 'src/app/interface/food';
@@ -10,6 +10,8 @@ import { environment } from 'src/environments/environment';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { CartService } from 'src/app/services/cart.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
+import { CartComponent } from '../cart/cart.component';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -17,13 +19,16 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
   templateUrl: './food-profile.component.html',
   styleUrls: ['./food-profile.component.scss']
 })
-export class FoodProfileComponent {
+export class FoodProfileComponent implements OnInit, OnDestroy {
   @Input() foodId!: string;
   food: any;
   chefFoods: Food[] = [];
   similarFoodsByRegion: Food[] = [];
   chefName:any;
   count: number | undefined;
+  cartCount = 0;
+  cartSubtotal = 0;
+  private cartSub?: Subscription;
  
   
   constructor(
@@ -38,6 +43,12 @@ export class FoodProfileComponent {
 
   ngOnInit(): void {
     this.loadFood();
+    this.refreshCartState();
+    this.cartSub = this.cartService.cart$.subscribe(() => this.refreshCartState());
+  }
+
+  ngOnDestroy(): void {
+    this.cartSub?.unsubscribe();
   }
 
   countOrder(): void{
@@ -67,7 +78,11 @@ export class FoodProfileComponent {
       try { await this.modalController.dismiss(); } catch (e) {}
       const modal = await this.modalController.create({
         component: FoodProfileComponent,
-        componentProps: { foodId }
+        componentProps: { foodId },
+        cssClass: 'suga-food-profile-sheet',
+        handle: true,
+        initialBreakpoint: 0.9,
+        breakpoints: [0, 0.58, 0.9, 1]
       });
       await modal.present();
     }
@@ -200,6 +215,24 @@ async openOrderModal(food: Food) {
       category: this.food.category
     });
     this.uiFeedback.success('Added to cart.');
+    this.refreshCartState();
+  }
+
+  async goToCart(): Promise<void> {
+    await this.modalController.dismiss();
+    const modal = await this.modalController.create({
+      component: CartComponent,
+      cssClass: 'suga-cart-sheet',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.72, 0.92, 1]
+    });
+    await modal.present();
+  }
+
+  private refreshCartState(): void {
+    this.cartCount = this.cartService.getItemCount();
+    this.cartSubtotal = this.cartService.getSubtotal();
   }
 
   private loadRecommendations(): void {
