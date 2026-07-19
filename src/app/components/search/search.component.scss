@@ -44,6 +44,25 @@
   margin: 18px 0 8px;
 }
 
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-head .section-title {
+  margin-bottom: 8px;
+}
+
+.text-btn {
+  border: none;
+  background: transparent;
+  color: var(--ion-color-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .chips {
   display: flex;
   gap: 8px;
@@ -74,6 +93,48 @@
   border-radius: 14px;
   padding: 10px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+.chef-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 10px;
+}
+
+.chef-chip {
+  min-height: 118px;
+  border: 1px solid var(--suga-border);
+  background: var(--suga-surface);
+  color: var(--ion-color-primary-text);
+  border-radius: 12px;
+  padding: 10px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.chef-chip img {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--suga-surface-muted);
+}
+
+.chef-chip span {
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chef-chip small {
+  color: var(--suga-muted);
+  font-size: 11px;
 }
 
 .card-title {

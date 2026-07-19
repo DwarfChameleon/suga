@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Chefs</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="refresh()" aria-label="Refresh chefs">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="chef-directory-page">
+    <div class="search-box">
+      <ion-icon name="search-outline"></ion-icon>
+      <input [(ngModel)]="query" placeholder="Search chefs by username" />
+    </div>
+
+    <div *ngIf="loading" class="state">Loading chefs...</div>
+    <div *ngIf="!loading && errorMessage" class="state error">{{ errorMessage }}</div>
+    <div *ngIf="!loading && !errorMessage && filteredChefs.length === 0" class="state">No chefs found.</div>
+
+    <div class="chef-list" *ngIf="!loading && filteredChefs.length > 0">
+      <button type="button" class="chef-row" *ngFor="let chef of filteredChefs" (click)="openChefProfile(chef.username)">
+        <img [src]="getChefImage(chef.profilePicture)" [alt]="chef.username" />
+        <div class="chef-info">
+          <div class="chef-name">@{{ chef.username }}</div>
+          <div class="chef-meta">{{ chef.dishCount || 0 }} dishes · {{ chef.followersCount || 0 }} followers</div>
+        </div>
+        <button
+          *ngIf="canFollowChefs"
+          type="button"
+          class="follow-btn"
+          [class.is-following]="isFollowing(chef._id)"
+          (click)="toggleFollow(chef, $event)"
+        >
+          <ion-icon [name]="isFollowing(chef._id) ? 'checkmark-circle-outline' : 'add-circle-outline'"></ion-icon>
+          <span>{{ isFollowing(chef._id) ? 'Unfollow' : 'Follow' }}</span>
+        </button>
+      </button>
+    </div>
+  </div>
+</ion-content>

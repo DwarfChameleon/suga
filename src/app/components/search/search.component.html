@@ -20,6 +20,23 @@
       </div>
     </div>
 
+    <div class="result-section">
+      <div class="section-head">
+        <div class="section-title">Chefs</div>
+        <button type="button" class="text-btn" (click)="openChefDirectory()">View all</button>
+      </div>
+      <div *ngIf="chefsLoading" class="state">Loading chefs...</div>
+      <div *ngIf="!chefsLoading && chefsError" class="empty">{{ chefsError }}</div>
+      <div *ngIf="!chefsLoading && !chefsError && visibleChefs.length === 0" class="empty">No chefs found.</div>
+      <div class="chef-strip" *ngIf="!chefsLoading && visibleChefs.length > 0">
+        <button type="button" class="chef-chip" *ngFor="let chef of visibleChefs" (click)="openUser(chef.username)">
+          <img [src]="getChefImage(chef.profilePicture)" [alt]="chef.username" />
+          <span>@{{ chef.username }}</span>
+          <small>{{ chef.dishCount || 0 }} dishes</small>
+        </button>
+      </div>
+    </div>
+
     <div *ngIf="loading" class="state">Searching...</div>
 
     <ng-container *ngIf="results">

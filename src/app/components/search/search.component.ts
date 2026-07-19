@@ -5,6 +5,8 @@ import { ModalController } from '@ionic/angular';
 import { FoodProfileComponent } from '../food-profile/food-profile.component';
 import { ProfileModalComponent } from '../profile-modal/profile-modal.component';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { UserService } from 'src/app/services/user.service';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 interface QuickLink {
   label: string;
@@ -21,9 +23,13 @@ export class SearchComponent implements OnInit {
   query = '';
   loading = false;
   results: SearchResults | null = null;
+  chefs: Array<{ _id: string; username: string; profilePicture: string; dishCount: number; followersCount: number; score: number }> = [];
+  chefsLoading = false;
+  chefsError = '';
 
   quickLinks: QuickLink[] = [
     { label: 'Explore', route: '/components/explore', keywords: ['explore', 'home', 'foods'] },
+    { label: 'Chefs', route: '/components/chefs', keywords: ['chef', 'chefs', 'kitchen', 'follow'] },
     { label: 'Food Story', route: '/components/story', keywords: ['story', 'video', 'posts'] },
     { label: 'Notifications', route: '/components/notifications', keywords: ['notification', 'alert'] },
     { label: 'My Account', route: '/components/account', keywords: ['account', 'profile', 'me', 'dashboard'] },
@@ -35,10 +41,12 @@ export class SearchComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private modalController: ModalController,
-    private tokenStorage: TokenStorageService
+    private tokenStorage: TokenStorageService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
+    this.loadChefs();
     const q = this.route.snapshot.queryParamMap.get('q');
     if (q) {
       this.query = q;
@@ -71,6 +79,17 @@ export class SearchComponent implements OnInit {
       return;
     }
     this.router.navigate([route]);
+  }
+
+  get visibleChefs(): Array<{ _id: string; username: string; profilePicture: string; dishCount: number; followersCount: number; score: number }> {
+    const q = this.query.trim().toLowerCase();
+    const sorted = [...this.chefs].sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
+    if (!q) return sorted.slice(0, 8);
+    return sorted.filter((chef) => String(chef.username || '').toLowerCase().includes(q)).slice(0, 8);
+  }
+
+  getChefImage(profilePicture: string): string {
+    return resolveUploadUrl(profilePicture, '/assets/img/regpage.jpeg');
   }
 
   filteredQuickLinks(): QuickLink[] {
@@ -107,6 +126,10 @@ export class SearchComponent implements OnInit {
     await modal.present();
   }
 
+  openChefDirectory(): void {
+    this.router.navigate(['/components/chefs']);
+  }
+
   openVideo(videoId: string): void {
     if (!videoId) return;
     this.router.navigate(['/components/story'], { queryParams: { videoId } });
@@ -122,5 +145,21 @@ export class SearchComponent implements OnInit {
     if (roles.includes('dispatch')) return '/components/dispatch';
     if (roles.includes('consumer')) return '/components/consumer';
     return '/components/explore';
+  }
+
+  private loadChefs(): void {
+    this.chefsLoading = true;
+    this.chefsError = '';
+    this.userService.getChefSummaries().subscribe({
+      next: (chefs) => {
+        this.chefs = Array.isArray(chefs) ? chefs : [];
+        this.chefsLoading = false;
+      },
+      error: () => {
+        this.chefs = [];
+        this.chefsLoading = false;
+        this.chefsError = 'Chef list unavailable.';
+      }
+    });
   }
 }

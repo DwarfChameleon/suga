@@ -307,6 +307,10 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.route.navigate(['/components/search']);
   }
 
+  openChefDirectory(): void {
+    this.route.navigate(['/components/chefs']);
+  }
+
   loadUserPreferences(): void {
     if (!this.tokenStorage.getAccessToken()) return;
     this.userService.getUserPreferences().subscribe(

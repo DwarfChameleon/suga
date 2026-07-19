@@ -50,11 +50,13 @@ import { LiveOrderMapComponent } from './components/live-order-map/live-order-ma
 import { OrderRatingComponent } from './components/order-rating/order-rating.component';
 import { DispatchProfileComponent } from './components/dispatch-profile/dispatch-profile.component';
 import { AdSlotComponent } from './components/ad-slot/ad-slot.component';
+import { ChefDirectoryComponent } from './components/chef-directory/chef-directory.component';
 import { MoneyPipe } from './pipes/money.pipe';
 import { ConvertedMoneyPipe } from './pipes/converted-money.pipe';
 import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './services/global-error-handler';
 import { ErrorLoggingInterceptor } from './services/error-logging.interceptor';
+import { FallbackServerInterceptor } from './services/fallback-server.interceptor';
 import { AddressDataService } from './services/address-data.service';
 import { AdConfigService } from './services/ad-config.service';
 
@@ -67,7 +69,7 @@ export function preloadAdConfig(adConfigService: AdConfigService): () => Promise
 }
 
 @NgModule({
-  declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, PaymentSuccessSheetComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
+  declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,ChefDirectoryComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, PaymentSuccessSheetComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
   imports: [BrowserModule, HttpClientModule, FormsModule, IonicModule.forRoot(), LoginPageModule, AppRoutingModule, ReactiveFormsModule],
 
   providers: [
@@ -85,6 +87,7 @@ export function preloadAdConfig(adConfigService: AdConfigService): () => Promise
       deps: [AdConfigService],
       multi: true
     },
+    { provide: HTTP_INTERCEPTORS, useClass: FallbackServerInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorLoggingInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },

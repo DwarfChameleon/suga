@@ -1,0 +1,130 @@
+.chef-directory-page {
+  min-height: 100%;
+  padding: 14px;
+  background: var(--ion-background-color);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: var(--suga-input-bg);
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  color: var(--ion-color-primary-text);
+}
+
+.search-box ion-icon {
+  color: var(--ion-color-primary);
+  font-size: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ion-color-primary-text);
+  font-size: 14px;
+}
+
+.state {
+  margin-top: 18px;
+  color: var(--suga-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.state.error {
+  color: #ef4444;
+}
+
+.chef-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.chef-row {
+  width: 100%;
+  min-height: 76px;
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--suga-surface);
+  color: var(--ion-color-primary-text);
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.chef-row img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--suga-surface-muted);
+}
+
+.chef-info {
+  min-width: 0;
+}
+
+.chef-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chef-meta {
+  margin-top: 4px;
+  color: var(--suga-muted);
+  font-size: 12px;
+}
+
+.follow-btn {
+  min-width: 94px;
+  min-height: 38px;
+  border: none;
+  border-radius: 10px;
+  padding: 0 10px;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.follow-btn.is-following {
+  background: var(--suga-surface-muted);
+  color: var(--suga-muted);
+}
+
+.follow-btn ion-icon {
+  font-size: 16px;
+}
+
+@media (max-width: 420px) {
+  .chef-row {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .chef-row img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .follow-btn {
+    grid-column: 2;
+    justify-self: start;
+    min-width: 104px;
+  }
+}

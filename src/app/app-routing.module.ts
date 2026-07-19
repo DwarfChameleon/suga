@@ -29,6 +29,7 @@ import { DispatchRegistrationComponent } from './dispatch-registration/dispatch-
 import { DispatchComponent } from './components/dispatch/dispatch.component';
 import { LogsComponent } from './components/logs/logs.component';
 import { DispatchProfileComponent } from './components/dispatch-profile/dispatch-profile.component';
+import { ChefDirectoryComponent } from './components/chef-directory/chef-directory.component';
 const routes: Routes = [
   {
     path: '',
@@ -141,6 +142,10 @@ const routes: Routes = [
   {
     path: 'components/search',
     component: SearchComponent
+  },
+  {
+    path: 'components/chefs',
+    component: ChefDirectoryComponent
   },
   {
     path: 'components/wallet',

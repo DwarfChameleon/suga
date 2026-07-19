@@ -1,8 +1,6 @@
 <ion-app>
   <div class="boot-loader" *ngIf="isBooting">
-    <div class="boot-brand">SUGA</div>
-    <div class="boot-line"><span></span></div>
-    <div class="boot-copy">Opening your kitchen feed...</div>
+    <img class="boot-logo" src="assets/bitebuzz.png" alt="Suga" />
   </div>
   <div class="network-banner" *ngIf="!isInternetOnline">
     <ion-icon name="wifi-outline"></ion-icon>
@@ -30,6 +28,7 @@
            
           <a (click)="closeMenu()" [routerLink]="'/components/explore'" class="menuLink"><div class="menuIcons"><ion-icon name="home"></ion-icon> <span class="menuLabel"> Explore</span></div></a>
           <a (click)="closeMenu()" [routerLink]="'/components/search'" class="menuLink"><div class="menuIcons"><ion-icon name="search-outline"></ion-icon> <span class="menuLabel"> Search</span></div></a>
+          <a (click)="closeMenu()" [routerLink]="'/components/chefs'" class="menuLink"><div class="menuIcons"><ion-icon name="restaurant-outline"></ion-icon> <span class="menuLabel"> Chefs</span></div></a>
           <a (click)="closeMenu()" [routerLink]="'/components/story'" class="menuLink"><div class="menuIcons"><ion-icon name="play-circle-outline"></ion-icon><span class="menuLabel"> Food Story</span></div></a>
           <a *ngIf="isLoggedIn && isConsumer()" (click)="closeMenu()" [routerLink]="'/components/cart'" class="menuLink">
             <div class="menuIcons"><ion-icon name="cart-outline"></ion-icon><span class="menuLabel"> Cart</span></div>
@@ -69,3 +68,4 @@
     <ion-router-outlet id="main-content"></ion-router-outlet>
   </ion-split-pane>
 </ion-app>
+
