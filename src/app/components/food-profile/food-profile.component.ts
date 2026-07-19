@@ -6,12 +6,12 @@ import { UserService } from '../../services/user.service';
 import { UserDetails } from '../../interface/user-details';
 import { OrderService } from 'src/app/services/order.service';
 import { ModalController } from '@ionic/angular';
-import { environment } from 'src/environments/environment';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { CartService } from 'src/app/services/cart.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { CartComponent } from '../cart/cart.component';
 import { Subscription } from 'rxjs';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 
 @Component({
@@ -190,10 +190,7 @@ async openOrderModal(food: Food) {
 
 
   getImageUrl(image: string): string {
-    if (!image) {
-      return ''; // Handle case where image is not provided
-    }
-    return `${environment.uploadUrl}/${image}`;
+    return resolveUploadUrl(image);
   }
 
   addCurrentFoodToCart(): void {

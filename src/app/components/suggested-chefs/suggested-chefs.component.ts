@@ -65,6 +65,7 @@ export class SuggestedChefsComponent implements OnInit, OnDestroy {
   getChefImage(profilePicture: string): string {
     const cleaned = profilePicture ? profilePicture.replace(/\\/g, '/') : '';
     if (!cleaned) return '/assets/img/regpage.jpeg';
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
     if (cleaned.startsWith('uploads/')) {
       return `${environment.baseUrl}/${cleaned}`;
     }

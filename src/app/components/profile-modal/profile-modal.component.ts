@@ -4,6 +4,7 @@ import { Food } from 'src/app/interface/food';
 import { FoodService } from 'src/app/services/food.service';
 import { ModalController } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoginModalComponent } from 'src/app/login-modal/login-modal.component';
@@ -188,6 +189,7 @@ export class ProfileModalComponent implements OnInit {
 
   getImageUrl(imageName: string): string {
     const cleaned = imageName ? imageName.replace(/\\/g, '/') : '';
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
     if (!cleaned) {
       return '/assets/img/regpage.jpeg';
     }
@@ -206,9 +208,7 @@ export class ProfileModalComponent implements OnInit {
   getFoodImageUrl(imageName: string): string {
     const cleaned = imageName ? imageName.replace(/\\/g, '/') : '';
     if (!cleaned) return '/assets/img/regpage.jpeg';
-    if (cleaned.startsWith('uploads/')) return `${environment.baseUrl}/${cleaned}`;
-    if (cleaned.includes('/')) return `${environment.baseUrl}/${cleaned}`;
-    return `${environment.uploadUrl}/${cleaned}`;
+    return resolveUploadUrl(cleaned, '/assets/img/regpage.jpeg');
   }
 
   getStoryUrl(path: string): string {

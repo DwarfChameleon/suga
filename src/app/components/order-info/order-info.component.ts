@@ -4,7 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import * as QRCode from 'qrcode';
 import { FoodService } from 'src/app/services/food.service';
-import { environment } from 'src/environments/environment';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 import { DispatchService } from 'src/app/services/dispatch.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { NotificationSocketService } from 'src/app/services/notification-socket.service';
@@ -173,7 +173,7 @@ export class OrderInfoComponent  implements OnInit, OnDestroy {
       next: (food) => {
         const image = String(food?.image || '').trim();
         if (!image) return;
-        this.foodImageUrl = `${environment.uploadUrl}/${image}`;
+        this.foodImageUrl = resolveUploadUrl(image);
       },
       error: () => {}
     });

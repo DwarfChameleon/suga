@@ -13,6 +13,7 @@ import { OrderInfoComponent } from '../order-info/order-info.component';
 import { ActionSheetController, AlertController, ModalController, AlertInput } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 import { NetworkService } from 'src/app/services/network.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { ProfileModalComponent } from '../profile-modal/profile-modal.component';
@@ -389,7 +390,7 @@ export class ChefComponent implements OnInit, OnDestroy {
       (foods: Food[]) => {
         if (foods.length === 0) {
           this.chefFoods = [];
-          this.errorMessage = 'You have not added any foods yet<br>';
+          this.errorMessage = 'You have not added any foods yet';
           this.promptMessage = 'Add a new dish.';
         } else {
           this.chefFoods = foods;
@@ -476,7 +477,7 @@ export class ChefComponent implements OnInit, OnDestroy {
   }
 
   getImageUrl(imageName: string): string {
-    return `${environment.uploadUrl}/${imageName}`;
+    return resolveUploadUrl(imageName, '/assets/img/regpage.jpeg');
   }
 
   private normalizePath(value?: string): string {
@@ -485,6 +486,7 @@ export class ChefComponent implements OnInit, OnDestroy {
 
   getProfileImage(profilePicture?: string): string {
     const cleaned = this.normalizePath(profilePicture);
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
     if (!cleaned) return `/assets/img/regpage.jpeg`;
     if (cleaned.startsWith('uploads/')) {
       return `${environment.baseUrl}/${cleaned}`;
@@ -500,6 +502,7 @@ export class ChefComponent implements OnInit, OnDestroy {
 
   getCoverImage(coverPicture?: string, profilePicture?: string): string {
     const cleaned = this.normalizePath(coverPicture);
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
     if (!cleaned) {
       return this.getProfileImage(profilePicture);
     }
@@ -796,6 +799,7 @@ export class ChefComponent implements OnInit, OnDestroy {
 
   getFollowerImage(profilePicture: string): string {
     const cleaned = this.normalizePath(profilePicture);
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
     if (!cleaned) return `/assets/img/regpage.jpeg`;
     if (cleaned.startsWith('uploads/')) {
       return `${environment.baseUrl}/${cleaned}`;

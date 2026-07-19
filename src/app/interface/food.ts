@@ -17,6 +17,8 @@ export interface Food {
   category: string;
   availability: string;
   image: string;
+  imageProvider?: string;
+  imagePublicId?: string;
   createdBy: string; // Assuming createdBy is stored as the chef's ID
   createdAt: Date;
   updatedAt: Date;

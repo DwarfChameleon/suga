@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FoodService, FoodCategory } from 'src/app/services/food.service';
 import { Food } from 'src/app/interface/food';
-import { environment } from 'src/environments/environment';
 import { FoodProfileComponent } from '../food-profile/food-profile.component';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 @Component({
   selector: 'app-category-modal',
@@ -90,15 +90,14 @@ export class CategoryModalComponent implements OnInit {
   }
 
   getImageUrl(image: string): string {
-    return `${environment.uploadUrl}/${image}`;
+    return resolveUploadUrl(image, '/assets/img/regpage.jpeg');
   }
 
   getCategoryProfileImageUrl(image: string): string {
     const normalized = String(image || '').trim().replace(/\\/g, '/').replace(/^\.\//, '').replace(/^\/+/, '');
     if (!normalized || this.brokenProfileImages.has(normalized)) return '/assets/img/regpage.jpeg';
     if (normalized.startsWith('/assets/')) return normalized;
-    if (normalized.startsWith('http://') || normalized.startsWith('https://')) return normalized;
-    return `${environment.uploadUrl}/${normalized}`;
+    return resolveUploadUrl(normalized, '/assets/img/regpage.jpeg');
   }
 
   onProfileImageError(image: string): void {

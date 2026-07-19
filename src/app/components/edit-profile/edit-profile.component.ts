@@ -523,6 +523,9 @@ export class EditProfileComponent implements OnInit {
     if (uploadsIndex >= 0) {
       cleaned = cleaned.slice(uploadsIndex);
     }
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+      return cleaned;
+    }
     if (cleaned.startsWith('uploads/')) {
       return `${environment.baseUrl}/${cleaned}`;
     }

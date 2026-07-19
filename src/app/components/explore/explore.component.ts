@@ -19,6 +19,7 @@ import { FoodCategory } from 'src/app/services/food.service';
 import { LikeEffectsService } from 'src/app/services/like-effects.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { HttpClient } from '@angular/common/http';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 interface StoryVideoItem {
   _id: string;
@@ -625,7 +626,7 @@ getBackgroundImageStyle(imageUrl:string): any{
     if (!normalized || this.brokenFoodImages.has(normalized)) {
       return '/assets/img/regpage.jpeg';
     }
-    return `${environment.uploadUrl}/${normalized}`;
+    return resolveUploadUrl(normalized, '/assets/img/regpage.jpeg');
   }
 
   getStoryVideoUrl(path: string): string {
@@ -640,6 +641,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   getChefImage(profilePicture: string): string {
     const cleaned = profilePicture ? profilePicture.replace(/\\/g, '/') : '';
     if (!cleaned) return `/assets/img/regpage.jpeg`;
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
     if (cleaned.startsWith('uploads/')) {
       return `${environment.baseUrl}/${cleaned}`;
     }
@@ -655,7 +657,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   getCategoryImage(image?: string): string {
     const normalized = this.normalizeMediaPath(image);
     if (!normalized || this.brokenCategoryImages.has(normalized)) return '/assets/img/regpage.jpeg';
-    return `${environment.uploadUrl}/${normalized}`;
+    return resolveUploadUrl(normalized, '/assets/img/regpage.jpeg');
   }
 
   onCategoryImageError(image?: string): void {

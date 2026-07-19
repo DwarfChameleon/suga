@@ -6,6 +6,8 @@ import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { LoaderService } from 'src/app/services/loader.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { environment } from 'src/environments/environment';
+import { AppLogService } from 'src/app/services/app-log.service';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 interface CategoryFormProfile {
   title: string;
@@ -78,7 +80,8 @@ export class FoodRegistrationComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     public loaderService: LoaderService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private appLog: AppLogService
   ) {}
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('categoryList') categoryList?: ElementRef<HTMLElement>;
@@ -89,7 +92,7 @@ export class FoodRegistrationComponent implements OnInit {
       preparationTime: ['', Validators.required],
       price: ['', Validators.required],
       category: ['', Validators.required],
-      availability: ['', Validators.required],
+      availability: ['Yes', Validators.required],
       image: ['', Validators.required],
       servingSize: [''],
       spiceLevel: [''],
@@ -115,8 +118,7 @@ export class FoodRegistrationComponent implements OnInit {
 
   getCategoryImage(image?: string): string {
     if (!image) return '/assets/img/hambuga.png';
-    if (image.startsWith('http://') || image.startsWith('https://')) return image;
-    return `${environment.uploadUrl}/${image.replace(/^\/+/, '')}`;
+    return resolveUploadUrl(image, '/assets/img/hambuga.png');
   }
 
   goBackToCategoryStep(): void {
@@ -291,6 +293,12 @@ export class FoodRegistrationComponent implements OnInit {
 
     if (this.foodForm.invalid) {
       this.invalidFormMessage = 'Please complete all required fields.';
+      this.appLog.warn('Food registration blocked by invalid form.', {
+        formValue: this.foodForm.value,
+        invalidControls: Object.entries(this.foodForm.controls)
+          .filter(([, control]) => control.invalid)
+          .map(([name, control]) => ({ name, errors: control.errors }))
+      });
       return;
     }
 
@@ -300,6 +308,11 @@ export class FoodRegistrationComponent implements OnInit {
     });
     if (missingDynamic.length > 0) {
       this.invalidFormMessage = 'Please complete required category-specific fields.';
+      this.appLog.warn('Food registration blocked by missing category fields.', {
+        category: this.selectedCategoryName,
+        missingDynamic,
+        formValue: this.foodForm.value
+      });
       return;
     }
 
@@ -333,6 +346,19 @@ export class FoodRegistrationComponent implements OnInit {
     formData.append('additionalDetails', JSON.stringify(additionalDetails));
     formData.append('chefID', user._id);  // Adding chefID
     formData.append('chefUsername', user.username); // Adding chefUsername
+    this.appLog.info('Food registration request started.', {
+      apiUrl: `${environment.apiUrl}/food`,
+      category: this.selectedCategoryName,
+      dishName: this.foodForm.value.dishName,
+      availability: this.foodForm.value.availability,
+      additionalDetails,
+      hasImage: !!this.selectedFile,
+      imageName: this.selectedFile?.name,
+      imageType: this.selectedFile?.type,
+      imageSize: this.selectedFile?.size,
+      userId: user._id,
+      username: user.username
+    });
   
     // Set a timeout to stop the loader after a specified time (e.g., 10 seconds)
     this.loaderTimeout = setTimeout(() => {
@@ -342,12 +368,28 @@ export class FoodRegistrationComponent implements OnInit {
     this.foodService.registerFood(formData).subscribe(
       (response: any) => {
         console.log('Food registered successfully:', response);
+        this.appLog.info('Food registration response succeeded.', {
+          foodId: response?._id,
+          dishName: response?.dishName,
+          category: response?.category,
+          image: response?.image,
+          chef: response?.chef
+        });
         this.stopLoader();
         this.router.navigate(['/components/food-reg-success']);
       },
       (error: any) => {
         console.error('Error registering food:', error);
-        this.errorMessage = 'Error registering food. Please try again.';
+        this.appLog.error('Food registration response failed.', {
+          status: error?.status,
+          statusText: error?.statusText,
+          url: error?.url,
+          backendError: error?.error
+        });
+        this.errorMessage =
+          error?.error?.error ||
+          error?.error?.message ||
+          'Error registering food. Please try again.';
         this.stopLoader();
       }
     );
