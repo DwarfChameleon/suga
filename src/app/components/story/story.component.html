@@ -1,7 +1,10 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <app-back-button class="no-fill-back-button"></app-back-button>
+      <app-back-button *ngIf="!presentedAsModal" class="no-fill-back-button"></app-back-button>
+      <ion-button *ngIf="presentedAsModal" fill="clear" (click)="dismissModal()" aria-label="Close food story">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title>Food Story</ion-title>
   </ion-toolbar>

@@ -14,6 +14,16 @@
 
 /* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
+
+ion-modal.story-sheet-modal {
+  --height: 92%;
+  --border-radius: 22px 22px 0 0;
+  --box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.24);
+}
+
+ion-modal.story-sheet-modal::part(content) {
+  overflow: hidden;
+}
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import '@ionic/angular/css/display.css';

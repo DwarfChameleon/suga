@@ -5,50 +5,36 @@
   inset: 0;
   z-index: 10000;
   display: grid;
-  place-content: center;
-  gap: 18px;
+  place-items: center;
   padding: 28px;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(83, 234, 143, 0.18), transparent 34%),
-    #ffffff;
-  color: #172026;
-  text-align: center;
-}
-
-.boot-brand {
-  font-weight: 900;
-  font-size: 28px;
-  letter-spacing: 10px;
-  color: var(--ion-color-primary-food, #fe2c55);
-}
-
-.boot-line {
-  width: min(72vw, 320px);
-  height: 12px;
-  border-radius: 999px;
   overflow: hidden;
-  background: rgba(15, 23, 42, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  background: #ffffff;
 }
 
-.boot-line span {
-  display: block;
-  width: 42%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #fe2c55, #ffc300, #53ea8f);
-  animation: bootLine 1.05s ease-in-out infinite;
+.boot-logo {
+  width: clamp(112px, 34vw, 178px);
+  height: auto;
+  object-fit: contain;
+  animation: bootPulse 1.15s ease-in-out infinite;
+  transform-origin: center;
 }
 
-.boot-copy {
+.boot-credit {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: calc(34px + env(safe-area-inset-bottom));
+  color: #2d2d2d;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--suga-muted, #64748b);
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  letter-spacing: 0;
 }
 
-@keyframes bootLine {
-  0% { transform: translateX(-110%); }
-  100% { transform: translateX(250%); }
+@keyframes bootPulse {
+  0%, 100% { transform: scale(0.94); }
+  50% { transform: scale(1.08); }
 }
 
 ion-menu ion-content {

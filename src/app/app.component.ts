@@ -13,6 +13,7 @@ import { UiFeedbackService } from './services/ui-feedback.service';
 import { ThemeService } from './services/theme.service';
 import { environment } from 'src/environments/environment';
 import { NativeUiService } from './services/native-ui.service';
+import { StoryComponent } from './components/story/story.component';
 
 @Component({
   selector: 'app-root',
@@ -26,13 +27,13 @@ export class AppComponent implements OnInit, OnDestroy {
     { title: 'Settings', url: '/components/profile-update', icon: 'settings' },
   ];
   userEmail: string | undefined;
-  userName: string| undefined;
+  userName: string | undefined;
   userRoles: string | undefined;
   userRolesList: string[] = [];
-  isLoggedIn: boolean = false;
+  isLoggedIn = false;
   public labels = ['Kitchens', 'Delivery'];
-  myAccountUrl: string|undefined;
-  unreadCount: number = 0;
+  myAccountUrl: string | undefined;
+  unreadCount = 0;
   private notificationsInitialized = false;
   private socketSub?: Subscription;
   private unreadSub?: Subscription;
@@ -44,27 +45,26 @@ export class AppComponent implements OnInit, OnDestroy {
   private suggestedChefsModalOpen = false;
   private suggestedChefsShownForUserId?: string;
   isBooting = true;
+  private bootTimer?: number;
 
   constructor(
     private userService: UserService,
     private router: Router,
-    private tokenStorage: TokenStorageService
-  , private menuController: MenuController
-  , private modalController: ModalController
-  , private toastController: ToastController
-  , private notificationService: NotificationService
-  , private notificationSocket: NotificationSocketService
-  , private networkService: NetworkService
-  , private uiFeedback: UiFeedbackService
-  , private themeService: ThemeService
-  , private nativeUi: NativeUiService
+    private tokenStorage: TokenStorageService,
+    private menuController: MenuController,
+    private modalController: ModalController,
+    private toastController: ToastController,
+    private notificationService: NotificationService,
+    private notificationSocket: NotificationSocketService,
+    private networkService: NetworkService,
+    private uiFeedback: UiFeedbackService,
+    private themeService: ThemeService,
+    private nativeUi: NativeUiService
   ) {}
 
   ngOnInit(): void {
     void this.nativeUi.initialize();
-    window.setTimeout(() => {
-      this.isBooting = false;
-    }, 4500);
+    this.bootTimer = window.setTimeout(() => this.finishBoot(), 2800);
     this.themeService.apply(this.themeService.getSavedTheme());
     this.refreshUserState();
     this.authSub = this.tokenStorage.authState$.subscribe(() => {
@@ -86,8 +86,8 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isInternetOnline = online;
       }
     });
-
   }
+
   async handleAccountClick(): Promise<void> {
     await this.closeMenu();
     this.refreshUserState();
@@ -95,10 +95,10 @@ export class AppComponent implements OnInit, OnDestroy {
     if (!this.isLoggedIn) {
       const modal = await this.modalController.create({
         component: LoginModalComponent,
-              cssClass: 'login-modal-class',
-      handle: true,
-      initialBreakpoint: 1,
-      breakpoints: [0, 0.92, 1],
+        cssClass: 'login-modal-class',
+        handle: true,
+        initialBreakpoint: 1,
+        breakpoints: [0, 0.92, 1],
         backdropDismiss: false
       });
 
@@ -213,7 +213,6 @@ export class AppComponent implements OnInit, OnDestroy {
     await toast.present();
   }
 
-
   logout(): void {
     this.tokenStorage.signOut();
     this.isLoggedIn = false;
@@ -223,11 +222,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.suggestedChefsShownForUserId = undefined;
     this.notificationSocket.disconnect();
     this.notificationService.clear();
-    this.router.navigate(['/login']); // Redirect to login page
+    this.router.navigate(['/login']);
   }
 
-  // Close the side menu when a link is clicked
-  async closeMenu() {
+  async closeMenu(): Promise<void> {
     try {
       await this.menuController.close();
     } catch (err) {
@@ -240,6 +238,19 @@ export class AppComponent implements OnInit, OnDestroy {
     this.refreshUserState();
     if (!this.isLoggedIn) return;
     this.router.navigate(['/components/profile-update']);
+  }
+
+  async openFoodStory(): Promise<void> {
+    await this.closeMenu();
+    const modal = await this.modalController.create({
+      component: StoryComponent,
+      componentProps: { presentedAsModal: true },
+      cssClass: 'story-sheet-modal',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.55, 0.92, 1]
+    });
+    await modal.present();
   }
 
   isAdmin(): boolean {
@@ -256,6 +267,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.internetSub?.unsubscribe();
     this.socketSub?.unsubscribe();
     this.unreadSub?.unsubscribe();
+    if (this.bootTimer) {
+      window.clearTimeout(this.bootTimer);
+    }
   }
 
   isDispatch(): boolean {
@@ -265,5 +279,14 @@ export class AppComponent implements OnInit, OnDestroy {
   async openAdminDashboard(): Promise<void> {
     await this.closeMenu();
     window.location.href = `${environment.baseUrl}/dashboard`;
+  }
+
+  finishBoot(): void {
+    if (!this.isBooting) return;
+    this.isBooting = false;
+    if (this.bootTimer) {
+      window.clearTimeout(this.bootTimer);
+      this.bootTimer = undefined;
+    }
   }
 }

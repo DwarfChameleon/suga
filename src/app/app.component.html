@@ -1,6 +1,10 @@
 <ion-app>
   <div class="boot-loader" *ngIf="isBooting">
     <img class="boot-logo" src="assets/bitebuzz.png" alt="Suga" />
+    <div class="boot-credit">
+      by<br />
+      oneKobo Technologies
+    </div>
   </div>
   <div class="network-banner" *ngIf="!isInternetOnline">
     <ion-icon name="wifi-outline"></ion-icon>
@@ -29,7 +33,7 @@
           <a (click)="closeMenu()" [routerLink]="'/components/explore'" class="menuLink"><div class="menuIcons"><ion-icon name="home"></ion-icon> <span class="menuLabel"> Explore</span></div></a>
           <a (click)="closeMenu()" [routerLink]="'/components/search'" class="menuLink"><div class="menuIcons"><ion-icon name="search-outline"></ion-icon> <span class="menuLabel"> Search</span></div></a>
           <a (click)="closeMenu()" [routerLink]="'/components/chefs'" class="menuLink"><div class="menuIcons"><ion-icon name="restaurant-outline"></ion-icon> <span class="menuLabel"> Chefs</span></div></a>
-          <a (click)="closeMenu()" [routerLink]="'/components/story'" class="menuLink"><div class="menuIcons"><ion-icon name="play-circle-outline"></ion-icon><span class="menuLabel"> Food Story</span></div></a>
+          <a (click)="openFoodStory()" class="menuLink"><div class="menuIcons"><ion-icon name="play-circle-outline"></ion-icon><span class="menuLabel"> Food Story</span></div></a>
           <a *ngIf="isLoggedIn && isConsumer()" (click)="closeMenu()" [routerLink]="'/components/cart'" class="menuLink">
             <div class="menuIcons"><ion-icon name="cart-outline"></ion-icon><span class="menuLabel"> Cart</span></div>
           </a>
@@ -51,9 +55,6 @@
             <div class="menuIcons"><ion-icon name="log-out-outline"></ion-icon><span class="menuLabel"> Logout</span></div>
           </a>
           <a *ngIf="isLoggedIn" (click)="openSettings()" class="menuLink"><div class="menuIcons"><ion-icon name="settings-outline"></ion-icon><span class="menuLabel"> Settings</span></div></a>
-          <a *ngIf="isLoggedIn" (click)="closeMenu()" [routerLink]="'/components/logs'" class="menuLink">
-            <div class="menuIcons"><ion-icon name="bug-outline"></ion-icon><span class="menuLabel"> App Logs</span></div>
-          </a>
    
          
         </div>

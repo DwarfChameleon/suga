@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-back-button defaultHref="/components/explore"></ion-back-button>
     </ion-buttons>
     <ion-title>Chefs</ion-title>
     <ion-buttons slot="end">
@@ -24,7 +24,14 @@
     <div *ngIf="!loading && !errorMessage && filteredChefs.length === 0" class="state">No chefs found.</div>
 
     <div class="chef-list" *ngIf="!loading && filteredChefs.length > 0">
-      <button type="button" class="chef-row" *ngFor="let chef of filteredChefs" (click)="openChefProfile(chef.username)">
+      <div
+        class="chef-row"
+        *ngFor="let chef of filteredChefs"
+        role="button"
+        tabindex="0"
+        (click)="openChefProfile(chef.username)"
+        (keyup.enter)="openChefProfile(chef.username)"
+      >
         <img [src]="getChefImage(chef.profilePicture)" [alt]="chef.username" />
         <div class="chef-info">
           <div class="chef-name">@{{ chef.username }}</div>
@@ -40,7 +47,7 @@
           <ion-icon [name]="isFollowing(chef._id) ? 'checkmark-circle-outline' : 'add-circle-outline'"></ion-icon>
           <span>{{ isFollowing(chef._id) ? 'Unfollow' : 'Follow' }}</span>
         </button>
-      </button>
+      </div>
     </div>
   </div>
 </ion-content>

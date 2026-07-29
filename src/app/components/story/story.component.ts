@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild, ViewChildren, AfterViewInit, QueryList } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, ViewChildren, AfterViewInit, QueryList } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, of } from 'rxjs';
 import { UserDetails } from 'src/app/interface/user-details';
@@ -60,6 +60,7 @@ interface Comment {
   styleUrls: ['./story.component.scss'],
 })
 export class StoryComponent implements OnInit {
+  @Input() presentedAsModal = false;
   @ViewChild('video') video: ElementRef<HTMLVideoElement> | undefined;
   @ViewChildren('videoEl') videoEls!: QueryList<ElementRef<HTMLVideoElement>>;
   private observer?: IntersectionObserver;
@@ -258,6 +259,10 @@ export class StoryComponent implements OnInit {
   }
   cancelComment() {
     this.newComment = '';
+  }
+
+  dismissModal(): void {
+    this.modalController.dismiss();
   }
 
   toggleComments(video: Video): void {
