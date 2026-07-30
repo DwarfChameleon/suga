@@ -9,6 +9,8 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
 import { PaymentSuccessSheetComponent } from '../payment-success-sheet/payment-success-sheet.component';
 import { Subscription } from 'rxjs';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
+import { LoginModalComponent } from 'src/app/login-modal/login-modal.component';
 
 @Component({
   selector: 'app-cart',
@@ -21,7 +23,9 @@ export class CartComponent implements OnInit, OnDestroy {
   feeAmount = 0;
   totalAmount = 0;
   isSubmitting = false;
+  isLoggedIn = false;
   private cartSub?: Subscription;
+  private authSub?: Subscription;
 
   constructor(
     private readonly cartService: CartService,
@@ -30,16 +34,20 @@ export class CartComponent implements OnInit, OnDestroy {
     private readonly loadingService: LoadingService,
     private readonly uiFeedback: UiFeedbackService,
     private readonly router: Router,
-    private readonly location: Location
+    private readonly location: Location,
+    private readonly tokenStorage: TokenStorageService
   ) {}
 
   ngOnInit(): void {
+    this.refreshAuthState();
     this.refresh();
     this.cartSub = this.cartService.cart$.subscribe(() => this.refresh());
+    this.authSub = this.tokenStorage.authState$.subscribe(() => this.refreshAuthState());
   }
 
   ngOnDestroy(): void {
     this.cartSub?.unsubscribe();
+    this.authSub?.unsubscribe();
   }
 
   increase(item: CartItem): void {
@@ -95,6 +103,11 @@ export class CartComponent implements OnInit, OnDestroy {
   async checkout(): Promise<void> {
     if (!this.items.length) {
       this.uiFeedback.error('Your cart is empty.');
+      return;
+    }
+
+    if (!this.isLoggedIn) {
+      await this.openLoginModal();
       return;
     }
 
@@ -159,6 +172,28 @@ export class CartComponent implements OnInit, OnDestroy {
     this.subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     this.feeAmount = Math.round(this.subtotal * 0.1);
     this.totalAmount = this.subtotal + this.feeAmount;
+  }
+
+  private refreshAuthState(): void {
+    this.isLoggedIn = !!this.tokenStorage.getAccessToken();
+  }
+
+  get checkoutLabel(): string {
+    return this.isLoggedIn ? 'Checkout' : 'Login to checkout';
+  }
+
+  private async openLoginModal(): Promise<void> {
+    this.uiFeedback.error('Please log in before checkout.');
+    const modal = await this.modalCtrl.create({
+      component: LoginModalComponent,
+      componentProps: { returnUrl: '/components/cart' },
+      cssClass: 'login-modal-class',
+      handle: true,
+      initialBreakpoint: 1,
+      breakpoints: [0, 0.92, 1],
+      backdropDismiss: false
+    });
+    await modal.present();
   }
 
   private async openPaymentSuccessSheet(orderId: string, orderIds: string[] = [], paymentProvider = ''): Promise<void> {

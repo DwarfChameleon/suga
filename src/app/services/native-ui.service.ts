@@ -32,6 +32,11 @@ export class NativeUiService {
 
     this.initialized = true;
 
+    void this.hideSplash();
+    window.setTimeout(() => {
+      void this.hideSplash();
+    }, 500);
+
     App.addListener('appStateChange', ({ isActive }) => {
       this.appIsActive = isActive;
     });
@@ -46,10 +51,6 @@ export class NativeUiService {
 
     await this.ensureNotificationPermission();
     await this.setupPushNotifications();
-
-    window.setTimeout(() => {
-      void this.hideSplash();
-    }, 1200);
   }
 
   async syncPushRegistration(): Promise<void> {

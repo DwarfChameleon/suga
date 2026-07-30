@@ -549,7 +549,7 @@ float:left;
 .order-price {
   font-size: 15px;
   font-weight: 700;
-  color: var(--ion-color-primary);
+  color: var(--ion-color-secondary-contrast);
 }
 
 .order-card-actions {
@@ -568,6 +568,7 @@ float:left;
     padding: 0 10px;
     font-size: 12px;
     font-weight: 600;
+    border:1.5px solid white;
 }
 
 .spcStyle ion-icon{
@@ -576,11 +577,12 @@ float:left;
 }
 
 .accept{
-    background:var(--ion-color-primary-button) ;
+    background:var(--ion-color-secondary-contrast) ;
 }
 
 .decline{
     background:var(--ion-color-danger);
+    color:var(--ion-color-secondary-contrast) !important;
 }
 
 .processing {
@@ -593,8 +595,9 @@ float:left;
 }
 
 .details {
-  background: var(--suga-surface-muted);
-  color: var(--ion-text-color);
+  background: transparent;
+  color: var(--ion-color-secondary-contrast);
+  border:none;
 }
 
 .spcStyle{

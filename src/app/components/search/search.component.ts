@@ -7,6 +7,7 @@ import { ProfileModalComponent } from '../profile-modal/profile-modal.component'
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserService } from 'src/app/services/user.service';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
+import { StoryComponent } from '../story/story.component';
 
 interface QuickLink {
   label: string;
@@ -73,9 +74,13 @@ export class SearchComponent implements OnInit {
     });
   }
 
-  goTo(route: string): void {
+  async goTo(route: string): Promise<void> {
     if (route === '/components/account') {
       this.router.navigate([this.getDashboardRoute()]);
+      return;
+    }
+    if (route === '/components/story') {
+      await this.openStoryModal();
       return;
     }
     this.router.navigate([route]);
@@ -130,9 +135,9 @@ export class SearchComponent implements OnInit {
     this.router.navigate(['/components/chefs']);
   }
 
-  openVideo(videoId: string): void {
+  async openVideo(videoId: string): Promise<void> {
     if (!videoId) return;
-    this.router.navigate(['/components/story'], { queryParams: { videoId } });
+    await this.openStoryModal(videoId);
   }
 
   goBack(): void {
@@ -145,6 +150,18 @@ export class SearchComponent implements OnInit {
     if (roles.includes('dispatch')) return '/components/dispatch';
     if (roles.includes('consumer')) return '/components/consumer';
     return '/components/explore';
+  }
+
+  private async openStoryModal(initialVideoId = ''): Promise<void> {
+    const modal = await this.modalController.create({
+      component: StoryComponent,
+      componentProps: { presentedAsModal: true, initialVideoId },
+      cssClass: 'story-sheet-modal',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.55, 0.92, 1]
+    });
+    await modal.present();
   }
 
   private loadChefs(): void {

@@ -22,6 +22,16 @@ export class FoodService {
     return this.http.post<any>(`${this.apiUrl}`, formData);
   }
 
+  updateFood(foodId: string, payload: Partial<Pick<Food, 'price' | 'availability' | 'ingredients'>>): Observable<Food> {
+    return this.http.patch<Food>(`${this.apiUrl}/${foodId}`, payload);
+  }
+
+  updateFoodImage(foodId: string, image: File): Observable<Food> {
+    const formData = new FormData();
+    formData.append('image', image);
+    return this.http.patch<Food>(`${this.apiUrl}/${foodId}`, formData);
+  }
+
   getAllFoods(): Observable<Food[]> {
     return this.http.get<Food[]>(`${this.apiUrl}/all`);
   }

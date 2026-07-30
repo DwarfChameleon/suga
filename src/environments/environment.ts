@@ -3,25 +3,24 @@
 // The list of file replacements can be found in `angular.json`.
 
 const resolveBackendBaseUrl = (): string => {
-  const localhostBase = 'http://localhost:5000';
   const renderBackendBase = 'https://suga-server.onrender.com';
 
   if (typeof window === 'undefined') {
-    return localhostBase;
+    return renderBackendBase;
   }
 
   const { protocol, hostname, port } = window.location;
   const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
   const isNativeApp = !!(window as any)?.Capacitor?.isNativePlatform?.();
 
-  // Native app webview uses localhost origin, so point it to the hosted backend.
-  if (isLocalHost && isNativeApp) {
+  // Native app: always use Render backend. Fallback to localhost is handled by the interceptor.
+  if (isNativeApp) {
     return renderBackendBase;
   }
 
-  // Browser localhost frontend -> localhost backend.
+  // Browser localhost frontend -> use the live backend first during development.
   if (isLocalHost) {
-    return localhostBase;
+    return renderBackendBase;
   }
 
   // Forwarded frontend URL like "...-8100.uks1.devtunnels.ms" -> "...-5000.uks1.devtunnels.ms".

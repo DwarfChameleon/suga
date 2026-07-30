@@ -56,6 +56,8 @@ export class ChefComponent implements OnInit, OnDestroy {
   private completedSeen = new Set<string>();
   private locationCaptured = false;
   @ViewChild('imageInput') imageInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('dishImageInput') dishImageInput?: ElementRef<HTMLInputElement>;
+  private selectedDishImageFood?: Food;
   
   constructor(
     private foodService: FoodService,
@@ -478,6 +480,182 @@ export class ChefComponent implements OnInit, OnDestroy {
 
   getImageUrl(imageName: string): string {
     return resolveUploadUrl(imageName, '/assets/img/regpage.jpeg');
+  }
+
+  getFoodIngredients(food: Food): string {
+    return String(food?.ingredients || food?.additionalDetails?.['ingredients'] || '').trim();
+  }
+
+  async openDishActions(food: Food, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    if (!food?._id) return;
+
+    const actionSheet = await this.actionSheetController.create({
+      header: food.dishName || 'Dish Options',
+      buttons: [
+        {
+          text: 'Edit Image',
+          icon: 'image-outline',
+          handler: () => this.selectDishImage(food)
+        },
+        {
+          text: 'Edit Price',
+          icon: 'cash-outline',
+          handler: () => this.promptEditDishPrice(food)
+        },
+        {
+          text: 'Edit Availability',
+          icon: 'toggle-outline',
+          handler: () => this.promptEditDishAvailability(food)
+        },
+        {
+          text: 'Edit Ingredients',
+          icon: 'nutrition-outline',
+          handler: () => this.promptEditDishIngredients(food)
+        },
+        {
+          text: 'View Dish',
+          icon: 'open-outline',
+          handler: () => this.openModalFood(food._id)
+        },
+        {
+          text: 'Cancel',
+          icon: 'close-outline',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  private async promptEditDishPrice(food: Food): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Edit Price',
+      inputs: [
+        {
+          name: 'price',
+          type: 'number',
+          value: String(food.price || ''),
+          placeholder: 'Enter price'
+        }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Save',
+          handler: (data) => {
+            const price = Number(data?.price);
+            if (!Number.isFinite(price) || price <= 0) {
+              this.uiFeedback.error('Enter a valid price.');
+              return false;
+            }
+            this.updateDishField(food._id, { price }, 'Price updated.');
+            return true;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async promptEditDishAvailability(food: Food): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Edit Availability',
+      inputs: [
+        {
+          name: 'availability',
+          type: 'radio',
+          label: 'Available',
+          value: 'Yes',
+          checked: food.availability === 'Yes'
+        },
+        {
+          name: 'availability',
+          type: 'radio',
+          label: 'Unavailable',
+          value: 'No',
+          checked: food.availability === 'No'
+        }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Save',
+          handler: (availability) => {
+            this.updateDishField(food._id, { availability }, 'Availability updated.');
+            return true;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async promptEditDishIngredients(food: Food): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Edit Ingredients',
+      inputs: [
+        {
+          name: 'ingredients',
+          type: 'textarea',
+          value: this.getFoodIngredients(food),
+          placeholder: 'e.g., rice, tomato, pepper, chicken'
+        }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Save',
+          handler: (data) => {
+            this.updateDishField(food._id, { ingredients: String(data?.ingredients || '').trim() }, 'Ingredients updated.');
+            return true;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private updateDishField(foodId: string, payload: Partial<Pick<Food, 'price' | 'availability' | 'ingredients'>>, successMessage: string): void {
+    this.foodService.updateFood(foodId, payload).subscribe({
+      next: (updatedFood) => {
+        this.applyUpdatedFood(updatedFood);
+        this.uiFeedback.success(successMessage);
+      },
+      error: (error) => {
+        this.uiFeedback.error(error?.error?.error || 'Unable to update dish.');
+      }
+    });
+  }
+
+  private selectDishImage(food: Food): void {
+    this.selectedDishImageFood = food;
+    setTimeout(() => this.dishImageInput?.nativeElement.click(), 50);
+  }
+
+  onDishImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    const food = this.selectedDishImageFood;
+    input.value = '';
+    this.selectedDishImageFood = undefined;
+    if (!file || !food?._id) return;
+
+    this.foodService.updateFoodImage(food._id, file).subscribe({
+      next: (updatedFood) => {
+        this.applyUpdatedFood(updatedFood);
+        this.uiFeedback.success('Dish image updated.');
+      },
+      error: (error) => {
+        this.uiFeedback.error(error?.error?.error || 'Unable to update dish image.');
+      }
+    });
+  }
+
+  private applyUpdatedFood(updatedFood: Food): void {
+    if (!updatedFood?._id) return;
+    this.chefFoods = this.chefFoods.map((food) => food._id === updatedFood._id ? updatedFood : food);
+    this.foods = this.foods.map((food) => food._id === updatedFood._id ? updatedFood : food);
   }
 
   private normalizePath(value?: string): string {

@@ -16,6 +16,8 @@ export interface Food {
   priceCurrency?: string;
   category: string;
   availability: string;
+  ingredients?: string;
+  additionalDetails?: Record<string, any>;
   image: string;
   imageProvider?: string;
   imagePublicId?: string;

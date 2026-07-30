@@ -137,7 +137,7 @@
               expand="block"
               [disabled]="isSubmitting"
               (click)="checkoutCart()">
-              Checkout Cart
+              {{ isLoggedIn ? 'Checkout' : 'Login to checkout' }}
             </ion-button>
           </div>
         </div>

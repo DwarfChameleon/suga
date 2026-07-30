@@ -20,6 +20,7 @@ import { LikeEffectsService } from 'src/app/services/like-effects.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
+import { StoryComponent } from '../story/story.component';
 
 interface StoryVideoItem {
   _id: string;
@@ -287,16 +288,28 @@ getBackgroundImageStyle(imageUrl:string): any{
 
  
  
-  openStoryPage(): void {
-    this.route.navigate(['/components/story']);
+  async openStoryPage(): Promise<void> {
+    await this.openStoryModal();
   }
  
-  foodStory() {
+  async foodStory(): Promise<void> {
     if (this.storyGroups.length > 0) {
       this.openStoryViewer(this.storyGroups[0]);
       return;
     }
-    this.route.navigate(['/components/story']);
+    await this.openStoryModal();
+  }
+
+  private async openStoryModal(initialVideoId = ''): Promise<void> {
+    const modal = await this.modalController.create({
+      component: StoryComponent,
+      componentProps: { presentedAsModal: true, initialVideoId },
+      cssClass: 'story-sheet-modal',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.55, 0.92, 1]
+    });
+    await modal.present();
   }
 
   openNotifications(): void {

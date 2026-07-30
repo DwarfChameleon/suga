@@ -7,8 +7,8 @@ import { ProfileModalComponent } from '../profile-modal/profile-modal.component'
 import { FoodProfileComponent } from '../food-profile/food-profile.component';
 import { CategoryModalComponent } from '../category-modal/category-modal.component';
 import { UserService } from 'src/app/services/user.service';
-import { Router } from '@angular/router';
 import { humanizeHistoryLabel } from 'src/app/utils/history-formatters';
+import { StoryComponent } from '../story/story.component';
 
 interface RewardEvent {
   _id?: string;
@@ -41,8 +41,7 @@ export class RewardsComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private modalController: ModalController,
-    private userService: UserService,
-    private router: Router
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -143,7 +142,15 @@ export class RewardsComponent implements OnInit {
     await modal.present();
   }
 
-  openStoryPage(): void {
-    this.router.navigate(['/components/story']);
+  async openStoryPage(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: StoryComponent,
+      componentProps: { presentedAsModal: true },
+      cssClass: 'story-sheet-modal',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.55, 0.92, 1]
+    });
+    await modal.present();
   }
 }

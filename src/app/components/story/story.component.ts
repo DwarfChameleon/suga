@@ -61,6 +61,7 @@ interface Comment {
 })
 export class StoryComponent implements OnInit {
   @Input() presentedAsModal = false;
+  @Input() initialVideoId = '';
   @ViewChild('video') video: ElementRef<HTMLVideoElement> | undefined;
   @ViewChildren('videoEl') videoEls!: QueryList<ElementRef<HTMLVideoElement>>;
   private observer?: IntersectionObserver;
@@ -99,7 +100,7 @@ export class StoryComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
-    const target = this.route.snapshot.queryParamMap.get('videoId');
+    const target = this.initialVideoId || this.route.snapshot.queryParamMap.get('videoId');
     if (target) this.targetVideoId = target;
 
     const role = this.userService.getUserRole();

@@ -11,12 +11,12 @@ const config: CapacitorConfig = {
       providers: ['google.com', 'phone']
     },
     SplashScreen: {
-      launchAutoHide: false,
-      launchShowDuration: 3000,
+      launchAutoHide: true,
+      launchShowDuration: 700,
       backgroundColor: '#ffffffff',
-      showSpinner: true,
+      showSpinner: false,
       spinnerColor: '#fe2c55',
-      androidScaleType: 'CENTER_CROP'
+      androidScaleType: 'CENTER'
     },
     StatusBar: {
       overlaysWebView: false,

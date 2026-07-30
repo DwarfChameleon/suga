@@ -131,8 +131,10 @@
           <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" (click)="openModalFood(food._id)" class="chef-my-food-image"/>
           <div class="food-info">
             <p><b>{{ food.dishName | titlecase }}</b> {{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</p>
+            <p>{{ food.availability === 'Yes' ? 'Available' : 'Unavailable' }}</p>
+            <p *ngIf="getFoodIngredients(food)">Ingredients: {{ getFoodIngredients(food) }}</p>
           </div>
-          <div class="edit-icon" (click)="openModalFood(food._id)">
+          <div class="edit-icon" (click)="openDishActions(food, $event)">
             <ion-icon name="create-outline"></ion-icon>
           </div>
         </div>
@@ -254,3 +256,11 @@
     </div>
   </ng-template>
 </ion-modal>
+
+<input
+  #dishImageInput
+  type="file"
+  accept="image/*"
+  (change)="onDishImageSelected($event)"
+  style="display:none"
+/>
