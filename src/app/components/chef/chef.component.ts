@@ -766,7 +766,13 @@ export class ChefComponent implements OnInit, OnDestroy {
   }
 
   getVideoUrl(path: string): string {
-    return `${environment.baseUrl}/${path}`;
+    const cleaned = String(path || '').trim();
+    if (/^https?:\/\//i.test(cleaned)) return cleaned;
+    if (cleaned.startsWith('videos/') || cleaned.startsWith('uploads/')) {
+      return `${environment.baseUrl}/${cleaned}`;
+    }
+    if (!cleaned) return '';
+    return `${environment.baseUrl}/videos/${cleaned}`;
   }
 
   openVideoModal(video: any): void {

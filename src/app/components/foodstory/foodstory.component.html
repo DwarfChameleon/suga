@@ -15,15 +15,22 @@
   <div [ngSwitch]="step">
     <section *ngSwitchCase="'capture'" class="cameraArea">
       <video #liveVideo class="liveVideo" playsinline muted [style.filter]="selectedFilterCss"></video>
+      <div class="cameraTopBar">
+        <span class="camera-pill" *ngIf="!isRecording">Live camera</span>
+        <span class="camera-pill recording" *ngIf="isRecording">Recording {{ timer | number:'2.0-0' }}s</span>
+      </div>
 
       <div class="controls">
         <div class="leftControls">
-          <button (click)="switchCamera()" class="controlBtn">Switch</button>
-          <button (click)="openGallery()" class="controlBtn">Gallery</button>
+          <button (click)="switchCamera()" class="controlBtn iconControl" aria-label="Switch camera">
+            <ion-icon name="camera-reverse-outline"></ion-icon>
+          </button>
+          <button (click)="openGallery()" class="controlBtn iconControl" aria-label="Pick video from gallery">
+            <ion-icon name="images-outline"></ion-icon>
+          </button>
         </div>
 
         <div class="recordControls">
-          <div class="timer">{{ timer | number:'2.0-0' }}s</div>
           <button class="recordBtn" [class.recording]="isRecording" (click)="toggleRecording()">
             <span *ngIf="!isRecording">&#9679;</span>
             <span *ngIf="isRecording">&#9632;</span>
@@ -31,7 +38,9 @@
         </div>
 
         <div class="rightControls">
-          <button (click)="captureVideo()" class="controlBtn">Native</button>
+          <button (click)="captureVideo()" class="controlBtn iconControl" aria-label="Use phone camera">
+            <ion-icon name="videocam-outline"></ion-icon>
+          </button>
         </div>
       </div>
       <p class="status status-overlay" *ngIf="uploadStatus">{{ uploadStatus }}</p>
@@ -86,7 +95,11 @@
         <select *ngIf="orderEnabled" [(ngModel)]="linkedFoodId" class="descInput">
           <option value="">Select dish for order</option>
           <option *ngFor="let dish of myDishes" [value]="dish._id">{{ dish.dishName }} - {{ dish.price | money:dish.priceCurrency:'1.0-0' }}</option>
+          <option [value]="createDishValue">Create new dish after upload</option>
         </select>
+        <p *ngIf="shouldCreateDishAfterUpload" class="order-note">
+          After this story uploads, you can create a new dish and link it to the video.
+        </p>
 
         <select [(ngModel)]="visibility" class="descInput">
           <option value="public">Who can view: Public</option>
@@ -107,3 +120,31 @@
 
   <input #fileInput type="file" (change)="handleFileInput($event)" accept="image/*,video/*" style="display:none">
 </ion-content>
+
+<ion-modal [isOpen]="isSuccessModalOpen" (didDismiss)="closeSuccessModal()" cssClass="story-success-modal">
+  <ng-template>
+    <ion-content class="success-content">
+      <div class="success-card">
+        <div class="success-icon">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <h2>Story uploaded</h2>
+        <p>Your food story has been posted successfully.</p>
+
+        <button class="preview-frame" *ngIf="uploadedVideoUrl" (click)="previewUploadedStory()">
+          <video [src]="uploadedVideoUrl" muted playsinline preload="metadata"></video>
+          <span>
+            <ion-icon name="play-circle-outline"></ion-icon>
+            Preview story
+          </span>
+        </button>
+
+        <div class="success-actions">
+          <button class="uploadBtn" (click)="previewUploadedStory()">Preview</button>
+          <button class="uploadBtn" *ngIf="shouldCreateDishAfterUpload" (click)="createDishForUploadedStory()">Create Dish</button>
+          <button class="controlBtn" (click)="closeSuccessModal(); resetAll()">Done</button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

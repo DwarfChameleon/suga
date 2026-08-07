@@ -9,6 +9,9 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { FoodService } from 'src/app/services/food.service';
 import { Food } from 'src/app/interface/food';
+import { ModalController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { StoryComponent } from '../story/story.component';
 
 type StoryStep = 'capture' | 'review' | 'details';
 
@@ -26,8 +29,11 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
   mediaType: 'video' | 'image' | null = null;
   orderEnabled = false;
   linkedFoodId = '';
+  isSuccessModalOpen = false;
+  uploadedVideo: any | null = null;
   myDishes: Food[] = [];
   step: StoryStep = 'capture';
+  readonly createDishValue = '__create_new__';
 
   selectedFilter = 'none';
   visibility: 'public' | 'followers' | 'private' = 'public';
@@ -65,7 +71,9 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
     private uiFeedback: UiFeedbackService,
     private loadingService: LoadingService,
     private tokenStorage: TokenStorageService,
-    private foodService: FoodService
+    private foodService: FoodService,
+    private modalController: ModalController,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -110,6 +118,14 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
 
   get canGoBack(): boolean {
     return this.step !== 'capture';
+  }
+
+  get shouldCreateDishAfterUpload(): boolean {
+    return this.orderEnabled && this.linkedFoodId === this.createDishValue;
+  }
+
+  get uploadedVideoUrl(): string {
+    return this.getVideoUrl(this.uploadedVideo?.path || '');
   }
 
   onHeaderBack(): void {
@@ -306,10 +322,10 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
     formData.append('description', this.description || '');
     formData.append('contentCategory', this.contentCategory);
     formData.append('type', this.mediaType || '');
-    formData.append('orderEnabled', String(this.orderEnabled));
+    formData.append('orderEnabled', String(this.orderEnabled && !this.shouldCreateDishAfterUpload));
     formData.append('visibility', this.visibility);
     formData.append('filterPreset', this.selectedFilter);
-    if (this.orderEnabled && this.linkedFoodId) {
+    if (this.orderEnabled && this.linkedFoodId && !this.shouldCreateDishAfterUpload) {
       formData.append('linkedFoodId', this.linkedFoodId);
     }
 
@@ -326,8 +342,9 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
         response = await this.http.post<any>(`${this.apiUrl}/upload-video`, formData).toPromise();
       }
       this.uploadStatus = response?.message || 'Upload successful';
+      this.uploadedVideo = response?.video || null;
+      this.isSuccessModalOpen = true;
       this.uiFeedback.success('Story posted successfully.');
-      this.resetAll();
       await this.loadingService.hide();
     } catch (error) {
       console.error('Error uploading media:', error);
@@ -335,6 +352,49 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
       this.uiFeedback.error(this.uploadStatus);
       await this.loadingService.hide();
     }
+  }
+
+  async previewUploadedStory(): Promise<void> {
+    const videoId = String(this.uploadedVideo?._id || '');
+    this.closeSuccessModal();
+    this.resetAll();
+    if (!videoId) return;
+    const modal = await this.modalController.create({
+      component: StoryComponent,
+      componentProps: { presentedAsModal: true, initialVideoId: videoId },
+      cssClass: 'story-sheet-modal',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.55, 0.92, 1]
+    });
+    await modal.present();
+  }
+
+  createDishForUploadedStory(): void {
+    const videoId = String(this.uploadedVideo?._id || '');
+    const description = String(this.uploadedVideo?.description || this.description || '');
+    this.closeSuccessModal();
+    this.resetAll();
+    this.router.navigate(['/components/food-registration'], {
+      state: {
+        linkStoryVideoId: videoId,
+        storyDescription: description
+      }
+    });
+  }
+
+  closeSuccessModal(): void {
+    this.isSuccessModalOpen = false;
+  }
+
+  getVideoUrl(path: string): string {
+    const cleaned = String(path || '').trim();
+    if (!cleaned) return '';
+    if (/^https?:\/\//i.test(cleaned)) return cleaned;
+    if (cleaned.startsWith('videos/') || cleaned.startsWith('uploads/')) {
+      return `${environment.baseUrl}/${cleaned}`;
+    }
+    return `${environment.baseUrl}/videos/${cleaned}`;
   }
 
   async captureVideo() {
@@ -417,7 +477,7 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
     }
   }
 
-  private resetAll(): void {
+  resetAll(): void {
     this.mediaFile = null;
     this.description = '';
     this.contentCategory = '';
@@ -425,6 +485,8 @@ export class FoodstoryComponent implements OnInit, OnDestroy {
     this.mediaType = null;
     this.orderEnabled = false;
     this.linkedFoodId = '';
+    this.uploadedVideo = null;
+    this.isSuccessModalOpen = false;
     this.visibility = 'public';
     this.selectedFilter = 'none';
     this.step = 'capture';

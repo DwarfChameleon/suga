@@ -150,6 +150,7 @@ export class StoryComponent implements OnInit {
   getVideoUrl(path: string): string {
     const normalized = this.normalizeVideoPath(path);
     if (!normalized) return '';
+    if (/^https?:\/\//i.test(normalized)) return normalized;
     if (normalized.startsWith('videos/') || normalized.startsWith('uploads/')) {
       return `${environment.baseUrl}/${normalized}`;
     }

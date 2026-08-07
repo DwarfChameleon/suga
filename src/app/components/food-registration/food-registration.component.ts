@@ -8,6 +8,7 @@ import { LoadingService } from 'src/app/services/loading.service';
 import { environment } from 'src/environments/environment';
 import { AppLogService } from 'src/app/services/app-log.service';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
+import { ChefDashboardService } from 'src/app/services/chefdashboard.service';
 
 interface CategoryFormProfile {
   title: string;
@@ -60,6 +61,8 @@ export class FoodRegistrationComponent implements OnInit {
   readonly prepHourOptions = Array.from({ length: 13 }, (_, i) => i);
   readonly prepMinuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
   currencyCode = 'NGN';
+  storyVideoId = '';
+  storyDescription = '';
   currencySymbol = '₦';
   private readonly countryCurrencyMap: Record<string, string> = {
     nigeria: 'NGN',
@@ -81,12 +84,16 @@ export class FoodRegistrationComponent implements OnInit {
     private formBuilder: FormBuilder,
     public loaderService: LoaderService,
     private loadingService: LoadingService,
-    private appLog: AppLogService
+    private appLog: AppLogService,
+    private chefDashboardService: ChefDashboardService
   ) {}
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('categoryList') categoryList?: ElementRef<HTMLElement>;
 
   ngOnInit(): void {
+    const navState = history?.state || {};
+    this.storyVideoId = String(navState.linkStoryVideoId || '').trim();
+    this.storyDescription = String(navState.storyDescription || '').trim();
     this.foodForm = this.formBuilder.group({
       dishName: ['', Validators.required],
       preparationTime: ['', Validators.required],

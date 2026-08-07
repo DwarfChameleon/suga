@@ -38,7 +38,12 @@ private getToken(): string {
     return this.http.put<any>(`${this.baseUrl}/videos/${videoId}`, { description }, { headers });
   }
 
-  updateVideoSettings(videoId: string, payload: { description?: string; visibility?: 'public' | 'followers' | 'private' }): Observable<any> {
+  updateVideoSettings(videoId: string, payload: {
+    description?: string;
+    visibility?: 'public' | 'followers' | 'private';
+    orderEnabled?: boolean;
+    linkedFoodId?: string;
+  }): Observable<any> {
     const headers = this.getAuthHeaders().set('Content-Type', 'application/json');
     return this.http.put<any>(`${this.baseUrl}/videos/${videoId}`, payload, { headers });
   }
