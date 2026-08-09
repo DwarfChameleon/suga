@@ -23,10 +23,8 @@ export class PaymentModalComponent implements OnInit {
   @Input() totalAmount?: number;
 
   password = '';
-  walletAccount = '';
   paystackEmail = '';
-  payMethod: 'BankTransfer' | 'OpayWalletNgQR' | 'OpayWalletNg' | 'Paystack' = 'BankTransfer';
-  paymentProvider: 'opay' | 'paystack' = 'opay';
+  paymentProvider: 'paystack' = 'paystack';
   transactionId?: string;
   paymentReference?: string;
   paymentHint = '';
@@ -120,11 +118,7 @@ export class PaymentModalComponent implements OnInit {
       this.uiFeedback.error('Please enter your password to continue.');
       return;
     }
-    if (this.payMethod === 'OpayWalletNg' && !this.walletAccount.trim()) {
-      this.uiFeedback.error('Please enter your OPay account number.');
-      return;
-    }
-    if (this.payMethod === 'Paystack' && !this.paystackEmail.trim()) {
+    if (!this.paystackEmail.trim()) {
       this.uiFeedback.error('Please enter your email address for Paystack.');
       return;
     }
@@ -145,52 +139,15 @@ export class PaymentModalComponent implements OnInit {
   }
 
   private initiatePayment(): void {
-    this.paymentProvider = this.payMethod === 'Paystack' ? 'paystack' : 'opay';
-    if (this.payMethod === 'Paystack') {
-      this.initiatePaystackPayment();
-    } else {
-      this.initiateOpayPayment();
-    }
+    this.paymentProvider = 'paystack';
+    this.initiatePaystackPayment();
   }
 
   onPayMethodChange(): void {
-    this.paymentProvider = this.payMethod === 'Paystack' ? 'paystack' : 'opay';
+    this.paymentProvider = 'paystack';
     this.transactionId = undefined;
     this.paymentReference = undefined;
     this.paymentHint = '';
-  }
-
-  private initiateOpayPayment(): void {
-    this.loading.show('Creating OPay payment...');
-    this.http.post<any>(`${environment.apiUrl}/wallet/topup/initiate`, {
-      orderId: this.orderId,
-      orderIds: this.orderIds,
-      amount: this.totalAmount,
-      walletAccount: this.walletAccount.trim(),
-      payMethod: this.payMethod
-    }).pipe(timeout(30000)).subscribe({
-      next: (resp) => {
-        this.loading.hide();
-        this.isSubmitting = false;
-        this.transactionId = resp?.transactionId;
-        const qrCode = resp?.nextAction?.qrCode || '';
-        const deepLink = resp?.nextAction?.deepLink || '';
-        const cashUrl = resp?.paymentData?.cashierUrl || '';
-        const paymentUrl = deepLink || cashUrl || qrCode || '';
-        if (paymentUrl) {
-          void Browser.open({ url: paymentUrl, presentationStyle: 'fullscreen' });
-          this.paymentHint = 'Complete payment in OPay, then tap Verify Payment.';
-        } else {
-          this.paymentHint = 'Payment created. Complete payment in OPay, then tap Verify Payment.';
-        }
-        this.uiFeedback.success('OPay payment initiated.');
-      },
-      error: (err) => {
-        this.loading.hide();
-        this.isSubmitting = false;
-        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Payment setup timed out. Try again.' : 'Payment initiation failed.');
-      }
-    });
   }
 
   private initiatePaystackPayment(): void {
@@ -238,30 +195,7 @@ export class PaymentModalComponent implements OnInit {
     this.isSubmitting = true;
     this.loading.show('Verifying payment...');
     
-    if (this.paymentProvider === 'paystack') {
-      this.confirmPaystackPayment(this.transactionId);
-    } else {
-      this.confirmOpayPayment(this.transactionId);
-    }
-  }
-
-  private confirmOpayPayment(transactionId: string): void {
-    this.http.post(`${environment.apiUrl}/wallet/topup/confirm`, {
-      transactionId,
-      paidAmount: this.totalAmount
-    }).pipe(timeout(30000)).subscribe({
-      next: (resp: any) => {
-        this.loading.hide();
-        this.isSubmitting = false;
-        this.uiFeedback.success('Payment successful. Order placed.');
-        this.close(true, resp);
-      },
-      error: (err) => {
-        this.loading.hide();
-        this.isSubmitting = false;
-        this.uiFeedback.error(err?.name === 'TimeoutError' ? 'Verification timed out. Confirm payment and try Verify Payment again.' : 'Payment verification failed. Confirm reference and try again.');
-      }
-    });
+    this.confirmPaystackPayment(this.transactionId);
   }
 
   private confirmPaystackPayment(transactionId: string): void {

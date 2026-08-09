@@ -16,13 +16,25 @@
 @import "@ionic/angular/css/normalize.css";
 
 ion-modal.story-sheet-modal {
-  --height: 92%;
-  --border-radius: 22px 22px 0 0;
+  --height: calc(100vh - var(--suga-safe-top));
+  --height: calc(100dvh - var(--suga-safe-top));
+  --border-radius: 18px 18px 0 0;
   --box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.24);
 }
 
 ion-modal.story-sheet-modal::part(content) {
+  height: calc(100vh - var(--suga-safe-top));
+  height: calc(100dvh - var(--suga-safe-top));
+  max-height: calc(100vh - var(--suga-safe-top));
+  max-height: calc(100dvh - var(--suga-safe-top));
+  margin-top: var(--suga-safe-top);
+  margin-bottom: 0;
   overflow: hidden;
+}
+
+ion-modal.story-sheet-modal::part(handle) {
+  background: #fe2c55;
+  opacity: 1;
 }
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";

@@ -9,6 +9,7 @@ import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoginModalComponent } from 'src/app/login-modal/login-modal.component';
 import { HttpClient } from '@angular/common/http';
+import { StoryComponent } from '../story/story.component';
 
 interface PublicProfileSummary {
   level?: string;
@@ -215,7 +216,26 @@ export class ProfileModalComponent implements OnInit {
     const cleaned = path ? path.replace(/\\/g, '/') : '';
     if (!cleaned) return '';
     if (cleaned.startsWith('http')) return cleaned;
-    return `${environment.baseUrl}/${cleaned}`;
+    if (cleaned.startsWith('videos/') || cleaned.startsWith('uploads/')) {
+      return `${environment.baseUrl}/${cleaned}`;
+    }
+    return `${environment.baseUrl}/videos/${cleaned}`;
+  }
+
+  async openStoryModal(story: { _id: string }): Promise<void> {
+    if (!story?._id) return;
+    const modal = await this.modalController.create({
+      component: StoryComponent,
+      componentProps: {
+        presentedAsModal: true,
+        initialVideoId: story._id
+      },
+      cssClass: 'story-sheet-modal',
+      handle: true,
+      initialBreakpoint: 0.92,
+      breakpoints: [0, 0.55, 0.92, 1]
+    });
+    await modal.present();
   }
 
   selectStatTab(tab: 'followers' | 'dishes' | 'stories'): void {

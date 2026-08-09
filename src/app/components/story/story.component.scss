@@ -6,6 +6,69 @@
   height:auto;
   background-color: var(--ion-color-primary-transparent-banner);
 }
+
+:host ion-header {
+  min-height: 44px;
+  height: 44px;
+  padding-top: 6px;
+  background: var(--suga-surface);
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+:host ion-toolbar {
+  --background: var(--suga-surface);
+  --border-color: var(--suga-border);
+  --color: var(--ion-text-color);
+  --min-height: 38px;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  min-height: 38px;
+  height: 38px;
+  max-height: 38px;
+  color: var(--ion-text-color);
+  position: relative;
+}
+
+:host ion-title {
+  color: color-mix(in srgb, var(--ion-text-color) 76%, var(--suga-muted));
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 38px;
+  letter-spacing: 0;
+  padding: 0 44px;
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+:host ion-buttons {
+  min-height: 38px;
+  height: 38px;
+  position: relative;
+  z-index: 2;
+}
+
+:host ion-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --background-hover: transparent;
+  --background-focused: transparent;
+  --border-radius: 50%;
+  color: var(--ion-text-color);
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+}
+
+:host ion-button ion-icon {
+  color: var(--ion-text-color);
+  font-size: 20px;
+}
 .story-skeleton{
   padding: 8px;
 }
@@ -34,7 +97,8 @@ ion-toolbar.transparent {
 .video-frame {
   position: relative;
   width: 100%;
-  min-height: 98vh;
+  min-height: calc(100vh - 44px);
+  min-height: calc(100dvh - 44px);
   background: #05070d;
 }
 
@@ -77,7 +141,8 @@ vg-player {
   width: calc(100% - 5px);
 }
 video{
-  height: 98vh;
+  height: calc(100vh - 44px);
+  height: calc(100dvh - 44px);
   position: relative;
   width: 100%;
   object-fit: cover;

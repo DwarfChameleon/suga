@@ -139,6 +139,13 @@
             <span class="imgTitle"><br>Camera</span>
           </div>
         </div>
+        <div class="popup-selected-image" *ngIf="selectedImage">
+          <img [src]="selectedImage" alt="Selected food image preview">
+          <div>
+            <span>Selected image</span>
+            <small>{{ selectedFile?.name || 'Ready to upload' }}</small>
+          </div>
+        </div>
         <button type="button" class="ghost-btn close-sheet" (click)="togglePopup()">Done</button>
       </div>
     </div>

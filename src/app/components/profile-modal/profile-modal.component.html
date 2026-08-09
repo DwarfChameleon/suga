@@ -122,13 +122,18 @@
 
     <div *ngIf="isChefProfile && selectedStatTab === 'stories'" class="list-shell">
       <div *ngIf="storyList.length === 0" class="empty-list">No stories yet.</div>
-      <div *ngFor="let story of pagedStories" class="list-row story-row">
-        <video [src]="getStoryUrl(story.path)" muted controls preload="metadata"></video>
+      <button *ngFor="let story of pagedStories" type="button" class="list-row story-row" (click)="openStoryModal(story)">
+        <span class="story-thumb">
+          <video [src]="getStoryUrl(story.path)" muted playsinline preload="metadata"></video>
+          <span class="story-play">
+            <ion-icon name="play-circle-outline"></ion-icon>
+          </span>
+        </span>
         <div class="list-meta">
           <h4>@{{ story.username }}</h4>
           <p>{{ story.description || 'No description' }}</p>
         </div>
-      </div>
+      </button>
       <button *ngIf="hasMoreStories" class="load-more-btn" (click)="loadMoreStories()">Load more stories</button>
     </div>
 

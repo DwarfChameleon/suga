@@ -121,6 +121,37 @@
   outline: none;
 }
 
+.method-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ion-color-primary);
+  background: color-mix(in srgb, var(--ion-color-primary) 9%, var(--suga-surface));
+  color: var(--ion-text-color);
+}
+
+.method-card strong,
+.method-card small {
+  display: block;
+}
+
+.method-card small {
+  margin-top: 2px;
+  color: var(--suga-muted);
+  font-size: 12px;
+}
+
+.method-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
+  flex: 0 0 auto;
+}
+
 .pay-btn {
   margin-top: 16px;
   width: 100%;

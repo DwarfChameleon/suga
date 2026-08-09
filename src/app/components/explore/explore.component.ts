@@ -649,6 +649,7 @@ getBackgroundImageStyle(imageUrl:string): any{
   getStoryVideoUrl(path: string): string {
     const normalized = this.normalizeMediaPath(path);
     if (!normalized) return '';
+    if (/^(https?:|data:|blob:)/i.test(normalized)) return normalized;
     if (normalized.startsWith('videos/') || normalized.startsWith('uploads/')) {
       return `${environment.baseUrl}/${normalized}`;
     }
