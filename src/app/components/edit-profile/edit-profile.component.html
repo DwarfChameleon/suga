@@ -212,6 +212,58 @@
         <small class="field-error" *ngIf="isFieldInvalid('restaurantAddress')">{{ getFieldError('restaurantAddress') }}</small>
       </div>
 
+      <section class="diet-section" *ngIf="isConsumer">
+        <div class="section-title-row">
+          <h2>Diet Preferences</h2>
+          <span>Optional</span>
+        </div>
+        <p class="muted">These help SUGA label dishes as Suggested or Not recommended.</p>
+
+        <div class="diet-grid">
+          <div class="diet-card">
+            <h3>Allergies</h3>
+            <div class="diet-input-row">
+              <input
+                [(ngModel)]="allergyDraft"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="addAllergy()"
+                placeholder="e.g. peanut" />
+              <button type="button" class="verify-btn diet-add-btn" (click)="addAllergy()">Add</button>
+            </div>
+            <div class="diet-chip-row" *ngIf="profile.dietPreferences?.allergies?.length; else noAllergies">
+              <span class="diet-chip allergy" *ngFor="let item of profile.dietPreferences?.allergies">
+                {{ item }}
+                <button type="button" (click)="removeDietItem('allergies', item)" aria-label="Remove allergy">x</button>
+              </span>
+            </div>
+            <ng-template #noAllergies>
+              <small class="muted">No allergy items added.</small>
+            </ng-template>
+          </div>
+
+          <div class="diet-card">
+            <h3>Ingredients I Like</h3>
+            <div class="diet-input-row">
+              <input
+                [(ngModel)]="desiredIngredientDraft"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup.enter)="addDesiredIngredient()"
+                placeholder="e.g. chicken" />
+              <button type="button" class="verify-btn diet-add-btn" (click)="addDesiredIngredient()">Add</button>
+            </div>
+            <div class="diet-chip-row" *ngIf="profile.dietPreferences?.desiredIngredients?.length; else noDesiredIngredients">
+              <span class="diet-chip desired" *ngFor="let item of profile.dietPreferences?.desiredIngredients">
+                {{ item }}
+                <button type="button" (click)="removeDietItem('desiredIngredients', item)" aria-label="Remove desired ingredient">x</button>
+              </span>
+            </div>
+            <ng-template #noDesiredIngredients>
+              <small class="muted">No preferred ingredients added.</small>
+            </ng-template>
+          </div>
+        </div>
+      </section>
+
       <h2>Appearance</h2>
       <div class="row">
         <label>Theme</label>

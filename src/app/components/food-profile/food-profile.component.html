@@ -36,6 +36,25 @@
         <div class="order-count">{{ count || 0 }} orders</div>
       </div>
 
+      <div class="dish-status-row">
+        <span class="verify-badge" [class.verified]="isFoodVerified()" [class.unverified]="!isFoodVerified()">
+          <ion-icon [name]="isFoodVerified() ? 'checkmark-circle' : 'alert-circle-outline'"></ion-icon>
+          {{ isFoodVerified() ? 'Verified 100%' : 'Unverified' }}
+        </span>
+        <span class="recommendation-badge suggested" *ngIf="recommendationTag === 'suggested'">Suggested</span>
+        <span class="recommendation-badge warning" *ngIf="recommendationTag === 'not_recommended'">Not recommended</span>
+      </div>
+
+      <div class="ingredients-panel" *ngIf="getIngredientList().length">
+        <button type="button" class="ingredients-toggle" (click)="toggleIngredients()">
+          <span>Ingredients</span>
+          <ion-icon [name]="showIngredients ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+        <div class="ingredient-cards" *ngIf="showIngredients">
+          <span class="ingredient-card" *ngFor="let ingredient of getIngredientList()">{{ ingredient }}</span>
+        </div>
+      </div>
+
       <ion-button (click)="openOrderModal(food)" class="primary-order-btn">Place order</ion-button>
       <ion-button fill="clear" (click)="addCurrentFoodToCart()" class="cart-link-btn">
         <ion-icon slot="start" name="cart-outline"></ion-icon>

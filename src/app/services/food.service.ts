@@ -22,7 +22,7 @@ export class FoodService {
     return this.http.post<any>(`${this.apiUrl}`, formData);
   }
 
-  updateFood(foodId: string, payload: Partial<Pick<Food, 'price' | 'availability' | 'ingredients'>>): Observable<Food> {
+  updateFood(foodId: string, payload: Partial<Pick<Food, 'price' | 'availability' | 'ingredients' | 'ingredientsList'>>): Observable<Food> {
     return this.http.patch<Food>(`${this.apiUrl}/${foodId}`, payload);
   }
 

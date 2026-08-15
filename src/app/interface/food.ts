@@ -17,6 +17,16 @@ export interface Food {
   category: string;
   availability: string;
   ingredients?: string;
+  ingredientsList?: string[];
+  verificationStatus?: 'verified' | 'unverified';
+  profileCompletion?: {
+    requiredFields?: string[];
+    missingFields?: string[];
+    percent?: number;
+    verified?: boolean;
+    verifiedAt?: string;
+  };
+  recommendationTag?: 'suggested' | 'not_recommended' | '';
   additionalDetails?: Record<string, any>;
   image: string;
   imageProvider?: string;

@@ -58,10 +58,10 @@
   --padding-end: 6px;
   --background-hover: transparent;
   --background-focused: transparent;
-  --border-radius: 50%;
-  color: var(--ion-text-color);
-  width: 34px;
-  height: 34px;
+  --border-radius: 30px;
+  color: var(--ion-color-tertiary-contrast);
+  width: 90%;
+  height: 30px;
   min-height: 34px;
 }
 
@@ -176,9 +176,30 @@ font-size:var(--font-strong-large);
 .order-now-btn{
   --background: var(--ion-color-primary-food);
   --color: #fff;
-  --border-radius: 14px;
-  margin-top: 6px;
+  --border-radius: 999px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  display: flex;
+  width: min(90%, 360px);
+  max-width: 90%;
+  height: 30px;
+  min-height: 30px;
+  margin: 8px auto 0;
+  color: #fff;
   font-weight: 600;
+  font-size: 12px;
+}
+
+.order-now-btn::part(native) {
+  color: #fff;
+  min-height: 30px;
+  height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.order-now-btn ion-icon {
+  color: #fff;
 }
 
 .tag-row {

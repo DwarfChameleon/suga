@@ -6,22 +6,9 @@
         <span class="explore-brand">SUGA</span>
       </div>
       <div class="explore-toolbar-right">
-        <ion-button fill="clear" (click)="openStoryPage()" aria-label="Story page">
-          <ion-icon slot="icon-only" name="play-circle-outline"></ion-icon>
-          <span *ngIf="missedStoriesCount > 0" class="icon-badge">{{ missedStoriesCount }}</span>
-        </ion-button>
         <ion-button fill="clear" (click)="openNotifications()" aria-label="Notifications">
           <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
           <span *ngIf="unreadNotifications > 0" class="icon-badge">{{ unreadNotifications }}</span>
-        </ion-button>
-        <ion-button fill="clear" (click)="goToSearch()" aria-label="Search">
-          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" (click)="openChefDirectory()" aria-label="Chefs">
-          <ion-icon slot="icon-only" name="restaurant-outline"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" (click)="openAccount()" aria-label="Account">
-          <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
         </ion-button>
       </div>
     </div>
@@ -143,6 +130,8 @@
             <h3 class="author" (click)="openChefProfile(food.chef)">@{{ food.chef | titlecase }}</h3>
        <div  (click)="openModalFood(food._id)" class="food-top-details color">
                    <span>{{ food.dishName | titlecase }}</span>
+            <span class="food-reco-badge suggested" *ngIf="getFoodRecommendationTag(food) === 'suggested'">Suggested</span>
+            <span class="food-reco-badge warning" *ngIf="getFoodRecommendationTag(food) === 'not_recommended'">Not recommended</span>
             <div class="foodTimer-flex">
              <span><ion-icon name="time-outline"></ion-icon></span> 
              
@@ -234,6 +223,29 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <div slot="fixed" class="explore-bottom-toolbar" *ngIf="shouldShowExploreBottomToolbar()">
+    <nav class="explore-tabbar" aria-label="Explore navigation">
+      <button type="button" class="explore-tab" (click)="goToSearch()" aria-label="Search">
+        <ion-icon name="search-outline"></ion-icon>
+        <span>Search</span>
+      </button>
+      <button type="button" class="explore-tab story-tab" (click)="openStoryPage()" aria-label="Food Story">
+        <span class="story-tab-glow"></span>
+        <ion-icon name="film-outline"></ion-icon>
+        <span>Story</span>
+        <span *ngIf="missedStoriesCount > 0" class="tab-badge">{{ missedStoriesCount }}</span>
+      </button>
+      <button type="button" class="explore-tab" (click)="openChefDirectory()" aria-label="Chefs">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <span>Chefs</span>
+      </button>
+      <button type="button" class="explore-tab" (click)="openAccount()" aria-label="Account">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <span>Account</span>
+      </button>
+    </nav>
+  </div>
 
   <ion-modal [isOpen]="showStoryViewer" (didDismiss)="closeStoryViewer()">
     <ng-template>

@@ -28,6 +28,9 @@ export class FoodProfileComponent implements OnInit, OnDestroy {
   count: number | undefined;
   cartCount = 0;
   cartSubtotal = 0;
+  showIngredients = false;
+  recommendationTag: 'suggested' | 'not_recommended' | '' = '';
+  private dietPreferences = { allergies: [] as string[], desiredIngredients: [] as string[] };
   private cartSub?: Subscription;
  
   
@@ -43,6 +46,7 @@ export class FoodProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadFood();
+    this.loadDietPreferences();
     this.refreshCartState();
     this.cartSub = this.cartService.cart$.subscribe(() => this.refreshCartState());
   }
@@ -173,6 +177,7 @@ async openOrderModal(food: Food) {
     this.foodService.getFoodById(this.foodId).subscribe(
       (response) => {
         this.food = { ...response, chefName: response.chef };
+        this.recommendationTag = this.getRecommendationTag(this.food);
         this.chefName = this.food.chefName;
         if (this.chefName) {
           this.moreFoodByChef(this.chefName);
@@ -185,6 +190,66 @@ async openOrderModal(food: Food) {
         console.error('Error fetching food:', error);
       }
     );
+  }
+
+  getIngredientList(food: Food | any = this.food): string[] {
+    const source = Array.isArray(food?.ingredientsList) && food.ingredientsList.length
+      ? food.ingredientsList
+      : String(food?.ingredients || '').split(/[\n,]/);
+    return [...new Set<string>(source.map((item: any) => String(item || '').trim()).filter(Boolean))];
+  }
+
+  toggleIngredients(): void {
+    this.showIngredients = !this.showIngredients;
+  }
+
+  isFoodVerified(): boolean {
+    return this.food?.verificationStatus === 'verified' || !!this.food?.profileCompletion?.verified;
+  }
+
+  private getRecommendationTag(food: Food | any): 'suggested' | 'not_recommended' | '' {
+    const user = this.tokenStorage.getUser() as any;
+    const preferences = {
+      allergies: this.dietPreferences.allergies.length ? this.dietPreferences.allergies : user?.dietPreferences?.allergies,
+      desiredIngredients: this.dietPreferences.desiredIngredients.length ? this.dietPreferences.desiredIngredients : user?.dietPreferences?.desiredIngredients
+    };
+    const allergies = this.normalizeTags(preferences.allergies);
+    const desired = this.normalizeTags(preferences.desiredIngredients);
+    if (!allergies.length && !desired.length) return '';
+
+    const ingredients = this.normalizeTags(this.getIngredientList(food));
+    if (allergies.some((item) => ingredients.includes(item))) return 'not_recommended';
+    if (desired.some((item) => ingredients.includes(item))) return 'suggested';
+    return '';
+  }
+
+  private normalizeTags(value: any): string[] {
+    const list = Array.isArray(value) ? value : String(value || '').split(/[\n,]/);
+    return [...new Set(list.map((item: any) => String(item || '').trim().toLowerCase()).filter(Boolean))];
+  }
+
+  private loadDietPreferences(): void {
+    const storedUser = this.tokenStorage.getUser();
+    this.dietPreferences = {
+      allergies: this.normalizeTags(storedUser?.dietPreferences?.allergies),
+      desiredIngredients: this.normalizeTags(storedUser?.dietPreferences?.desiredIngredients)
+    };
+
+    if (!this.tokenStorage.getAccessToken()) {
+      return;
+    }
+
+    this.userService.getEditableProfile().subscribe({
+      next: (profile: any) => {
+        this.dietPreferences = {
+          allergies: this.normalizeTags(profile?.dietPreferences?.allergies),
+          desiredIngredients: this.normalizeTags(profile?.dietPreferences?.desiredIngredients)
+        };
+        if (this.food) {
+          this.recommendationTag = this.getRecommendationTag(this.food);
+        }
+      }
+    });
   }
 
 

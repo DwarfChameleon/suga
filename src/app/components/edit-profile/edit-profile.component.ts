@@ -39,7 +39,11 @@ export class EditProfileComponent implements OnInit {
     locationInfo: '',
     uiTheme: 'light',
     emailVerified: false,
-    emailVerifiedAt: null
+    emailVerifiedAt: null,
+    dietPreferences: {
+      allergies: [],
+      desiredIngredients: []
+    }
   };
   initialProfile: EditableProfile = this.getDefaultProfile();
   isSaving = false;
@@ -64,6 +68,8 @@ export class EditProfileComponent implements OnInit {
   isSendingVerificationEmail = false;
   isVerifyingEmailCode = false;
   emailVerificationCode = '';
+  allergyDraft = '';
+  desiredIngredientDraft = '';
 
   constructor(
     private readonly userService: UserService,
@@ -82,6 +88,10 @@ export class EditProfileComponent implements OnInit {
 
   get isChef(): boolean {
     return (this.profile.roles || []).map((r) => r.toLowerCase()).includes('chef');
+  }
+
+  get isConsumer(): boolean {
+    return (this.profile.roles || []).map((r) => r.toLowerCase()).includes('consumer');
   }
 
   get phoneDialCode(): string {
@@ -320,13 +330,14 @@ export class EditProfileComponent implements OnInit {
       this.resetPhoneVerification();
       const existingUser = this.tokenStorage.getUser();
       if (existingUser) {
-        this.tokenStorage.saveUser({
+      this.tokenStorage.saveUser({
           ...existingUser,
           username: this.profile.username,
           email: this.profile.email,
           emailVerified: !!this.profile.emailVerified,
           profilePicture: this.profile.profilePicture,
-          coverPicture: this.profile.coverPicture
+          coverPicture: this.profile.coverPicture,
+          dietPreferences: this.profile.dietPreferences
         });
       }
 
@@ -364,6 +375,23 @@ export class EditProfileComponent implements OnInit {
     this.selectedCoverImage = undefined;
   }
 
+  addAllergy(): void {
+    this.addDietItem('allergies', this.allergyDraft);
+    this.allergyDraft = '';
+  }
+
+  addDesiredIngredient(): void {
+    this.addDietItem('desiredIngredients', this.desiredIngredientDraft);
+    this.desiredIngredientDraft = '';
+  }
+
+  removeDietItem(kind: 'allergies' | 'desiredIngredients', item: string): void {
+    const preferences = this.profile.dietPreferences || { allergies: [], desiredIngredients: [] };
+    const current = this.normalizePreferenceList(preferences[kind]);
+    preferences[kind] = current.filter((value) => value !== this.normalizeDietItem(item));
+    this.profile.dietPreferences = preferences;
+  }
+
   private getDefaultProfile(): EditableProfile {
     return {
       username: '',
@@ -386,7 +414,11 @@ export class EditProfileComponent implements OnInit {
       emailVerified: false,
       emailVerifiedAt: null,
       profilePicture: '',
-      coverPicture: ''
+      coverPicture: '',
+      dietPreferences: {
+        allergies: [],
+        desiredIngredients: []
+      }
     };
   }
 
@@ -396,8 +428,34 @@ export class EditProfileComponent implements OnInit {
       ...defaults,
       ...(data || {}),
       phoneNumber: stripDialCode(data?.phoneNumber || '', this.addressData.getDialCode(data?.country || '')),
-      roles: Array.isArray(data?.roles) ? data!.roles : defaults.roles
+      roles: Array.isArray(data?.roles) ? data!.roles : defaults.roles,
+      dietPreferences: {
+        allergies: this.normalizePreferenceList((data as any)?.dietPreferences?.allergies),
+        desiredIngredients: this.normalizePreferenceList((data as any)?.dietPreferences?.desiredIngredients)
+      }
     };
+  }
+
+  private addDietItem(kind: 'allergies' | 'desiredIngredients', value: string): void {
+    const normalized = this.normalizeDietItem(value);
+    if (!normalized) {
+      return;
+    }
+    const preferences = this.profile.dietPreferences || { allergies: [], desiredIngredients: [] };
+    const current = this.normalizePreferenceList(preferences[kind]);
+    if (!current.includes(normalized)) {
+      preferences[kind] = [...current, normalized];
+    }
+    this.profile.dietPreferences = preferences;
+  }
+
+  private normalizePreferenceList(value: any): string[] {
+    const source = Array.isArray(value) ? value : String(value || '').split(/[\n,]/);
+    return [...new Set(source.map((item) => this.normalizeDietItem(item)).filter(Boolean))];
+  }
+
+  private normalizeDietItem(value: any): string {
+    return String(value || '').trim().toLowerCase();
   }
 
   async sendVerificationEmail(): Promise<void> {

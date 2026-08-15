@@ -483,7 +483,23 @@ export class ChefComponent implements OnInit, OnDestroy {
   }
 
   getFoodIngredients(food: Food): string {
-    return String(food?.ingredients || food?.additionalDetails?.['ingredients'] || '').trim();
+    const list = this.getFoodIngredientList(food);
+    return list.length ? list.join(', ') : String(food?.ingredients || food?.additionalDetails?.['ingredients'] || '').trim();
+  }
+
+  getFoodIngredientList(food: Food): string[] {
+    const source = Array.isArray(food?.ingredientsList) && food.ingredientsList.length
+      ? food.ingredientsList
+      : String(food?.ingredients || food?.additionalDetails?.['ingredients'] || '').split(/[\n,]/);
+    return [...new Set(source.map((item) => String(item || '').trim()).filter(Boolean))];
+  }
+
+  isFoodVerified(food: Food): boolean {
+    return food?.verificationStatus === 'verified' || !!food?.profileCompletion?.verified;
+  }
+
+  getFoodVerificationPercent(food: Food): number {
+    return Number(food?.profileCompletion?.percent || (this.isFoodVerified(food) ? 100 : 0));
   }
 
   async openDishActions(food: Food, event?: Event): Promise<void> {
@@ -594,11 +610,12 @@ export class ChefComponent implements OnInit, OnDestroy {
   private async promptEditDishIngredients(food: Food): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Edit Ingredients',
+      message: 'Separate each ingredient with a comma. Each one will appear as its own removable card on the food profile.',
       inputs: [
         {
           name: 'ingredients',
           type: 'textarea',
-          value: this.getFoodIngredients(food),
+          value: this.getFoodIngredientList(food).join(', '),
           placeholder: 'e.g., rice, tomato, pepper, chicken'
         }
       ],
@@ -607,7 +624,8 @@ export class ChefComponent implements OnInit, OnDestroy {
         {
           text: 'Save',
           handler: (data) => {
-            this.updateDishField(food._id, { ingredients: String(data?.ingredients || '').trim() }, 'Ingredients updated.');
+            const ingredientsList = this.parseIngredientInput(data?.ingredients);
+            this.updateDishField(food._id, { ingredientsList, ingredients: ingredientsList.join(', ') }, 'Ingredients updated.');
             return true;
           }
         }
@@ -616,7 +634,14 @@ export class ChefComponent implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  private updateDishField(foodId: string, payload: Partial<Pick<Food, 'price' | 'availability' | 'ingredients'>>, successMessage: string): void {
+  removeDishIngredient(food: Food, ingredient: string, event?: Event): void {
+    event?.stopPropagation();
+    const target = String(ingredient || '').trim().toLowerCase();
+    const ingredientsList = this.getFoodIngredientList(food).filter((item) => item.trim().toLowerCase() !== target);
+    this.updateDishField(food._id, { ingredientsList, ingredients: ingredientsList.join(', ') }, 'Ingredient removed.');
+  }
+
+  private updateDishField(foodId: string, payload: Partial<Pick<Food, 'price' | 'availability' | 'ingredients' | 'ingredientsList'>>, successMessage: string): void {
     this.foodService.updateFood(foodId, payload).subscribe({
       next: (updatedFood) => {
         this.applyUpdatedFood(updatedFood);
@@ -626,6 +651,13 @@ export class ChefComponent implements OnInit, OnDestroy {
         this.uiFeedback.error(error?.error?.error || 'Unable to update dish.');
       }
     });
+  }
+
+  private parseIngredientInput(value: string): string[] {
+    return [...new Set(String(value || '')
+      .split(/[\n,]/)
+      .map((item) => item.trim())
+      .filter(Boolean))];
   }
 
   private selectDishImage(food: Food): void {

@@ -260,6 +260,113 @@ select {
   min-width: 132px;
 }
 
+.diet-section {
+  border: 1px solid var(--suga-border);
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.08);
+  padding: 12px;
+  margin: 12px 0 14px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.section-title-row h2 {
+  margin: 0;
+}
+
+.section-title-row span {
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 999px;
+  color: var(--ion-color-medium);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+}
+
+.diet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.diet-card {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  background: var(--suga-surface);
+  padding: 10px;
+}
+
+.diet-card h3 {
+  margin: 0 0 8px;
+  color: var(--ion-text-color);
+  font-size: 14px;
+}
+
+.diet-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diet-input-row input {
+  min-width: 0;
+}
+
+.diet-add-btn {
+  flex: 0 0 auto;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.diet-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.diet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--ion-text-color);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 7px 5px 10px;
+}
+
+.diet-chip.allergy {
+  background: rgba(254, 44, 85, 0.08);
+  border-color: rgba(254, 44, 85, 0.18);
+}
+
+.diet-chip.desired {
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.18);
+}
+
+.diet-chip button {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.1);
+  color: var(--ion-text-color);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  padding: 0;
+}
+
 .verify-ok {
   color: #18844d;
   font-size: 12px;
@@ -307,6 +414,10 @@ input[type='color'] {
   }
 
   .profile-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .diet-grid {
     grid-template-columns: 1fr;
   }
 }

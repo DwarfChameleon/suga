@@ -44,6 +44,10 @@ export interface EditableProfile {
   uiTheme?: 'light' | 'dark';
   emailVerified?: boolean;
   emailVerifiedAt?: string | null;
+  dietPreferences?: {
+    allergies?: string[];
+    desiredIngredients?: string[];
+  };
   phoneVerification?: {
     idToken: string;
     uid: string;

@@ -22,17 +22,17 @@
       <video
         #videoEl
         [attr.data-id]="video._id"
-        preload="auto"
-        autoplay
+        [src]="getVideoUrl(video.path)"
+        preload="metadata"
         muted
         playsinline
+        crossorigin="anonymous"
         [class.video-hidden]="isVideoUnavailable(video._id)"
         (error)="onVideoError(video._id, videoEl)"
         (play)="scheduleView(video._id)"
         (pause)="cancelView(video._id)"
         (dblclick)="likeVideo(video)"
         (click)="togglePlayPause(videoEl, video._id)">
-        <source [src]="getVideoUrl(video.path)" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <div class="video-unavailable" *ngIf="isVideoUnavailable(video._id)">

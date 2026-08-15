@@ -66,10 +66,12 @@ export class ExploreComponent implements OnInit {
   isLoading = false;
   isOnline = true;
   showCommentsModal = false;
+  isExploreModalOpen = false;
   activeCommentFood: Food | null = null;
   commentDraft = '';
   likedFoodIds = new Set<string>();
   foodHeartBursts: Record<string, number[]> = {};
+  private exploreModalDepth = 0;
   unreadNotifications = 0;
   missedStoriesCount = 0;
   storyGroups: StoryChefGroup[] = [];
@@ -90,6 +92,7 @@ export class ExploreComponent implements OnInit {
   private brokenFoodImages = new Set<string>();
   private loadedCategoryImages = new Set<string>();
   private loadedFoodImages = new Set<string>();
+  private dietPreferences = { allergies: [] as string[], desiredIngredients: [] as string[] };
 
   
   constructor(
@@ -218,7 +221,7 @@ getBackgroundImageStyle(imageUrl:string): any{
       initialBreakpoint: 0.9,
       breakpoints: [0, 0.58, 0.9, 1]
     });
-    await modal.present();
+    await this.presentExploreModal(modal);
   }
 
   async openChefProfile(username: string) {
@@ -231,7 +234,7 @@ getBackgroundImageStyle(imageUrl:string): any{
       initialBreakpoint: 0.82,
       breakpoints: [0, 0.58, 0.82, 0.96]
     });
-    await modal.present();
+    await this.presentExploreModal(modal);
   }
 
   async openCategoryModal(categoryData: FoodCategory | string): Promise<void> {
@@ -251,7 +254,7 @@ getBackgroundImageStyle(imageUrl:string): any{
         state: this.userDetails?.city || ''
       }
     });
-    await modal.present();
+    await this.presentExploreModal(modal);
   }
 
   fetchFood(foodId: string) {
@@ -283,13 +286,17 @@ getBackgroundImageStyle(imageUrl:string): any{
         user: this.loggedInUser
       }
     });
-    await modal.present();
+    await this.presentExploreModal(modal);
   }
 
  
  
   async openStoryPage(): Promise<void> {
     await this.openStoryModal();
+  }
+
+  shouldShowExploreBottomToolbar(): boolean {
+    return !this.showCommentsModal && !this.showStoryViewer && !this.isExploreModalOpen;
   }
  
   async foodStory(): Promise<void> {
@@ -309,6 +316,16 @@ getBackgroundImageStyle(imageUrl:string): any{
       initialBreakpoint: 0.92,
       breakpoints: [0, 0.55, 0.92, 1]
     });
+    await this.presentExploreModal(modal);
+  }
+
+  private async presentExploreModal(modal: any): Promise<void> {
+    this.exploreModalDepth += 1;
+    this.isExploreModalOpen = true;
+    modal.onDidDismiss().then(() => {
+      this.exploreModalDepth = Math.max(0, this.exploreModalDepth - 1);
+      this.isExploreModalOpen = this.exploreModalDepth > 0;
+    });
     await modal.present();
   }
 
@@ -325,10 +342,23 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   loadUserPreferences(): void {
+    const storedUser = this.tokenStorage.getUser();
+    this.dietPreferences = {
+      allergies: this.normalizeDietTags(storedUser?.dietPreferences?.allergies),
+      desiredIngredients: this.normalizeDietTags(storedUser?.dietPreferences?.desiredIngredients)
+    };
+
     if (!this.tokenStorage.getAccessToken()) return;
     this.userService.getUserPreferences().subscribe(
       (data: UserDetails) => {
         this.userDetails = data;
+        const preferences = (data as any)?.dietPreferences;
+        if (preferences) {
+          this.dietPreferences = {
+            allergies: this.normalizeDietTags(preferences.allergies),
+            desiredIngredients: this.normalizeDietTags(preferences.desiredIngredients)
+          };
+        }
       },
       (error) => {
         if (error?.status === 401) {
@@ -341,6 +371,29 @@ getBackgroundImageStyle(imageUrl:string): any{
         console.error('Error fetching user preferences:', error);
       }
     );
+  }
+
+  getFoodRecommendationTag(food: Food): 'suggested' | 'not_recommended' | '' {
+    const allergies = this.dietPreferences.allergies;
+    const desired = this.dietPreferences.desiredIngredients;
+    if (!allergies.length && !desired.length) return '';
+
+    const ingredients = this.getFoodIngredientList(food);
+    if (allergies.some((item) => ingredients.includes(item))) return 'not_recommended';
+    if (desired.some((item) => ingredients.includes(item))) return 'suggested';
+    return '';
+  }
+
+  private getFoodIngredientList(food: Food | any): string[] {
+    const source = Array.isArray(food?.ingredientsList) && food.ingredientsList.length
+      ? food.ingredientsList
+      : String(food?.ingredients || food?.additionalDetails?.ingredients || '').split(/[\n,]/);
+    return this.normalizeDietTags(source);
+  }
+
+  private normalizeDietTags(value: any): string[] {
+    const source = Array.isArray(value) ? value : String(value || '').split(/[\n,]/);
+    return [...new Set(source.map((item: any) => String(item || '').trim().toLowerCase()).filter(Boolean))];
   }
 
   getAllFoods(): void {
@@ -497,7 +550,7 @@ getBackgroundImageStyle(imageUrl:string): any{
       breakpoints: [0, 0.92, 1],
       backdropDismiss: false
     });
-    await modal.present();
+    await this.presentExploreModal(modal);
   }
 
   loadCategories(): void {

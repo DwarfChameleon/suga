@@ -44,8 +44,6 @@ export class AppComponent implements OnInit, OnDestroy {
   private authSub?: Subscription;
   private suggestedChefsModalOpen = false;
   private suggestedChefsShownForUserId?: string;
-  isBooting = true;
-  private bootTimer?: number;
 
   constructor(
     private userService: UserService,
@@ -64,7 +62,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     void this.nativeUi.initialize();
-    this.bootTimer = window.setTimeout(() => this.finishBoot(), 2800);
     this.themeService.apply(this.themeService.getSavedTheme());
     this.refreshUserState();
     this.authSub = this.tokenStorage.authState$.subscribe(() => {
@@ -267,9 +264,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.internetSub?.unsubscribe();
     this.socketSub?.unsubscribe();
     this.unreadSub?.unsubscribe();
-    if (this.bootTimer) {
-      window.clearTimeout(this.bootTimer);
-    }
   }
 
   isDispatch(): boolean {
@@ -281,12 +275,4 @@ export class AppComponent implements OnInit, OnDestroy {
     window.location.href = `${environment.baseUrl}/dashboard`;
   }
 
-  finishBoot(): void {
-    if (!this.isBooting) return;
-    this.isBooting = false;
-    if (this.bootTimer) {
-      window.clearTimeout(this.bootTimer);
-      this.bootTimer = undefined;
-    }
-  }
 }

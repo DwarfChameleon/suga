@@ -131,8 +131,17 @@
           <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" (click)="openModalFood(food._id)" class="chef-my-food-image"/>
           <div class="food-info">
             <p><b>{{ food.dishName | titlecase }}</b> {{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</p>
+            <span class="dish-verify-badge" [class.verified]="isFoodVerified(food)" [class.unverified]="!isFoodVerified(food)">
+              <ion-icon [name]="isFoodVerified(food) ? 'checkmark-circle' : 'alert-circle-outline'"></ion-icon>
+              {{ isFoodVerified(food) ? 'Verified 100%' : 'Unverified ' + getFoodVerificationPercent(food) + '%' }}
+            </span>
             <p>{{ food.availability === 'Yes' ? 'Available' : 'Unavailable' }}</p>
-            <p *ngIf="getFoodIngredients(food)">Ingredients: {{ getFoodIngredients(food) }}</p>
+            <div class="ingredient-mini-row" *ngIf="getFoodIngredientList(food).length">
+              <span *ngFor="let ingredient of getFoodIngredientList(food)" class="ingredient-mini">
+                {{ ingredient }}
+                <button type="button" class="ingredient-remove" (click)="removeDishIngredient(food, ingredient, $event)" aria-label="Remove ingredient">x</button>
+              </span>
+            </div>
           </div>
           <div class="edit-icon" (click)="openDishActions(food, $event)">
             <ion-icon name="create-outline"></ion-icon>

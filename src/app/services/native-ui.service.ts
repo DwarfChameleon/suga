@@ -32,11 +32,6 @@ export class NativeUiService {
 
     this.initialized = true;
 
-    void this.hideSplash();
-    window.setTimeout(() => {
-      void this.hideSplash();
-    }, 500);
-
     App.addListener('appStateChange', ({ isActive }) => {
       this.appIsActive = isActive;
     });
@@ -156,11 +151,4 @@ export class NativeUiService {
     }
   }
 
-  private async hideSplash(): Promise<void> {
-    try {
-      await SplashScreen.hide({ fadeOutDuration: 180 });
-    } catch {
-      // Ignore when splash is already hidden.
-    }
-  }
 }

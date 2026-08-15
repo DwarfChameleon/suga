@@ -36,6 +36,7 @@ yarn-error.log
 *.keystore
 *.jks
 android/app/google-services.json
+android/key.properties
 .env
 .codex-*.log
 

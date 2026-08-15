@@ -44,7 +44,7 @@ const config: CapacitorConfig = {
       FadeSplashScreenDuration: '120',
       SplashShowOnlyFirstTime: 'false',
       SplashScreen: 'screen',
-      SplashScreenDelay: '3000'
+      SplashScreenDelay: '700'
     }
   }
 };
