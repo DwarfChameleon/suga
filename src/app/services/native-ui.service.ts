@@ -44,8 +44,20 @@ export class NativeUiService {
       // Native polish should never block app boot.
     }
 
-    await this.ensureNotificationPermission();
-    await this.setupPushNotifications();
+    if (this.tokenStorage.getAccessToken()) {
+      void this.setupPushNotifications();
+    }
+  }
+
+  async hideSplashScreen(): Promise<void> {
+    if (!this.isNativeApp) {
+      return;
+    }
+    try {
+      await SplashScreen.hide({ fadeOutDuration: 180 });
+    } catch {
+      // Ignore when the native splash is already hidden.
+    }
   }
 
   async syncPushRegistration(): Promise<void> {

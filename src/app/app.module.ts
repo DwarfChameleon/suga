@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -57,17 +57,6 @@ import { ErrorHandler } from '@angular/core';
 import { GlobalErrorHandler } from './services/global-error-handler';
 import { ErrorLoggingInterceptor } from './services/error-logging.interceptor';
 import { FallbackServerInterceptor } from './services/fallback-server.interceptor';
-import { AddressDataService } from './services/address-data.service';
-import { AdConfigService } from './services/ad-config.service';
-
-export function preloadAddressCatalog(addressDataService: AddressDataService): () => Promise<void> {
-  return () => addressDataService.warmCatalog();
-}
-
-export function preloadAdConfig(adConfigService: AdConfigService): () => Promise<void> {
-  return () => adConfigService.warmConfig();
-}
-
 @NgModule({
   declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,ChefDirectoryComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, PaymentSuccessSheetComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
   imports: [BrowserModule, HttpClientModule, FormsModule, IonicModule.forRoot(), LoginPageModule, AppRoutingModule, ReactiveFormsModule],
@@ -75,18 +64,6 @@ export function preloadAdConfig(adConfigService: AdConfigService): () => Promise
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     UserService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: preloadAddressCatalog,
-      deps: [AddressDataService],
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: preloadAdConfig,
-      deps: [AdConfigService],
-      multi: true
-    },
     { provide: HTTP_INTERCEPTORS, useClass: FallbackServerInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorLoggingInterceptor, multi: true },

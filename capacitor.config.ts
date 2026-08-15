@@ -11,8 +11,8 @@ const config: CapacitorConfig = {
       providers: ['google.com', 'phone']
     },
     SplashScreen: {
-      launchAutoHide: true,
-      launchShowDuration: 700,
+      launchAutoHide: false,
+      launchShowDuration: 0,
       backgroundColor: '#ffffffff',
       showSpinner: false,
       spinnerColor: '#fe2c55',
@@ -44,7 +44,7 @@ const config: CapacitorConfig = {
       FadeSplashScreenDuration: '120',
       SplashShowOnlyFirstTime: 'false',
       SplashScreen: 'screen',
-      SplashScreenDelay: '700'
+      SplashScreenDelay: '0'
     }
   }
 };

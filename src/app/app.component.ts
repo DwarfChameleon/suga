@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { UserService } from './services/user.service';
 import { Router } from '@angular/router';
 import { TokenStorageService } from './services/token-storage.service';
@@ -14,13 +14,15 @@ import { ThemeService } from './services/theme.service';
 import { environment } from 'src/environments/environment';
 import { NativeUiService } from './services/native-ui.service';
 import { StoryComponent } from './components/story/story.component';
+import { AddressDataService } from './services/address-data.service';
+import { AdConfigService } from './services/ad-config.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   public appPages = [
     { title: 'My Dashboard', url: '', icon: 'home' },
     { title: 'Explore', url: '/components/explore', icon: 'planet' },
@@ -57,7 +59,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private networkService: NetworkService,
     private uiFeedback: UiFeedbackService,
     private themeService: ThemeService,
-    private nativeUi: NativeUiService
+    private nativeUi: NativeUiService,
+    private addressData: AddressDataService,
+    private adConfig: AdConfigService
   ) {}
 
   ngOnInit(): void {
@@ -83,6 +87,20 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isInternetOnline = online;
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    window.setTimeout(() => {
+      window.requestAnimationFrame(() => {
+        void this.nativeUi.hideSplashScreen();
+      });
+      this.warmStartupData();
+    }, 150);
+  }
+
+  private warmStartupData(): void {
+    void this.addressData.warmCatalog();
+    void this.adConfig.warmConfig();
   }
 
   async handleAccountClick(): Promise<void> {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 export interface AdPlacementRule {
@@ -92,7 +93,9 @@ export class AdConfigService {
 
   private async fetchConfig(): Promise<void> {
     try {
-      const response = await firstValueFrom(this.http.get<{ ok: boolean; config?: AdConfig }>(`${environment.apiUrl}/ads/config`));
+      const response = await firstValueFrom(
+        this.http.get<{ ok: boolean; config?: AdConfig }>(`${environment.apiUrl}/ads/config`).pipe(timeout(3500))
+      );
       if (response?.config) {
         this.config = response.config;
         return;
