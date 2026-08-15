@@ -302,6 +302,8 @@ export class EditProfileComponent implements OnInit {
   }
 
   async save(): Promise<void> {
+    this.applyPendingDietDrafts();
+
     if (!this.isFormValid) {
       [
         'username', 'email', 'phoneNumber', 'fullName',
@@ -456,6 +458,15 @@ export class EditProfileComponent implements OnInit {
 
   private normalizeDietItem(value: any): string {
     return String(value || '').trim().toLowerCase();
+  }
+
+  private applyPendingDietDrafts(): void {
+    if (this.allergyDraft.trim()) {
+      this.addAllergy();
+    }
+    if (this.desiredIngredientDraft.trim()) {
+      this.addDesiredIngredient();
+    }
   }
 
   async sendVerificationEmail(): Promise<void> {

@@ -66,8 +66,11 @@ export class ExploreComponent implements OnInit {
   isLoading = false;
   isOnline = true;
   showCommentsModal = false;
+  showImagePreview = false;
   isExploreModalOpen = false;
   activeCommentFood: Food | null = null;
+  activePreviewFood: Food | null = null;
+  imagePreviewZoom = 1;
   commentDraft = '';
   likedFoodIds = new Set<string>();
   foodHeartBursts: Record<string, number[]> = {};
@@ -296,7 +299,26 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   shouldShowExploreBottomToolbar(): boolean {
-    return !this.showCommentsModal && !this.showStoryViewer && !this.isExploreModalOpen;
+    return !this.showCommentsModal && !this.showStoryViewer && !this.showImagePreview && !this.isExploreModalOpen;
+  }
+
+  openImagePreview(food: Food, event?: Event): void {
+    event?.stopPropagation();
+    this.closeCommentsModal();
+    this.activePreviewFood = food;
+    this.imagePreviewZoom = 1;
+    this.showImagePreview = true;
+  }
+
+  closeImagePreview(): void {
+    this.showImagePreview = false;
+    this.activePreviewFood = null;
+    this.imagePreviewZoom = 1;
+  }
+
+  zoomImagePreview(delta: number): void {
+    const next = this.imagePreviewZoom + delta;
+    this.imagePreviewZoom = Math.max(1, Math.min(3, Number(next.toFixed(2))));
   }
  
   async foodStory(): Promise<void> {

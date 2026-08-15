@@ -289,8 +289,8 @@
         </div>
       </div>
 
-      <button class="save-btn" (click)="save()" [disabled]="isSaving || isLoading || !hasChanges || !isFormValid">
-        {{ isSaving ? 'Saving...' : 'Save Profile' }}
+      <button class="save-btn" (click)="save()" [disabled]="isSaving || isLoading">
+        {{ isSaving ? 'Updating...' : 'Update Profile' }}
       </button>
     </div>
 

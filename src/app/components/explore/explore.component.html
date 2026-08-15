@@ -129,17 +129,18 @@
           <div class="food-Details-Top">
             <h3 class="author" (click)="openChefProfile(food.chef)">@{{ food.chef | titlecase }}</h3>
        <div  (click)="openModalFood(food._id)" class="food-top-details color">
-                   <span>{{ food.dishName | titlecase }}</span>
-            <span class="food-reco-badge suggested" *ngIf="getFoodRecommendationTag(food) === 'suggested'">Suggested</span>
-            <span class="food-reco-badge warning" *ngIf="getFoodRecommendationTag(food) === 'not_recommended'">Not recommended</span>
+            <div class="dish-title-row">
+              <span>{{ food.dishName | titlecase }}</span>
+              <span class="food-reco-badge suggested" *ngIf="getFoodRecommendationTag(food) === 'suggested'">Suggested</span>
+              <span class="food-reco-badge warning" *ngIf="getFoodRecommendationTag(food) === 'not_recommended'">Not recommended</span>
+            </div>
             <div class="foodTimer-flex">
-             <span><ion-icon name="time-outline"></ion-icon></span> 
-             
-             <span class="foodTimer-flex-duration">{{ food.preparationTime }}</span> 
-             </div>
+              <ion-icon name="time-outline"></ion-icon>
+              <span class="foodTimer-flex-duration">{{ food.preparationTime }}</span>
+            </div>
        </div>
 </div>
-          <div class="food-image-shell" [class.image-loading]="isFoodImageLoading(food.image)">
+          <div class="food-image-shell" [class.image-loading]="isFoodImageLoading(food.image)" (click)="openImagePreview(food, $event)">
             <div class="image-shimmer" *ngIf="isFoodImageLoading(food.image)"></div>
             <img [src]="getImageUrl(food.image)" alt="{{ food.dishName }}" class="food-image" loading="lazy" decoding="async" (load)="onFoodImageLoad(food.image)" (error)="onFoodImageError(food.image)"/>
           </div>
@@ -219,6 +220,38 @@
               <ion-icon name="paper-plane-outline"></ion-icon>
             </button>
           </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal [isOpen]="showImagePreview" (didDismiss)="closeImagePreview()" cssClass="dish-image-preview-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ (activePreviewFood?.dishName || 'Dish Image') | titlecase }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="closeImagePreview()" aria-label="Close image preview">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="dish-image-preview-content">
+        <div class="image-preview-stage" *ngIf="activePreviewFood as previewFood">
+          <img
+            [src]="getImageUrl(previewFood.image)"
+            [alt]="previewFood.dishName"
+            [style.transform]="'scale(' + imagePreviewZoom + ')'" />
+        </div>
+        <div class="image-preview-controls">
+          <button type="button" (click)="zoomImagePreview(-0.25)" [disabled]="imagePreviewZoom <= 1" aria-label="Zoom out">
+            <ion-icon name="remove-outline"></ion-icon>
+          </button>
+          <span>{{ imagePreviewZoom | number:'1.0-2' }}x</span>
+          <button type="button" (click)="zoomImagePreview(0.25)" [disabled]="imagePreviewZoom >= 3" aria-label="Zoom in">
+            <ion-icon name="add-outline"></ion-icon>
+          </button>
         </div>
       </ion-content>
     </ng-template>

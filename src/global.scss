@@ -88,18 +88,18 @@ ion-header{
   padding: 0;
   background: var(--ion-color-primary);
   border-bottom: none;
-  min-height: 94px;
+  min-height: 64px;
 }
 
 ion-header ion-toolbar{
   --background: var(--ion-color-primary);
   --color: var(--ion-color-primary-contrast);
-  --min-height: 90px;
+  --min-height: 60px;
   --padding-start: 14px;
   --padding-end: 14px;
-  min-height: 90px;
-  height: 90px;
-  max-height: 94px;
+  min-height: 60px;
+  height: 60px;
+  max-height: 64px;
   display: flex;
   align-items: center;
 }
