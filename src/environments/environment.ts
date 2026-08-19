@@ -45,7 +45,7 @@ export const environment = {
   baseUrl: backendBaseUrl,
   uploadUrl: `${backendBaseUrl}/uploads`,
   socketUrl: backendBaseUrl,
-  googleClientId: '442106181123-24duo2db3chep7m4amp2dghrtlonv5mo.apps.googleusercontent.com'
+  googleClientId: '580684284008-3hchjufr7hhu18agbqis8dghcd1m1p50.apps.googleusercontent.com'
 };
 
 /*

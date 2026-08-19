@@ -14,6 +14,7 @@ export class AccountReadinessService {
     const missing: string[] = [];
     if (!user.emailVerified) missing.push('verify your email');
     if (!user.phoneVerified && !user.phoneVerification?.verifiedAt) missing.push('verify your phone');
+    if (!String(user.country || '').trim()) missing.push('complete your service location');
     if (!missing.length) return;
 
     const key = `${user._id || user.email || 'user'}:${source}:${new Date().toDateString()}`;

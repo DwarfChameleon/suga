@@ -11,6 +11,7 @@ import { LoadingService } from '../services/loading.service';
 import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
 import { PhoneVerificationProof, PhoneVerificationService } from '../services/phone-verification.service';
 import { isValidInternationalPhone, normalizeInternationalPhone, phoneDigits, stripDialCode } from '../utils/phone-number';
+import { AccountReadinessService } from '../services/account-readiness.service';
 
 @Component({
   selector: 'app-consumer-registration',
@@ -45,7 +46,8 @@ export class ConsumerRegistrationComponent implements OnInit {
     private readonly uiFeedback: UiFeedbackService,
     private readonly loadingService: LoadingService,
     private readonly addressData: AddressDataService,
-    private readonly phoneVerification: PhoneVerificationService
+    private readonly phoneVerification: PhoneVerificationService,
+    private readonly accountReadiness: AccountReadinessService
   ) {
     this.registrationForm = this.formBuilder.group({
       country: ['', Validators.required],
@@ -114,6 +116,7 @@ export class ConsumerRegistrationComponent implements OnInit {
 
   onGoogleAuthenticated(response: any): void {
     this.uiFeedback.success('Signed in with Google successfully.');
+    this.accountReadiness.promptIfNeeded(response?.user, 'registration');
     const rolesRaw = response?.user?.roles ?? [];
     const roles = Array.isArray(rolesRaw) ? rolesRaw : [rolesRaw];
     if (roles.includes('chef')) {

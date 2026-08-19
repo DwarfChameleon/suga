@@ -28,8 +28,17 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
   private static gsiScriptPromise?: Promise<void>;
   private static nativeGoogleInitPromise?: Promise<void>;
   private destroyed = false;
-  isNativeBusy = false;
+  isGoogleBusy = false;
+  webButtonReady = false;
+  webButtonFailed = false;
   readonly isNativeApp = Capacitor.isNativePlatform();
+
+  get googleButtonText(): string {
+    if (this.isGoogleBusy) {
+      return 'Opening Google...';
+    }
+    return this.context === 'register' ? 'Sign up with Google' : 'Continue with Google';
+  }
 
   constructor(
     private readonly authService: AuthService,
@@ -50,11 +59,11 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
 
   private async initializeGoogleButton(): Promise<void> {
     if (this.isNativeApp || !this.googleButtonContainer?.nativeElement) {
-      await this.initializeNativeGoogle();
       return;
     }
 
     try {
+      this.webButtonFailed = false;
       await this.loadGoogleScript();
       if (this.destroyed) return;
 
@@ -85,18 +94,29 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
         size: 'large',
         width: 260
       });
+      this.webButtonReady = true;
     } catch (error) {
       console.error('Google script load failed:', error);
+      this.webButtonFailed = true;
       this.uiFeedback.error('Unable to load Google sign-in.');
     }
   }
 
-  async signInWithNativeGoogle(): Promise<void> {
-    if (this.isNativeBusy) {
-      return;
+  async retryWebGoogleButton(): Promise<void> {
+    this.isGoogleBusy = true;
+    try {
+      GoogleSigninComponent.gsiScriptPromise = undefined;
+      await this.initializeGoogleButton();
+      if (!this.webButtonReady) {
+        this.uiFeedback.error('Google sign-in is still not ready. Check your browser connection or Google OAuth origin.');
+      }
+    } finally {
+      this.isGoogleBusy = false;
     }
+  }
 
-    this.isNativeBusy = true;
+  async signInWithNativeGoogle(): Promise<void> {
+    this.isGoogleBusy = true;
     try {
       await this.initializeNativeGoogle();
       await this.loadingService.show('Opening Google...');
@@ -104,14 +124,13 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
       const result = await SocialLogin.login({
         provider: 'google',
         options: {
-          scopes: ['email', 'profile', 'openid'],
           style: 'bottom',
           filterByAuthorizedAccounts: false,
           autoSelectEnabled: false
         }
       });
 
-      const idToken = result.result.responseType === 'online' ? result.result.idToken : null;
+      const idToken = this.resolveGoogleIdToken(result);
       if (!idToken) {
         throw new Error('Google sign-in did not return an ID token.');
       }
@@ -125,7 +144,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
       console.error('Native Google sign-in failed:', error);
       this.uiFeedback.error(this.resolveNativeGoogleError(error));
     } finally {
-      this.isNativeBusy = false;
+      this.isGoogleBusy = false;
     }
   }
 
@@ -138,6 +157,7 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
       this.authService.loginWithGoogle(idToken, [this.role]).subscribe({
         next: async (response) => {
           await this.loadingService.hide();
+          this.isGoogleBusy = false;
           this.authenticated.emit(response);
           if (this.authenticated.observers.length === 0) {
             this.accountReadiness.promptIfNeeded(response?.user, 'login');
@@ -147,11 +167,25 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
         },
         error: async (error) => {
           await this.loadingService.hide();
-          this.uiFeedback.error('Google authentication failed.');
+          this.isGoogleBusy = false;
+          const message = error?.error?.message || error?.message || 'Google authentication failed.';
+          this.uiFeedback.error(message);
           reject({ ...error, uiHandled: true });
         }
       });
     });
+  }
+
+  private resolveGoogleIdToken(result: any): string | null {
+    const googleResult = result?.result || result || {};
+    const directToken = googleResult.idToken || googleResult.jwt || googleResult.authorizationCode?.jwt;
+    if (directToken) {
+      return String(directToken);
+    }
+    if (googleResult.responseType === 'online' && googleResult.idToken) {
+      return String(googleResult.idToken);
+    }
+    return null;
   }
 
   private redirectAfterLogin(response: any): void {
@@ -177,9 +211,12 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
     }
 
     GoogleSigninComponent.gsiScriptPromise = new Promise<void>((resolve, reject) => {
+      const resolveWhenReady = () => {
+        this.waitForGoogleIdentity().then(resolve).catch(reject);
+      };
       const existingScript = document.querySelector('script[data-google-identity="true"]') as HTMLScriptElement | null;
       if (existingScript) {
-        existingScript.addEventListener('load', () => resolve(), { once: true });
+        resolveWhenReady();
         existingScript.addEventListener('error', () => reject(new Error('Failed to load Google Identity script')), { once: true });
         return;
       }
@@ -189,12 +226,30 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
       script.async = true;
       script.defer = true;
       script.setAttribute('data-google-identity', 'true');
-      script.onload = () => resolve();
+      script.onload = resolveWhenReady;
       script.onerror = () => reject(new Error('Failed to load Google Identity script'));
       document.head.appendChild(script);
     });
 
     return GoogleSigninComponent.gsiScriptPromise;
+  }
+
+  private waitForGoogleIdentity(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const startedAt = Date.now();
+      const checkReady = () => {
+        if (window.google?.accounts?.id) {
+          resolve();
+          return;
+        }
+        if (Date.now() - startedAt > 8000) {
+          reject(new Error('Google Sign-In is not ready yet.'));
+          return;
+        }
+        window.setTimeout(checkReady, 100);
+      };
+      checkReady();
+    });
   }
 
   private initializeNativeGoogle(): Promise<void> {
@@ -235,6 +290,9 @@ export class GoogleSigninComponent implements AfterViewInit, OnDestroy {
     }
     if (message.toLowerCase().includes('network')) {
       return 'Google sign-in could not reach the network. Please check your connection and try again.';
+    }
+    if (message.toLowerCase().includes('10') || message.toLowerCase().includes('developer_error')) {
+      return 'Google Sign-In is not fully configured for this Android build. Check the package name and SHA fingerprints in Firebase/Google Cloud.';
     }
     return 'Google sign-in could not start on this device. Please try again.';
   }

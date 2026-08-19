@@ -17,9 +17,10 @@
   flex-direction: column;
   justify-content: flex-end;
   background-image: url(/assets/img/fstorybg.gif);
-  background-size: 100% var(--login-hero-height);
+  background-size: 100% calc(var(--login-hero-height) + 36px);
   background-position: center top;
   background-repeat: no-repeat;
+  background-color: var(--ion-color-primary-modal);
   padding: var(--login-hero-height) 0 0;
 }
 

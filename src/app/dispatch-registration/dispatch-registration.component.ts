@@ -9,6 +9,7 @@ import { ModalControlService } from '../services/modal-control.service';
 import { AddressDataService, AddressFieldConfig, AddressFieldKey } from '../services/address-data.service';
 import { PhoneVerificationProof, PhoneVerificationService } from '../services/phone-verification.service';
 import { isValidInternationalPhone, normalizeInternationalPhone, phoneDigits, stripDialCode } from '../utils/phone-number';
+import { AccountReadinessService } from '../services/account-readiness.service';
 
 @Component({
   selector: 'app-dispatch-registration',
@@ -41,7 +42,8 @@ export class DispatchRegistrationComponent implements OnInit {
     private readonly loadingService: LoadingService,
     private readonly modalControlService: ModalControlService,
     private readonly addressData: AddressDataService,
-    private readonly phoneVerification: PhoneVerificationService
+    private readonly phoneVerification: PhoneVerificationService,
+    private readonly accountReadiness: AccountReadinessService
   ) {
     this.registrationForm = this.fb.group({
       country: ['', Validators.required],
@@ -166,6 +168,22 @@ export class DispatchRegistrationComponent implements OnInit {
     if (phoneDigits(currentPhone) !== phoneDigits(this.phoneVerificationProof.phoneNumber)) {
       this.resetPhoneVerification();
     }
+  }
+
+  onGoogleAuthenticated(response: any): void {
+    this.uiFeedback.success('Signed in with Google successfully.');
+    this.accountReadiness.promptIfNeeded(response?.user, 'registration');
+    const rolesRaw = response?.user?.roles ?? [];
+    const roles = Array.isArray(rolesRaw) ? rolesRaw : [rolesRaw];
+    if (roles.includes('dispatch')) {
+      this.router.navigate(['/components/dispatch']);
+      return;
+    }
+    if (roles.includes('chef')) {
+      this.router.navigate(['/components/chef']);
+      return;
+    }
+    this.router.navigate(['/components/consumer']);
   }
 
   async startPhoneVerification(): Promise<void> {
