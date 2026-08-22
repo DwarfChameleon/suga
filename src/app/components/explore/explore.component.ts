@@ -20,6 +20,7 @@ import { LikeEffectsService } from 'src/app/services/like-effects.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
+import { buildLocationLabel } from 'src/app/utils/location-label';
 import { StoryComponent } from '../story/story.component';
 
 interface StoryVideoItem {
@@ -711,6 +712,10 @@ getBackgroundImageStyle(imageUrl:string): any{
       },
       error: () => this.uiFeedback.error('Failed to post comment.')
     });
+  }
+
+  getFoodLocationLabel(food: Food | any): string {
+    return buildLocationLabel(food);
   }
 
   getImageUrl(image: string): string {

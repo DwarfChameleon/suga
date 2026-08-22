@@ -36,6 +36,17 @@
         <div class="order-count">{{ count || 0 }} orders</div>
       </div>
 
+      <div class="location-panel" *ngIf="getFoodLocationLabel() || getFoodAddressLabel()">
+        <div class="location-line" *ngIf="getFoodLocationLabel()">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>{{ getFoodLocationLabel() }}</span>
+        </div>
+        <div class="location-line muted" *ngIf="getFoodAddressLabel()">
+          <ion-icon name="navigate-outline"></ion-icon>
+          <span>{{ getFoodAddressLabel() }}</span>
+        </div>
+      </div>
+
       <div class="dish-status-row">
         <span class="verify-badge" [class.verified]="isFoodVerified()" [class.unverified]="!isFoodVerified()">
           <ion-icon [name]="isFoodVerified() ? 'checkmark-circle' : 'alert-circle-outline'"></ion-icon>

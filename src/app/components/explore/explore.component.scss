@@ -97,6 +97,10 @@ ion-toolbar ion-menu-button {
   color: currentColor;
 }
 
+.explore-tab .chef-hat-icon {
+  font-size: 24px;
+}
+
 .story-tab {
   color: var(--ion-color-primary-contrast);
   background: var(--ion-color-primary);
@@ -360,7 +364,7 @@ ion-content {
 }
 
 
-.categoryBTN{ 
+.categoryBTN{
   width: auto !important;
   padding-left: 10px;
 }
@@ -878,13 +882,13 @@ ion-content {
 .food-info,
 .naira {
   font-size: var(--font-strong-xlarge);
-  
+
 }
 
 .price {
   margin: 0;
   font-size: var(--font-strong-xlarge);
-  
+
 }
 
 .price-info h3{
@@ -923,9 +927,33 @@ ion-content {
   margin-top: 0;
 }
 .foodTimer-flex-duration{
-  left: 0;
-  position: relative;
-} 
+    left: 0;
+    position: relative;
+  }
+
+.food-location-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  color: var(--suga-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.food-location-row ion-icon {
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: var(--ion-color-primary);
+}
+
+.food-location-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .dish-image-preview-modal::part(content){
   --height: 100%;

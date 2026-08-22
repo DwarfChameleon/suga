@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/components/explore"></ion-back-button>
     </ion-buttons>
-    <ion-title>Chefs</ion-title>
+    <ion-title>Food Creators</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="refresh()" aria-label="Refresh chefs">
         <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
@@ -16,12 +16,12 @@
   <div class="chef-directory-page">
     <div class="search-box">
       <ion-icon name="search-outline"></ion-icon>
-      <input [(ngModel)]="query" placeholder="Search chefs by username" />
+      <input [(ngModel)]="query" placeholder="Search chefs, restaurants, or creators" />
     </div>
 
-    <div *ngIf="loading" class="state">Loading chefs...</div>
+    <div *ngIf="loading" class="state">Loading food creators...</div>
     <div *ngIf="!loading && errorMessage" class="state error">{{ errorMessage }}</div>
-    <div *ngIf="!loading && !errorMessage && filteredChefs.length === 0" class="state">No chefs found.</div>
+    <div *ngIf="!loading && !errorMessage && filteredChefs.length === 0" class="state">No food creators found.</div>
 
     <div class="chef-list" *ngIf="!loading && filteredChefs.length > 0">
       <div
@@ -34,7 +34,12 @@
       >
         <img [src]="getChefImage(chef.profilePicture)" [alt]="chef.username" />
         <div class="chef-info">
-          <div class="chef-name">@{{ chef.username }}</div>
+          <div class="chef-name">{{ getChefDisplayName(chef) }}</div>
+          <div class="chef-handle">@{{ chef.username }} · {{ getChefSubtitle(chef) }}</div>
+          <div class="chef-location" *ngIf="getChefLocationLabel(chef)">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ getChefLocationLabel(chef) }}</span>
+          </div>
           <div class="chef-meta">{{ chef.dishCount || 0 }} dishes · {{ chef.followersCount || 0 }} followers</div>
         </div>
         <button

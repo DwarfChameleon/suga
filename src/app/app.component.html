@@ -25,8 +25,8 @@
            
           <a (click)="closeMenu()" [routerLink]="'/components/explore'" class="menuLink"><div class="menuIcons"><ion-icon name="home"></ion-icon> <span class="menuLabel"> Explore</span></div></a>
           <a (click)="closeMenu()" [routerLink]="'/components/search'" class="menuLink"><div class="menuIcons"><ion-icon name="search-outline"></ion-icon> <span class="menuLabel"> Search</span></div></a>
-          <a (click)="closeMenu()" [routerLink]="'/components/chefs'" class="menuLink"><div class="menuIcons"><ion-icon name="restaurant-outline"></ion-icon> <span class="menuLabel"> Chefs</span></div></a>
-          <a (click)="openFoodStory()" class="menuLink"><div class="menuIcons"><ion-icon name="play-circle-outline"></ion-icon><span class="menuLabel"> Food Story</span></div></a>
+          <a (click)="closeMenu()" [routerLink]="'/components/chefs'" class="menuLink"><div class="menuIcons"><ion-icon class="menu-chef-icon" src="assets/icons/cute-chef.svg"></ion-icon> <span class="menuLabel"> Chefs</span></div></a>
+          <a (click)="openFoodStory()" class="menuLink"><div class="menuIcons"><ion-icon name="film-outline"></ion-icon><span class="menuLabel"> Food Story</span></div></a>
           <a *ngIf="isLoggedIn && isConsumer()" (click)="closeMenu()" [routerLink]="'/components/cart'" class="menuLink">
             <div class="menuIcons"><ion-icon name="cart-outline"></ion-icon><span class="menuLabel"> Cart</span></div>
           </a>

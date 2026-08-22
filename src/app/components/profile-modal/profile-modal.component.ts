@@ -10,6 +10,7 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { LoginModalComponent } from 'src/app/login-modal/login-modal.component';
 import { HttpClient } from '@angular/common/http';
 import { StoryComponent } from '../story/story.component';
+import { buildAddressLabel, buildLocationLabel } from 'src/app/utils/location-label';
 
 interface PublicProfileSummary {
   level?: string;
@@ -35,6 +36,20 @@ interface UserDetails {
   isOnline?: boolean;
   followersCount?: number;
   summary?: PublicProfileSummary;
+  country?: string;
+  state?: string;
+  region?: string;
+  city?: string;
+  suburb?: string;
+  neighborhood?: string;
+  neighbourhood?: string;
+  localGovernment?: string;
+  street?: string;
+  homeAddress?: string;
+  address?: string;
+  restaurantAddress?: string;
+  restaurantLocation?: string;
+  locationInfo?: string;
 }
 
 @Component({
@@ -141,6 +156,18 @@ export class ProfileModalComponent implements OnInit {
 
   get onlineLabel(): string {
     return this.userDetails?.isOnline ? 'Online' : 'Offline';
+  }
+
+  get profileLocationLabel(): string {
+    return buildLocationLabel(this.userDetails);
+  }
+
+  get profileAddressLabel(): string {
+    return buildAddressLabel(this.userDetails);
+  }
+
+  getFoodLocationLabel(food: Food | any): string {
+    return buildLocationLabel(food);
   }
 
   getFoodsByChefUsername(username: string): void {

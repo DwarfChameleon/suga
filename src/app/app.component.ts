@@ -93,9 +93,28 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     window.setTimeout(() => {
       window.requestAnimationFrame(() => {
         void this.nativeUi.hideSplashScreen();
+        this.dismissStartupOverlayWhenReady();
       });
       this.warmStartupData();
     }, 150);
+  }
+
+  private dismissStartupOverlayWhenReady(): void {
+    const startedAt = Date.now();
+    const removeOverlay = () => {
+      const overlay = document.getElementById('suga-startup-overlay');
+      overlay?.classList.add('is-hidden');
+      window.setTimeout(() => overlay?.remove(), 280);
+    };
+    const waitForPage = () => {
+      const pageReady = !!document.querySelector('ion-router-outlet .ion-page, ion-router-outlet > *');
+      if (pageReady || Date.now() - startedAt > 8000) {
+        removeOverlay();
+        return;
+      }
+      window.setTimeout(waitForPage, 120);
+    };
+    window.setTimeout(waitForPage, 250);
   }
 
   private warmStartupData(): void {

@@ -12,6 +12,14 @@
             <span>{{ onlineLabel }}</span>
             <span *ngIf="isDispatchProfile && profile.summary?.verificationStatus">{{ profile.summary?.verificationStatus | titlecase }}</span>
           </div>
+          <div class="profile-location" *ngIf="profileLocationLabel">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ profileLocationLabel }}</span>
+          </div>
+          <div class="profile-address" *ngIf="profileAddressLabel">
+            <ion-icon name="navigate-outline"></ion-icon>
+            <span>{{ profileAddressLabel }}</span>
+          </div>
         </div>
       </div>
       <button type="button" class="close-btn" (click)="closeModal()" aria-label="Close profile">
@@ -111,6 +119,10 @@
           <div class="food-details">
             <h3>{{ food.dishName }}</h3>
             <p>{{ food.preparationTime }}</p>
+            <p class="food-location" *ngIf="getFoodLocationLabel(food)">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ getFoodLocationLabel(food) }}</span>
+            </p>
             <p>{{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</p>
           </div>
         </div>

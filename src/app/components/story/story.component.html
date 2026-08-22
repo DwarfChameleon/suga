@@ -13,10 +13,24 @@
 </ion-header>
 
 <ion-content class="story-content">
+  <div class="story-tab-strip" *ngIf="!isLoading && isOnline" role="tablist" aria-label="Food story feeds">
+    <button
+      *ngFor="let tab of storyTabs"
+      type="button"
+      role="tab"
+      class="story-feed-tab"
+      [class.active]="activeStoryTab === tab.key"
+      [attr.aria-selected]="activeStoryTab === tab.key"
+      (click)="switchStoryTab(tab.key)"
+    >
+      <span>{{ tab.label }}</span>
+      <small>{{ getStoryTabCount(tab.key) }}</small>
+    </button>
+  </div>
   <div *ngIf="isLoading || !isOnline" class="story-skeleton">
     <ion-skeleton-text animated style="width:100%;height:90vh;"></ion-skeleton-text>
   </div>
-  <div *ngIf="emptyMessage" class="empty-state">{{ emptyMessage }}</div>
+  <div *ngIf="!isLoading && emptyMessage" class="empty-state">{{ emptyMessage }}</div>
   <div *ngFor="let video of videos" class="video-container">
     <div class="video-frame">
       <video
@@ -57,6 +71,10 @@
     </div>
     <div class="video-description">
      <div (click)="openProfileModal(video.username, videoEl) "> <h3 class="username-link">@{{ video.username }}</h3></div>
+      <div class="story-location" *ngIf="getStoryLocationLabel(video)">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ getStoryLocationLabel(video) }}</span>
+      </div>
       <p>{{ video.description }}</p>
       <ion-button
         *ngIf="video.orderEnabled && (video.linkedFoodId || video.linkedFood?.dishName)"

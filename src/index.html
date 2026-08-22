@@ -15,6 +15,53 @@
   <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
   <link rel="preconnect" href="https://suga-server.onrender.com" crossorigin />
   <link rel="dns-prefetch" href="//suga-server.onrender.com" />
+  <style>
+    #suga-startup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      display: grid;
+      place-items: center;
+      background: #ffffff;
+      transition: opacity 260ms ease, visibility 260ms ease;
+    }
+
+    #suga-startup-overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #suga-startup-overlay img {
+      width: 132px;
+      height: 132px;
+      object-fit: contain;
+      animation: sugaStartupPulse 1.05s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    @keyframes sugaStartupPulse {
+      0%, 100% {
+        width: 118px;
+        height: 118px;
+      }
+      50% {
+        width: 154px;
+        height: 154px;
+      }
+    }
+
+    html:not(.hydrated) body {
+      display: block !important;
+    }
+
+    html:not(.hydrated) app-root {
+      visibility: hidden;
+    }
+
+    html:not(.hydrated) #suga-startup-overlay {
+      visibility: visible;
+    }
+  </style>
 
   <!-- add to homescreen for ios -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -22,7 +69,32 @@
 </head>
 
 <body>
+  <div id="suga-startup-overlay" aria-label="SUGA loading">
+    <img src="assets/sugalogo.png" alt="SUGA" />
+  </div>
   <app-root></app-root>
+  <script>
+    (function () {
+      var startedAt = Date.now();
+      function dismiss() {
+        var overlay = document.getElementById('suga-startup-overlay');
+        if (!overlay) return;
+        overlay.classList.add('is-hidden');
+        window.setTimeout(function () { overlay.remove(); }, 280);
+      }
+      function waitForApp() {
+        var pageReady = document.querySelector('ion-router-outlet .ion-page, ion-router-outlet > *');
+        if (pageReady || Date.now() - startedAt > 8000) {
+          dismiss();
+          return;
+        }
+        window.setTimeout(waitForApp, 120);
+      }
+      window.addEventListener('load', function () {
+        window.setTimeout(waitForApp, 250);
+      });
+    })();
+  </script>
 </body>
 
 </html>

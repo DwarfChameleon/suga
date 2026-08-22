@@ -82,6 +82,38 @@
   white-space: nowrap;
 }
 
+.chef-handle {
+  margin-top: 2px;
+  color: var(--suga-muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chef-location {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--suga-muted);
+  font-size: 11px;
+  min-width: 0;
+}
+
+.chef-location ion-icon {
+  flex: 0 0 auto;
+  color: var(--ion-color-primary);
+  font-size: 13px;
+}
+
+.chef-location span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .chef-meta {
   margin-top: 4px;
   color: var(--suga-muted);

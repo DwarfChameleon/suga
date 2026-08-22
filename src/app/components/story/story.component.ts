@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild, ViewChildren, AfterViewInit, QueryList } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
 import { UserDetails } from 'src/app/interface/user-details';
 import { UserService } from 'src/app/services/user.service';
 import { ProfileModalComponent } from '../profile-modal/profile-modal.component';
@@ -15,7 +15,7 @@ import { LikeEffectsService } from 'src/app/services/like-effects.service';
 import { FoodService } from 'src/app/services/food.service';
 import { Food } from 'src/app/interface/food';
 import { OrderModalComponent } from '../order-modal/order-modal.component';
-import { firstValueFrom } from 'rxjs';
+import { buildLocationLabel } from 'src/app/utils/location-label';
 
 interface LinkedFoodSnapshot {
   dishName?: string;
@@ -25,6 +25,16 @@ interface LinkedFoodSnapshot {
   chefUsername?: string;
   image?: string;
   category?: string;
+  ingredients?: string[] | string;
+  ingredientsList?: string[];
+  country?: string;
+  state?: string;
+  region?: string;
+  city?: string;
+  suburb?: string;
+  neighborhood?: string;
+  neighbourhood?: string;
+  localGovernment?: string;
 }
 
 interface Video {
@@ -45,6 +55,23 @@ interface Video {
   orderEnabled?: boolean;
   linkedFoodId?: string;
   linkedFood?: LinkedFoodSnapshot;
+  featured?: boolean;
+  isFeatured?: boolean;
+  isPublic?: boolean;
+  public?: boolean;
+  visibility?: string;
+  status?: string;
+  dishName?: string;
+  ingredients?: string[] | string;
+  ingredientsList?: string[];
+  country?: string;
+  state?: string;
+  region?: string;
+  city?: string;
+  suburb?: string;
+  neighborhood?: string;
+  neighbourhood?: string;
+  localGovernment?: string;
 }
 
 interface Comment {
@@ -52,6 +79,18 @@ interface Comment {
   username: string;
   text: string;
   createdAt: string;
+}
+
+type StoryTabKey = 'explore' | 'following' | 'forYou';
+
+interface StoryTab {
+  key: StoryTabKey;
+  label: string;
+}
+
+interface DietPreferences {
+  allergies: string[];
+  desiredIngredients: string[];
 }
 
 @Component({
@@ -85,6 +124,16 @@ export class StoryComponent implements OnInit {
   private playbackTimers: Record<string, any> = {};
   private seenStoryIds = new Set<string>();
   private brokenVideoIds = new Set<string>();
+  storyTabs: StoryTab[] = [
+    { key: 'explore', label: 'Explore' },
+    { key: 'following', label: 'Following' },
+    { key: 'forYou', label: 'For you' }
+  ];
+  activeStoryTab: StoryTabKey = 'explore';
+  private exploreVideos: Video[] = [];
+  private followingVideos: Video[] = [];
+  private forYouVideos: Video[] = [];
+  private dietPreferences: DietPreferences = { allergies: [], desiredIngredients: [] };
 
   constructor(
     private http: HttpClient,
@@ -103,50 +152,176 @@ export class StoryComponent implements OnInit {
     const target = this.initialVideoId || this.route.snapshot.queryParamMap.get('videoId');
     if (target) this.targetVideoId = target;
 
-    const role = this.userService.getUserRole();
-    const sourceUrl = role === 'consumer'
-      ? `${environment.apiUrl}/videos/followed`
-      : `${environment.apiUrl}/videos`;
-    this.isLoading = true;
-    this.http.get<any[]>(sourceUrl).pipe(
-      catchError((err) => {
-        if (err?.status === 404 && sourceUrl.endsWith('/videos/followed')) {
-          return this.http.get<any[]>(`${environment.apiUrl}/videos`);
-        }
-        return of([]);
-      })
-    ).subscribe((data) => {
-      const currentUser = this.tokenStorage.getUser();
-      this.videos = data.map((v: Video) => ({
-        ...v,
-        likedByMe: currentUser?._id ? (v.likedBy || []).includes(currentUser._id) : false
-      }));
-      this.isLoading = false;
-      this.videos.forEach(video => {
-        video.showComments = false;
-        video.showCommentForm = false;
-      });
-      if (role === 'consumer' && this.videos.length === 0) {
-        this.emptyMessage = 'You have not followed any chef yet. Follow chef to see their contents.';
-      } else if (this.videos.length > 0) {
-        this.emptyMessage = '';
-      }
-      this.scrollToTarget();
-      this.queueInitialAutoplay();
-    });
-
     this.networkService.online$.subscribe((online) => {
       this.isOnline = online;
     });
     const user = this.tokenStorage.getUser();
     if (user) {
       this.userDetails = user;
+      this.dietPreferences = this.getDietPreferences(user);
       this.hydrateSeenStories();
     }
+    this.loadStoryFeeds();
     this.userService.followChanged$.subscribe(() => {
       this.reloadVideos();
     });
   }
+
+  switchStoryTab(tab: StoryTabKey): void {
+    if (this.activeStoryTab === tab) return;
+    if (this.currentPlayingId) {
+      this.pauseVideoById(this.currentPlayingId);
+      this.currentPlayingId = undefined;
+    }
+    this.activeStoryTab = tab;
+    this.applyActiveStoryTab();
+  }
+
+  getStoryTabCount(tab: StoryTabKey): number {
+    return this.getVideosForTab(tab).length;
+  }
+
+  private loadStoryFeeds(): void {
+    this.isLoading = true;
+    const canLoadFollowing = !!this.tokenStorage.getAccessToken();
+    const publicVideos$ = this.http.get<any[]>(`${environment.apiUrl}/videos`).pipe(catchError(() => of([])));
+    const followedVideos$ = canLoadFollowing
+      ? this.http.get<any[]>(`${environment.apiUrl}/videos/followed`).pipe(catchError(() => of([])))
+      : of([]);
+
+    forkJoin({
+      publicVideos: publicVideos$,
+      followedVideos: followedVideos$
+    }).subscribe(({ publicVideos, followedVideos }) => {
+      const preparedPublic = this.prepareVideos(publicVideos);
+      this.exploreVideos = this.sortExploreVideos(preparedPublic);
+      this.followingVideos = this.prepareVideos(followedVideos);
+      this.forYouVideos = this.buildForYouVideos(this.exploreVideos);
+      this.isLoading = false;
+      this.applyActiveStoryTab();
+      this.scrollToTarget();
+      this.queueInitialAutoplay();
+    });
+  }
+
+  private prepareVideos(items: any[]): Video[] {
+    const currentUser = this.tokenStorage.getUser();
+    return (items || [])
+      .filter((v) => !!v?._id && !!v?.path)
+      .map((v: Video) => ({
+        ...v,
+        comments: Array.isArray(v.comments) ? v.comments : [],
+        likedByMe: currentUser?._id ? (v.likedBy || []).includes(currentUser._id) : false,
+        showComments: false,
+        showCommentForm: false
+      }));
+  }
+
+  private sortExploreVideos(videos: Video[]): Video[] {
+    return [...videos]
+      .filter((video) => this.isPublicVideo(video))
+      .sort((a, b) => {
+        const featuredDiff = Number(!!(b.featured || b.isFeatured)) - Number(!!(a.featured || a.isFeatured));
+        if (featuredDiff !== 0) return featuredDiff;
+        return new Date(b.uploadedAt || 0).getTime() - new Date(a.uploadedAt || 0).getTime();
+      });
+  }
+
+  private buildForYouVideos(videos: Video[]): Video[] {
+    const prefs = this.dietPreferences;
+    const hasPrefs = prefs.allergies.length > 0 || prefs.desiredIngredients.length > 0;
+    if (!hasPrefs) {
+      return videos.slice(0, 25);
+    }
+
+    const scored = videos
+      .map((video) => ({ video, score: this.getDietMatchScore(video, prefs) }))
+      .filter((item) => item.score >= 0)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return new Date(b.video.uploadedAt || 0).getTime() - new Date(a.video.uploadedAt || 0).getTime();
+      });
+
+    return scored.map((item) => item.video);
+  }
+
+  private getDietMatchScore(video: Video, prefs: DietPreferences): number {
+    const searchable = this.getSearchableVideoText(video);
+    const hasAllergy = prefs.allergies.some((term) => this.matchesAnyText(searchable, term));
+    if (hasAllergy) return -1;
+
+    const desiredMatches = prefs.desiredIngredients.filter((term) => this.matchesAnyText(searchable, term)).length;
+    return desiredMatches > 0 ? desiredMatches + 2 : 0;
+  }
+
+  private getSearchableVideoText(video: Video): string[] {
+    const linkedFood = video.linkedFood || {};
+    return [
+      video.description,
+      video.dishName,
+      linkedFood.dishName,
+      linkedFood.category,
+      linkedFood.chefUsername,
+      ...(video.hashtags || []),
+      ...this.normalizeIngredientTerms(video.ingredients),
+      ...this.normalizeIngredientTerms(video.ingredientsList),
+      ...this.normalizeIngredientTerms(linkedFood.ingredients),
+      ...this.normalizeIngredientTerms(linkedFood.ingredientsList)
+    ].filter((value): value is string => !!String(value || '').trim());
+  }
+
+  private normalizeIngredientTerms(value: string[] | string | undefined): string[] {
+    if (Array.isArray(value)) return value.map((item) => String(item || '').trim()).filter(Boolean);
+    if (!value) return [];
+    return String(value)
+      .split(/[,;\n]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  private matchesAnyText(values: string[], term: string): boolean {
+    const needle = String(term || '').trim().toLowerCase();
+    if (!needle) return false;
+    return values.some((value) => String(value || '').toLowerCase().includes(needle));
+  }
+
+  private isPublicVideo(video: Video): boolean {
+    const visibility = String(video.visibility || video.status || 'public').toLowerCase();
+    return video.isPublic !== false
+      && video.public !== false
+      && !['private', 'draft', 'deleted', 'inactive'].includes(visibility);
+  }
+
+  private getDietPreferences(user: any): DietPreferences {
+    const prefs = user?.dietPreferences || user?.profile?.dietPreferences || {};
+    return {
+      allergies: this.normalizeIngredientTerms(prefs.allergies || prefs.allergicItems),
+      desiredIngredients: this.normalizeIngredientTerms(prefs.desiredIngredients || prefs.interests || prefs.interestedItems)
+    };
+  }
+
+  private applyActiveStoryTab(): void {
+    this.videos = [...this.getVideosForTab(this.activeStoryTab)];
+    this.emptyMessage = this.getEmptyMessageForTab(this.activeStoryTab);
+    setTimeout(() => {
+      this.setupObserver();
+      this.queueInitialAutoplay();
+    }, 0);
+  }
+
+  private getVideosForTab(tab: StoryTabKey): Video[] {
+    if (tab === 'following') return this.followingVideos;
+    if (tab === 'forYou') return this.forYouVideos;
+    return this.exploreVideos;
+  }
+
+  private getEmptyMessageForTab(tab: StoryTabKey): string {
+    if (this.getVideosForTab(tab).length > 0) return '';
+    if (tab === 'following') return 'Follow chefs, restaurants, or food creators to see their stories here.';
+    if (tab === 'forYou') return 'Update your diet preferences to improve your story suggestions.';
+    return 'No public food stories yet.';
+  }
+
   getVideoUrl(path: string): string {
     const normalized = this.normalizeVideoPath(path);
     if (!normalized) return '';
@@ -155,6 +330,10 @@ export class StoryComponent implements OnInit {
       return `${environment.baseUrl}/${normalized}`;
     }
     return `${environment.baseUrl}/videos/${normalized}`;
+  }
+
+  getStoryLocationLabel(video: Video): string {
+    return buildLocationLabel(video.linkedFood) || buildLocationLabel(video);
   }
  onScroll(){
    
@@ -421,30 +600,8 @@ export class StoryComponent implements OnInit {
   }
 
   private reloadVideos(): void {
-    const role = this.userService.getUserRole();
-    const sourceUrl = role === 'consumer'
-      ? `${environment.apiUrl}/videos/followed`
-      : `${environment.apiUrl}/videos`;
-    this.http.get<any[]>(sourceUrl).pipe(
-      catchError((err) => {
-        if (err?.status === 404 && sourceUrl.endsWith('/videos/followed')) {
-          return this.http.get<any[]>(`${environment.apiUrl}/videos`);
-        }
-        return of([]);
-      })
-    ).subscribe((data) => {
-      const currentUser = this.tokenStorage.getUser();
-      this.videos = data.map((v: Video) => ({
-        ...v,
-        likedByMe: currentUser?._id ? (v.likedBy || []).includes(currentUser._id) : false
-      }));
-      if (role === 'consumer' && this.videos.length === 0) {
-        this.emptyMessage = 'You have not followed any chef yet. Follow chef to see their contents.';
-      } else {
-        this.emptyMessage = '';
-      }
-      this.scrollToTarget();
-    });
+    this.dietPreferences = this.getDietPreferences(this.tokenStorage.getUser());
+    this.loadStoryFeeds();
   }
 
   private scrollToTarget(): void {

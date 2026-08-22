@@ -138,6 +138,10 @@
               <ion-icon name="time-outline"></ion-icon>
               <span class="foodTimer-flex-duration">{{ food.preparationTime }}</span>
             </div>
+            <div class="food-location-row" *ngIf="getFoodLocationLabel(food)">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ getFoodLocationLabel(food) }}</span>
+            </div>
        </div>
 </div>
           <div class="food-image-shell" [class.image-loading]="isFoodImageLoading(food.image)" (click)="openImagePreview(food, $event)">
@@ -270,7 +274,7 @@
         <span *ngIf="missedStoriesCount > 0" class="tab-badge">{{ missedStoriesCount }}</span>
       </button>
       <button type="button" class="explore-tab" (click)="openChefDirectory()" aria-label="Chefs">
-        <ion-icon name="restaurant-outline"></ion-icon>
+        <ion-icon class="chef-hat-icon" src="assets/icons/cute-chef.svg"></ion-icon>
         <span>Chefs</span>
       </button>
       <button type="button" class="explore-tab" (click)="openAccount()" aria-label="Account">

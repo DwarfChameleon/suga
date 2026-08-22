@@ -1,25 +1,49 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>SUGA</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="welcome-page">
+  <header class="suga-header">
+    <ion-menu-button class="menu-btn" aria-label="Open menu"></ion-menu-button>
+    <div class="brand">SUGA</div>
+  </header>
 
-<ion-content class="auth-form">
-  <div id="container">
-    <div class="curvy-div2">
-      <div class="welcome-overlay">
-        <h1>Discover<br> Local Chefs Around<br> Your Area.</h1>
+  <section class="hero">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <h1>
+        Good<br>
+        Food<br>
+        <span>Starts</span><br>
+        <span>Here.</span>
+      </h1>
+
+      <div class="accent-line"></div>
+
+      <p class="intro">
+        Join thousands of food lovers, chefs, restaurants and riders on one powerful app.
+      </p>
+
+      <div class="slogan">
+        <span class="s-discover">Discover.</span>
+        <span class="s-connect">Connect.</span>
+        <span class="s-enjoy">Enjoy.</span>
+        <span class="s-earn">Earn.</span>
       </div>
+
     </div>
-    <div class="curvy-div">
-      <div class="authAction">
-        <button [routerLink]="['/registration']" expand="block" class="regSubmitBTN signon">Register</button>
-        <h2 class="alreadyUser">Or</h2>
-        <button (click)="openLoginModal()" expand="block" class="regSubmitBTN signin">Sign In</button>
-      </div>
+  </section>
+
+  <section class="cta">
+    <div class="cta-title">
+      <strong>Ready to join Suga?</strong>
     </div>
-  </div>
+
+    <button type="button" class="register-btn" [routerLink]="['/registration']">
+      Register
+    </button>
+
+    <div class="or">Or</div>
+
+    <button type="button" class="signin-btn" (click)="openLoginModal()">
+      Sign In
+    </button>
+  </section>
 </ion-content>

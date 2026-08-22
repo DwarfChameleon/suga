@@ -12,6 +12,7 @@ import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { CartComponent } from '../cart/cart.component';
 import { Subscription } from 'rxjs';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
+import { buildAddressLabel, buildLocationLabel } from 'src/app/utils/location-label';
 
 
 @Component({
@@ -205,6 +206,14 @@ async openOrderModal(food: Food) {
 
   isFoodVerified(): boolean {
     return this.food?.verificationStatus === 'verified' || !!this.food?.profileCompletion?.verified;
+  }
+
+  getFoodLocationLabel(food: Food | any = this.food): string {
+    return buildLocationLabel(food);
+  }
+
+  getFoodAddressLabel(food: Food | any = this.food): string {
+    return buildAddressLabel(food);
   }
 
   private getRecommendationTag(food: Food | any): 'suggested' | 'not_recommended' | '' {

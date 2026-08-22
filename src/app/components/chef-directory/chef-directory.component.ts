@@ -6,12 +6,28 @@ import { FollowChangeEvent, UserService } from 'src/app/services/user.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
+import { buildLocationLabel } from 'src/app/utils/location-label';
 import { ProfileModalComponent } from '../profile-modal/profile-modal.component';
 
 interface ChefDirectoryItem {
   _id: string;
   username: string;
   profilePicture: string;
+  name?: string;
+  displayName?: string;
+  restaurantName?: string;
+  businessName?: string;
+  brandName?: string;
+  creatorType?: string;
+  accountType?: string;
+  country?: string;
+  state?: string;
+  region?: string;
+  city?: string;
+  suburb?: string;
+  neighborhood?: string;
+  neighbourhood?: string;
+  localGovernment?: string;
   dishCount: number;
   followersCount: number;
   score?: number;
@@ -64,11 +80,37 @@ export class ChefDirectoryComponent implements OnInit, OnDestroy {
       return String(a.username || '').localeCompare(String(b.username || ''));
     });
     if (!term) return list;
-    return list.filter((chef) => String(chef.username || '').toLowerCase().includes(term));
+    return list.filter((chef) => [
+      chef.username,
+      this.getChefDisplayName(chef),
+      this.getChefSubtitle(chef),
+      this.getChefLocationLabel(chef)
+    ].some((value) => String(value || '').toLowerCase().includes(term)));
   }
 
   getChefImage(profilePicture: string): string {
     return resolveUploadUrl(profilePicture, '/assets/img/regpage.jpeg');
+  }
+
+  getChefDisplayName(chef: ChefDirectoryItem): string {
+    return chef.restaurantName
+      || chef.businessName
+      || chef.brandName
+      || chef.displayName
+      || chef.name
+      || chef.username
+      || 'Food creator';
+  }
+
+  getChefSubtitle(chef: ChefDirectoryItem): string {
+    const type = String(chef.creatorType || chef.accountType || '').trim();
+    if (type) return type;
+    if (chef.restaurantName || chef.businessName) return 'Restaurant';
+    return 'Chef / food creator';
+  }
+
+  getChefLocationLabel(chef: ChefDirectoryItem): string {
+    return buildLocationLabel(chef);
   }
 
   isFollowing(chefId: string): boolean {
