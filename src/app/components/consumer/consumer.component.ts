@@ -11,6 +11,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { OrderInfoComponent } from '../order-info/order-info.component';
 import { OrderRatingComponent } from '../order-rating/order-rating.component';
 import { UserService } from 'src/app/services/user.service';
+import { OrderChatComponent } from '../order-chat/order-chat.component';
 @Component({
   selector: 'app-consumer',
   templateUrl: './consumer.component.html',
@@ -34,6 +35,7 @@ export class ConsumerComponent implements OnInit {
   private completedSeen = new Set<string>();
   private pendingOpenOrderId = '';
   private openedStateOrder = false;
+  focusedOrderId = '';
 
   constructor(
     private authService: AuthService,
@@ -240,6 +242,35 @@ export class ConsumerComponent implements OnInit {
       cssClass: 'suga-order-fullsheet'
     });
     await modal.present();
+    const result = await modal.onDidDismiss();
+    const focusOrderId = String(result?.data?.focusOrderId || '').trim();
+    if (focusOrderId) {
+      this.focusOrderCard(focusOrderId);
+    } else if (result?.data?.changed) {
+      this.fetchUserOrders();
+    }
+  }
+
+  canOpenOrderChat(order: Order): boolean {
+    return ['confirmed', 'approved', 'processing', 'delivered'].includes(order.status);
+  }
+
+  async openOrderChat(order: Order, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    if (!order?._id || !this.canOpenOrderChat(order)) return;
+    const modal = await this.modalController.create({
+      component: OrderChatComponent,
+      componentProps: {
+        orderId: order._id,
+        dishName: order.dishName,
+        trackingNumber: (order as any).trackingNumber || ''
+      },
+      cssClass: 'suga-order-chat-sheet',
+      initialBreakpoint: 0.78,
+      breakpoints: [0, 0.55, 0.78, 0.96],
+      handle: false
+    });
+    await modal.present();
   }
 
   private async openPendingOrderFromState(): Promise<void> {
@@ -253,6 +284,46 @@ export class ConsumerComponent implements OnInit {
 
   trackByOrder(_index: number, order: Order): string {
     return order._id;
+  }
+
+  getOrderCardId(order: Order): string {
+    return `dashboard-order-${order?._id || ''}`;
+  }
+
+  getOrderCardClasses(order: Order): Record<string, boolean> {
+    return {
+      'order-card-pending-chef': this.isPendingChefAcceptance(order),
+      'order-card-chef-accepted': this.isChefAccepted(order) && order.status !== 'completed',
+      'order-card-completed': order.status === 'completed',
+      'order-card-focus': this.focusedOrderId === order._id
+    };
+  }
+
+  isPendingChefAcceptance(order: Order): boolean {
+    return order.status === 'placed';
+  }
+
+  isChefAccepted(order: Order): boolean {
+    return ['confirmed', 'approved', 'processing', 'delivered', 'completed'].includes(order.status);
+  }
+
+  private focusOrderCard(orderId: string): void {
+    this.selectedSegment = 'liveOrder';
+    const order = this.orders.find((item) => item._id === orderId);
+    if (order?.status === 'completed') {
+      this.selectedSegment = 'completedOrders';
+    }
+
+    this.focusedOrderId = orderId;
+    setTimeout(() => {
+      const card = document.getElementById(`dashboard-order-${orderId}`);
+      card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.setTimeout(() => {
+        if (this.focusedOrderId === orderId) {
+          this.focusedOrderId = '';
+        }
+      }, 2600);
+    }, 120);
   }
 
   getOrderStatusLabel(order: Order): string {

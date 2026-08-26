@@ -45,6 +45,7 @@ export const environment = {
   baseUrl: backendBaseUrl,
   uploadUrl: `${backendBaseUrl}/uploads`,
   socketUrl: backendBaseUrl,
+  mapTileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   googleClientId: '580684284008-3hchjufr7hhu18agbqis8dghcd1m1p50.apps.googleusercontent.com'
 };
 

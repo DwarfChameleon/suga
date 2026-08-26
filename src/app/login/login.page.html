@@ -17,8 +17,17 @@
     </ion-item>
     <ion-item lines="full">
       <ion-label position="floating">Password</ion-label>
-      <ion-input type="password" required></ion-input>
+      <ion-input [type]="showPassword ? 'text' : 'password'" required>
+      </ion-input>
     </ion-item>
+    <button
+      type="button"
+      class="password-toggle under-input"
+      (click)="showPassword = !showPassword"
+      [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+      <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+      <span>{{ showPassword ? 'Hide password' : 'Show password' }}</span>
+    </button>
     <ion-row>
       <ion-col>
         <ion-button type="submit" color="danger" expand="block">Sign In</ion-button>

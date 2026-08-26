@@ -23,8 +23,25 @@
       <h2>{{ profile?.dispatchProfile?.companyName || profile?.username || 'Dispatch rider' }}</h2>
       <p>Update the business, vehicle and availability details used for delivery matching.</p>
     </div>
-    <div class="hero-pill" [class.offline]="!form.isAvailable">
-      {{ form.isAvailable ? 'Available' : 'Offline' }}
+    <div class="hero-actions">
+      <div class="rider-photo">
+        <img [src]="getProfileImage()" alt="Dispatch rider profile" />
+      </div>
+      <input
+        #profileImageInput
+        type="file"
+        accept="image/*"
+        class="file-input-hidden"
+        (change)="onProfileImageChange($event)"
+      />
+      <button type="button" class="photo-btn" (click)="profileImageInput.click()" [disabled]="saving">
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>{{ selectedProfileImage ? 'Change selected' : 'Change photo' }}</span>
+      </button>
+      <small class="photo-name" *ngIf="selectedProfileImage">{{ selectedProfileImage.name }}</small>
+      <div class="hero-pill" [class.offline]="!form.isAvailable">
+        {{ form.isAvailable ? 'Available' : 'Offline' }}
+      </div>
     </div>
   </div>
 
@@ -45,11 +62,108 @@
 
   <div class="form-shell" *ngIf="!loading; else loadingState">
     <section class="form-card">
-      <div class="section-head">
-        <h3>Business</h3>
-        <p>How riders and chefs should see your dispatch identity.</p>
+      <button type="button" class="section-head section-toggle" (click)="toggleSection('personal')">
+        <span>
+          <h3>Personal Details</h3>
+          <p>These details help chefs, consumers and admins identify the rider correctly.</p>
+        </span>
+        <ion-icon [name]="expandedSections.personal ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </button>
+
+      <div class="card-body" *ngIf="expandedSections.personal">
+      <div class="field-grid">
+        <label class="field">
+          <span>Full name</span>
+          <input type="text" [(ngModel)]="form.fullName" placeholder="Enter full name" />
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" [(ngModel)]="form.email" placeholder="name@example.com" />
+        </label>
+
+        <label class="field">
+          <span>Phone number</span>
+          <input type="tel" [(ngModel)]="form.phoneNumber" placeholder="+2348012345678" />
+        </label>
+
+        <label class="field">
+          <span>Country</span>
+          <select [(ngModel)]="form.country" (ngModelChange)="onCountryChanged()">
+            <option value="">Select country</option>
+            <option *ngFor="let country of countryOptions" [value]="country">{{ country }}</option>
+          </select>
+        </label>
+
+        <label class="field" *ngIf="isAddressFieldActive('region')">
+          <span>{{ addressFieldLabel('region', 'Region') }}</span>
+          <select *ngIf="isAddressFieldSelect('region')" [(ngModel)]="form.region" (ngModelChange)="onRegionOrStateChanged()">
+            <option value="">Select {{ addressFieldLabel('region', 'Region') }}</option>
+            <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('region')" type="text" [(ngModel)]="form.region" />
+        </label>
+
+        <label class="field" *ngIf="isAddressFieldActive('state')">
+          <span>{{ addressFieldLabel('state', 'State') }}</span>
+          <select *ngIf="isAddressFieldSelect('state')" [(ngModel)]="form.state" (ngModelChange)="onRegionOrStateChanged()">
+            <option value="">Select {{ addressFieldLabel('state', 'State') }}</option>
+            <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('state')" type="text" [(ngModel)]="form.state" />
+        </label>
+
+        <label class="field" *ngIf="isAddressFieldActive('city')">
+          <span>{{ addressFieldLabel('city', 'City') }}</span>
+          <select *ngIf="isAddressFieldSelect('city')" [(ngModel)]="form.city" (ngModelChange)="onCityChanged()">
+            <option value="">Select {{ addressFieldLabel('city', 'City') }}</option>
+            <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('city')" type="text" [(ngModel)]="form.city" (ngModelChange)="onCityChanged()" />
+        </label>
+
+        <label class="field" *ngIf="isAddressFieldActive('suburb')">
+          <span>{{ addressFieldLabel('suburb', 'Neighbourhood') }}</span>
+          <select *ngIf="isAddressFieldSelect('suburb')" [(ngModel)]="form.suburb">
+            <option value="">Select {{ addressFieldLabel('suburb', 'Neighbourhood') }}</option>
+            <option *ngFor="let suburb of suburbs" [value]="suburb">{{ suburb }}</option>
+          </select>
+          <input *ngIf="!isAddressFieldSelect('suburb')" type="text" [(ngModel)]="form.suburb" />
+        </label>
+
+        <label class="field" *ngIf="isAddressFieldActive('localGovernment')">
+          <span>{{ addressFieldLabel('localGovernment', 'Local government') }}</span>
+          <input type="text" [(ngModel)]="form.localGovernment" />
+        </label>
+
+        <label class="field" *ngIf="isAddressFieldActive('street')">
+          <span>{{ addressFieldLabel('street', 'Street') }}</span>
+          <input type="text" [(ngModel)]="form.street" />
+        </label>
       </div>
 
+      <label class="field">
+        <span>Address</span>
+        <textarea rows="3" [(ngModel)]="form.homeAddress" placeholder="House number, street and nearby landmark"></textarea>
+      </label>
+
+      <label class="field">
+        <span>Location note</span>
+        <input type="text" [(ngModel)]="form.locationInfo" placeholder="Extra delivery or pickup note" />
+      </label>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <button type="button" class="section-head section-toggle" (click)="toggleSection('business')">
+        <span>
+          <h3>Business</h3>
+          <p>How riders and chefs should see your dispatch identity.</p>
+        </span>
+        <ion-icon [name]="expandedSections.business ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </button>
+
+      <div class="card-body" *ngIf="expandedSections.business">
       <label class="toggle-row">
         <span>Registered as a company</span>
         <ion-toggle [(ngModel)]="form.isCompany"></ion-toggle>
@@ -59,14 +173,19 @@
         <span>Company name</span>
         <input type="text" [(ngModel)]="form.companyName" placeholder="Enter dispatch company name" />
       </label>
+      </div>
     </section>
 
     <section class="form-card">
-      <div class="section-head">
-        <h3>Vehicle</h3>
-        <p>Used for route matching and delivery presentation.</p>
-      </div>
+      <button type="button" class="section-head section-toggle" (click)="toggleSection('vehicle')">
+        <span>
+          <h3>Vehicle</h3>
+          <p>Used for route matching and delivery presentation.</p>
+        </span>
+        <ion-icon [name]="expandedSections.vehicle ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </button>
 
+      <div class="card-body" *ngIf="expandedSections.vehicle">
       <label class="field">
         <span>Vehicle types</span>
         <input type="text" [(ngModel)]="form.vehicleTypes" placeholder="Bike, car, van" />
@@ -81,18 +200,45 @@
         <span>License number</span>
         <input type="text" [(ngModel)]="form.licenseNumber" placeholder="License or permit number" />
       </label>
+      </div>
     </section>
 
     <section class="form-card">
-      <div class="section-head">
-        <h3>Coverage</h3>
-        <p>Set the areas where you actively receive delivery requests.</p>
-      </div>
+      <button type="button" class="section-head section-toggle" (click)="toggleSection('coverage')">
+        <span>
+          <h3>Coverage</h3>
+          <p>Set the areas where you actively receive delivery requests.</p>
+        </span>
+        <ion-icon [name]="expandedSections.coverage ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+      </button>
 
+      <div class="card-body" *ngIf="expandedSections.coverage">
       <label class="field">
         <span>Operating areas</span>
-        <textarea rows="4" [(ngModel)]="form.operatingAreas" placeholder="Lagos Island, Yaba, Lekki"></textarea>
+        <textarea rows="4" [(ngModel)]="form.operatingAreas" placeholder="Separate areas with commas, e.g. Lagos Island, Yaba, Lekki"></textarea>
       </label>
+
+      <div class="area-chip-row" *ngIf="operatingAreaItems.length">
+        <span
+          class="area-chip"
+          *ngFor="let area of operatingAreaItems"
+          [class.invalid]="!area.valid"
+        >
+          {{ area.value }}
+          <button type="button" (click)="removeOperatingArea(area.value)" aria-label="Remove operating area">x</button>
+        </span>
+      </div>
+
+      <small class="field-error" *ngIf="invalidOperatingAreas.length">
+        Invalid areas: {{ invalidOperatingAreas.join(', ') }}
+      </small>
+
+      <div class="area-suggestions" *ngIf="operatingAreaSuggestions.length">
+        <span>Suggestions</span>
+        <button type="button" *ngFor="let area of operatingAreaSuggestions" (click)="addOperatingArea(area)">
+          {{ area }}
+        </button>
+      </div>
 
       <label class="toggle-row availability">
         <div>
@@ -101,6 +247,7 @@
         </div>
         <ion-toggle [(ngModel)]="form.isAvailable"></ion-toggle>
       </label>
+      </div>
     </section>
   </div>
 

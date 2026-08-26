@@ -33,6 +33,7 @@ export class DispatchRegistrationComponent implements OnInit {
   phoneVerificationCode = '';
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
+  showPassword = false;
 
   constructor(
     private readonly fb: FormBuilder,

@@ -7,9 +7,11 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ModalController } from '@ionic/angular';
 import { OrderInfoComponent } from '../order-info/order-info.component';
 import { OrderRatingComponent } from '../order-rating/order-rating.component';
+import { OrderChatComponent } from '../order-chat/order-chat.component';
 import { NotificationSocketService } from 'src/app/services/notification-socket.service';
 import { Subscription } from 'rxjs';
 import { humanizeHistoryLabel } from 'src/app/utils/history-formatters';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 type DispatchSectionKey = 'orders' | 'profile' | 'analytics' | 'history' | 'payout';
 
@@ -53,6 +55,8 @@ export class DispatchComponent implements OnInit, OnDestroy {
     payout: true
   };
   loading = true;
+  showAllRoutes = false;
+  showAllPayouts = false;
 
   constructor(
     private readonly dispatchService: DispatchService,
@@ -308,6 +312,10 @@ export class DispatchComponent implements OnInit, OnDestroy {
     this.router.navigate(['/components/story']);
   }
 
+  openStory(): void {
+    this.openStoryPage();
+  }
+
   goHome(): void {
     this.router.navigate(['/components/explore']);
   }
@@ -322,6 +330,14 @@ export class DispatchComponent implements OnInit, OnDestroy {
 
   openProfileSettings(): void {
     this.router.navigate(['/components/dispatch-profile']);
+  }
+
+  editProfile(): void {
+    this.openProfileSettings();
+  }
+
+  finishProfile(): void {
+    this.openProfileSettings();
   }
 
   logout(): void {
@@ -347,6 +363,153 @@ export class DispatchComponent implements OnInit, OnDestroy {
 
   toggleSection(section: DispatchSectionKey): void {
     this.sections[section] = !this.sections[section];
+  }
+
+  get currentOrders(): any[] {
+    if (this.selectedTab === 'available') return this.availableOrders;
+    if (this.selectedTab === 'completed') return this.completedOrders;
+    return this.activeOrders;
+  }
+
+  get displayedRoutes(): any[] {
+    return this.showAllRoutes ? this.historyOrders : this.historyOrders.slice(0, 4);
+  }
+
+  get displayedPayouts(): any[] {
+    return this.showAllPayouts ? this.walletTransactions : this.walletTransactions.slice(0, 3);
+  }
+
+  get hasDispatchNotifications(): boolean {
+    return this.seenNotificationIds.size > 0;
+  }
+
+  get profileCompleteness(): number {
+    const fields = this.getProfileCompletionFields();
+    if (!fields.length) return 0;
+    const completed = fields.filter((field) => field.done).length;
+    return Math.round((completed / fields.length) * 100);
+  }
+
+  get missingFields(): Array<{ label: string; icon: string }> {
+    return this.getProfileCompletionFields()
+      .filter((field) => !field.done)
+      .map(({ label, icon }) => ({ label, icon }));
+  }
+
+  toggleAllRoutes(): void {
+    this.showAllRoutes = !this.showAllRoutes;
+  }
+
+  toggleAllPayouts(): void {
+    this.showAllPayouts = !this.showAllPayouts;
+  }
+
+  setOrderTab(tab: 'active' | 'available' | 'completed'): void {
+    this.selectTab(tab);
+  }
+
+  async openOrder(order: any): Promise<void> {
+    await this.openOrderDetails(order?._id || order?.id);
+  }
+
+  canOpenOrderChat(order: any): boolean {
+    return !!(order?._id || order?.id) &&
+      this.selectedTab !== 'available' &&
+      ['confirmed', 'approved', 'processing', 'delivered'].includes(String(order?.status || ''));
+  }
+
+  async openOrderChat(order: any, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    if (!this.canOpenOrderChat(order)) return;
+    const modal = await this.modalController.create({
+      component: OrderChatComponent,
+      componentProps: {
+        orderId: order._id || order.id,
+        dishName: order.dishName || 'Delivery order',
+        trackingNumber: order.trackingNumber || ''
+      },
+      cssClass: 'suga-order-chat-sheet',
+      initialBreakpoint: 0.78,
+      breakpoints: [0, 0.55, 0.78, 0.96],
+      handle: false
+    });
+    await modal.present();
+  }
+
+  async openRoute(route: any): Promise<void> {
+    await this.openOrderDetails(route?._id || route?.orderId || route?.id);
+  }
+
+  getDispatchName(): string {
+    return this.profile?.dispatchProfile?.companyName || this.profile?.username || 'Dispatch rider';
+  }
+
+  getDispatchPhoto(): string {
+    const storedUser = this.tokenStorage.getUser();
+    return resolveUploadUrl(
+      this.profile?.profilePicture
+        || this.profile?.avatar
+        || this.profile?.dispatchProfile?.photo
+        || storedUser?.profilePicture
+        || storedUser?.avatar,
+      'assets/images/users/default-rider.jpg'
+    );
+  }
+
+  getVehicleType(): string {
+    const types = this.profile?.dispatchProfile?.vehicleTypes;
+    if (Array.isArray(types) && types.length) return types.join(', ');
+    return this.profile?.dispatchProfile?.vehicleType || this.profile?.dispatchProfile?.vehicle || 'Vehicle profile not completed yet.';
+  }
+
+  getVerificationStatus(): string {
+    return this.profile?.dispatchProfile?.verificationStatus || 'pending';
+  }
+
+  getPlateNumber(): string {
+    return this.profile?.dispatchProfile?.plateNumber || this.profile?.dispatchProfile?.vehiclePlateNumber || 'Not added';
+  }
+
+  getPhoneNumber(): string {
+    return this.profile?.phoneNumber || this.profile?.phone || 'Not added';
+  }
+
+  getCustomerUsername(order: any): string {
+    return order?.customerUsername || order?.username || order?.consumerUsername || 'customer';
+  }
+
+  getOrderStatusLabel(order: any): string {
+    return this.getDispatchHeadline(order);
+  }
+
+  getOrderFee(order: any): number {
+    return Number(order?.deliveryFee ?? order?.dispatchFee ?? order?.price ?? 0);
+  }
+
+  getEmptyOrderTitle(): string {
+    if (this.selectedTab === 'available') return 'No open jobs';
+    if (this.selectedTab === 'completed') return 'No completed deliveries';
+    return 'No active deliveries';
+  }
+
+  getEmptyOrderText(): string {
+    if (this.selectedTab === 'available') return 'New delivery requests will appear here.';
+    if (this.selectedTab === 'completed') return 'Completed routes will appear here.';
+    return 'Accepted deliveries will appear here.';
+  }
+
+  private getProfileCompletionFields(): Array<{ label: string; icon: string; done: boolean }> {
+    const dispatchProfile = this.profile?.dispatchProfile || {};
+    return [
+      { label: 'Email', icon: 'mail-outline', done: !!this.profile?.email },
+      { label: 'Phone', icon: 'call-outline', done: !!(this.profile?.phoneNumber || this.profile?.phone) },
+      { label: 'Country', icon: 'globe-outline', done: !!(this.profile?.country || dispatchProfile.country) },
+      { label: 'State/Region', icon: 'location-outline', done: !!(this.profile?.state || this.profile?.region || dispatchProfile.state || dispatchProfile.region) },
+      { label: 'Profile Photo', icon: 'camera-outline', done: !!(this.profile?.profilePicture || this.profile?.avatar) },
+      { label: 'Vehicle', icon: 'bicycle-outline', done: !!(dispatchProfile.vehicleType || dispatchProfile.vehicle || dispatchProfile.vehicleTypes?.length) },
+      { label: 'ID Verification', icon: 'card-outline', done: ['approved', 'verified'].includes(String(dispatchProfile.verificationStatus || '').toLowerCase()) },
+      { label: 'Payout Account', icon: 'wallet-outline', done: !!(dispatchProfile.bankName || dispatchProfile.bankAccountNumber || dispatchProfile.payoutAccount) }
+    ];
   }
 
   displayWalletTxLabel(type?: string): string {

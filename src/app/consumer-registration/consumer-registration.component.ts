@@ -35,6 +35,7 @@ export class ConsumerRegistrationComponent implements OnInit {
   phoneVerificationCode = '';
   phoneVerificationError = '';
   phoneVerificationProof: PhoneVerificationProof | null = null;
+  showPassword = false;
 
   constructor(
     private readonly formBuilder: FormBuilder,

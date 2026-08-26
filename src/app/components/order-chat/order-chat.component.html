@@ -1,0 +1,58 @@
+<div class="order-chat-sheet">
+  <div class="chat-handle"></div>
+
+  <header class="order-chat-header">
+    <div>
+      <span>Live order chat</span>
+      <h2>{{ dishName }}</h2>
+      <p *ngIf="trackingNumber">{{ trackingNumber }}</p>
+    </div>
+    <button type="button" class="chat-close" (click)="close()" aria-label="Close chat">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </header>
+
+  <section class="chat-state" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <span>Loading chat...</span>
+  </section>
+
+  <section class="chat-state" *ngIf="!isLoading && !available">
+    <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+    <span>Chat opens when the chef accepts this order.</span>
+  </section>
+
+  <section class="order-chat-messages" *ngIf="!isLoading && available">
+    <div class="empty-chat" *ngIf="messages.length === 0">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <span>No messages yet.</span>
+    </div>
+
+    <article class="chat-message" *ngFor="let message of messages; trackBy: trackByMessage">
+      <div class="message-heading">
+        <strong>@{{ message.username }}</strong>
+        <span>{{ message.senderRole }}</span>
+      </div>
+      <p>{{ message.message }}</p>
+      <time>{{ message.createdAt | date:'shortTime' }}</time>
+    </article>
+  </section>
+
+  <footer class="order-chat-footer" *ngIf="available">
+    <p class="chat-locked-note" *ngIf="locked">
+      Chat locked because delivery has been confirmed.
+    </p>
+
+    <div class="chat-input-row" *ngIf="!locked">
+      <textarea
+        [(ngModel)]="messageText"
+        rows="1"
+        maxlength="600"
+        placeholder="Send an order update..."
+      ></textarea>
+      <button type="button" (click)="sendMessage()" [disabled]="isSending || !messageText.trim()">
+        <ion-icon name="send-outline"></ion-icon>
+      </button>
+    </div>
+  </footer>
+</div>

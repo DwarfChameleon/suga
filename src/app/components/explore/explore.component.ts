@@ -360,6 +360,50 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.route.navigate(['/components/search']);
   }
 
+  openWallet(): void {
+    this.route.navigate(['/components/wallet']);
+  }
+
+  openOrderHistory(): void {
+    this.route.navigate(['/components/order-history']);
+  }
+
+  openRewards(): void {
+    this.route.navigate(['/components/rewards']);
+  }
+
+  getCategoryCountLabel(category: FoodCategory): string {
+    const count = this.allFoods.filter((food) =>
+      String(food.category || '').trim().toLowerCase() === String(category?.name || '').trim().toLowerCase()
+    ).length;
+    return `${count}+ ${count === 1 ? 'dish' : 'dishes'}`;
+  }
+
+  getCategoryIcon(category: FoodCategory): string {
+    const name = String(category?.name || '').toLowerCase();
+    if (name.includes('drink') || name.includes('juice') || name.includes('tea') || name.includes('coffee')) return 'cafe-outline';
+    if (name.includes('cake') || name.includes('snack')) return 'fast-food-outline';
+    return 'restaurant-outline';
+  }
+
+  getCategoryColor(index: number): string {
+    return ['red', 'orange', 'green', 'purple', 'blue'][index % 5];
+  }
+
+  getPrepTimeLabel(food: Food): string {
+    const raw = String(food?.preparationTime || '').trim();
+    if (!raw) return 'Time not set';
+    return /^\d+$/.test(raw) ? `${raw} mins` : raw;
+  }
+
+  getFoodDescription(food: Food | any): string {
+    return String(food?.description || food?.additionalDetails?.description || food?.category || 'Tap to view this dish and order from the chef.').trim();
+  }
+
+  getFoodCommentsCount(food: Food | any): number {
+    return Array.isArray(food?.comments) ? food.comments.length : 0;
+  }
+
   openChefDirectory(): void {
     this.route.navigate(['/components/chefs']);
   }

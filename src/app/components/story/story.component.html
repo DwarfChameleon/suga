@@ -1,24 +1,30 @@
-<ion-header class="story-modal-header">
-  <ion-toolbar class="story-modal-toolbar">
-    <ion-buttons *ngIf="!presentedAsModal" slot="start">
-      <app-back-button class="no-fill-back-button"></app-back-button>
-    </ion-buttons>
-    <ion-title class="story-modal-title">Food Story</ion-title>
-    <ion-buttons *ngIf="presentedAsModal" slot="end">
-      <ion-button fill="clear" (click)="dismissModal()" aria-label="Close food story">
-        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="story-page">
+  <section class="story-modal">
+    <div class="drag-handle"></div>
 
-<ion-content class="story-content">
-  <div class="story-tab-strip" *ngIf="!isLoading && isOnline" role="tablist" aria-label="Food story feeds">
+    <header class="story-header">
+      <div class="header-start" *ngIf="!presentedAsModal">
+        <app-back-button class="no-fill-back-button"></app-back-button>
+      </div>
+
+      <h1>Food Stories</h1>
+
+      <button
+        *ngIf="presentedAsModal"
+        type="button"
+        class="close-btn"
+        (click)="dismissModal()"
+        aria-label="Close food story"
+      >
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </header>
+
+    <nav class="story-tabs" *ngIf="!isLoading && isOnline" role="tablist" aria-label="Food story feeds">
     <button
       *ngFor="let tab of storyTabs"
       type="button"
       role="tab"
-      class="story-feed-tab"
       [class.active]="activeStoryTab === tab.key"
       [attr.aria-selected]="activeStoryTab === tab.key"
       (click)="switchStoryTab(tab.key)"
@@ -26,80 +32,141 @@
       <span>{{ tab.label }}</span>
       <small>{{ getStoryTabCount(tab.key) }}</small>
     </button>
-  </div>
-  <div *ngIf="isLoading || !isOnline" class="story-skeleton">
-    <ion-skeleton-text animated style="width:100%;height:90vh;"></ion-skeleton-text>
-  </div>
-  <div *ngIf="!isLoading && emptyMessage" class="empty-state">{{ emptyMessage }}</div>
-  <div *ngFor="let video of videos" class="video-container">
-    <div class="video-frame">
-      <video
-        #videoEl
-        [attr.data-id]="video._id"
-        [src]="getVideoUrl(video.path)"
-        preload="metadata"
-        muted
-        playsinline
-        crossorigin="anonymous"
-        [class.video-hidden]="isVideoUnavailable(video._id)"
-        (error)="onVideoError(video._id, videoEl)"
-        (play)="scheduleView(video._id)"
-        (pause)="cancelView(video._id)"
-        (dblclick)="likeVideo(video)"
-        (click)="togglePlayPause(videoEl, video._id)">
-        Your browser does not support the video tag.
-      </video>
-      <div class="video-unavailable" *ngIf="isVideoUnavailable(video._id)">
-        This video is unavailable right now.
-      </div>
-    </div>
-    <div class="playback-hint" *ngIf="playbackHint[video._id]">
-      <ion-icon [name]="playbackHint[video._id] === 'play' ? 'play' : 'pause'"></ion-icon>
-    </div>
-    <div class="floatingbox">
-      <div class="storyIcons">
-        <ion-icon [name]="video.likedByMe ? 'heart' : 'heart-outline'" class="floatedIcons like-icon" [class.liked]="video.likedByMe" (click)="likeVideo(video)"></ion-icon>
-        <span *ngFor="let burst of (storyHeartBursts[video._id] || [])" class="story-float-heart" [style.--i]="burst % 5">&#10084;</span>
-        <br>
-        <span class="actionText"> {{ video.likes }} </span>
-      </div>
-      <br>
-      <div class="storyIcons"><ion-icon name="chatbubble-outline" (click)="openComments(video)"></ion-icon>
-      <br>
-      <span class="actionText">{{ video.comments.length }}</span>
-      </div>
-    </div>
-    <div class="video-description">
-     <div (click)="openProfileModal(video.username, videoEl) "> <h3 class="username-link">@{{ video.username }}</h3></div>
-      <div class="story-location" *ngIf="getStoryLocationLabel(video)">
-        <ion-icon name="location-outline"></ion-icon>
-        <span>{{ getStoryLocationLabel(video) }}</span>
-      </div>
-      <p>{{ video.description }}</p>
-      <ion-button
-        *ngIf="video.orderEnabled && (video.linkedFoodId || video.linkedFood?.dishName)"
-        class="order-now-btn"
-        size="small"
-        (click)="openOrderFromStory(video); $event.stopPropagation()"
-      >
-        <ion-icon name="bag-check-outline" slot="start"></ion-icon>
-        Order Now
-      </ion-button>
-      <div class="tag-row" *ngIf="(video.hashtags?.length || 0) + (video.mentions?.length || 0) > 0">
-        <span *ngFor="let tag of video.hashtags" (click)="openTag(tag)">#{{ tag }}</span>
-        <span *ngFor="let mention of video.mentions" (click)="openMention(mention)">@{{ mention }}</span>
-      </div>
-  </div>
+    </nav>
 
+    <div *ngIf="isLoading || !isOnline" class="story-skeleton">
+      <ion-skeleton-text animated></ion-skeleton-text>
+    </div>
 
-  </div>
+    <div *ngIf="!isLoading && emptyMessage" class="empty-state">{{ emptyMessage }}</div>
 
-  <div class="comment-sheet" *ngIf="showCommentsPanel && activeVideo">
+    <div class="story-feed" *ngIf="!isLoading && !emptyMessage">
+      <article *ngFor="let video of videos" class="story-slide">
+        <div class="story-video-wrap">
+          <video
+            #videoEl
+            class="story-video"
+            [attr.data-id]="video._id"
+            [src]="getVideoUrl(video.path)"
+            preload="metadata"
+            muted
+            loop
+            playsinline
+            crossorigin="anonymous"
+            [class.video-hidden]="isVideoUnavailable(video._id)"
+            (error)="onVideoError(video._id, videoEl)"
+            (play)="scheduleView(video._id)"
+            (pause)="cancelView(video._id)"
+            (dblclick)="likeVideo(video)"
+            (click)="togglePlayPause(videoEl, video._id)">
+            Your browser does not support the video tag.
+          </video>
+
+          <div class="video-unavailable" *ngIf="isVideoUnavailable(video._id)">
+            This video is unavailable right now.
+          </div>
+
+          <div class="story-gradient"></div>
+        </div>
+
+        <div class="playback-hint" *ngIf="playbackHint[video._id]">
+          <ion-icon [name]="playbackHint[video._id] === 'play' ? 'play' : 'pause'"></ion-icon>
+        </div>
+
+        <div class="creator-info">
+          <button
+            type="button"
+            class="creator-profile"
+            (click)="openProfileModal(video.username, videoEl)"
+          >
+            <span class="creator-avatar">
+              <img *ngIf="getVideoAvatar(video)" [src]="getVideoAvatar(video)" [alt]="video.username || 'Creator'" />
+              <ion-icon *ngIf="!getVideoAvatar(video)" name="person-circle-outline"></ion-icon>
+            </span>
+
+            <span class="creator-copy">
+              <strong>@{{ video.username || 'creator' }}</strong>
+              <small *ngIf="video.uploadedAt">{{ video.uploadedAt | date:'mediumDate' }}</small>
+            </span>
+          </button>
+        </div>
+
+        <aside class="story-actions">
+          <button
+            type="button"
+            class="action-button"
+            (click)="likeVideo(video)"
+            aria-label="Like story"
+          >
+            <span class="action-icon-wrap" [class.liked]="video.likedByMe">
+              <ion-icon [name]="video.likedByMe ? 'heart' : 'heart-outline'"></ion-icon>
+            </span>
+            <span>{{ video.likes || 0 }}</span>
+            <span *ngFor="let burst of (storyHeartBursts[video._id] || [])" class="story-float-heart" [style.--i]="burst % 5">&#10084;</span>
+          </button>
+
+          <button
+            type="button"
+            class="action-button"
+            (click)="openComments(video)"
+            aria-label="Open comments"
+          >
+            <span class="action-icon-wrap">
+              <ion-icon name="chatbubble-outline"></ion-icon>
+            </span>
+            <span>{{ video.comments.length }}</span>
+          </button>
+        </aside>
+
+        <div class="story-caption" [class.with-order]="video.orderEnabled && (video.linkedFoodId || video.linkedFood?.dishName)">
+          <h2>{{ getVideoTitle(video) }}</h2>
+
+          <button
+            *ngIf="video.username"
+            class="chef-link"
+            type="button"
+            (click)="openProfileModal(video.username, videoEl)"
+          >
+            @{{ video.username }}
+          </button>
+
+          <div class="story-location" *ngIf="getStoryLocationLabel(video)">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ getStoryLocationLabel(video) }}</span>
+          </div>
+
+          <p *ngIf="video.description">{{ video.description }}</p>
+
+          <div class="tag-row" *ngIf="(video.hashtags?.length || 0) + (video.mentions?.length || 0) > 0">
+            <span *ngFor="let tag of video.hashtags" (click)="openTag(tag)">#{{ tag }}</span>
+            <span *ngFor="let mention of video.mentions" (click)="openMention(mention)">@{{ mention }}</span>
+          </div>
+        </div>
+
+        <button
+          *ngIf="video.orderEnabled && (video.linkedFoodId || video.linkedFood?.dishName)"
+          type="button"
+          class="order-now-btn"
+          (click)="openOrderFromStory(video); $event.stopPropagation()"
+        >
+          <ion-icon name="bag-check-outline"></ion-icon>
+          <span>Order Now</span>
+        </button>
+      </article>
+    </div>
+  </section>
+
+  <div class="comment-backdrop" *ngIf="showCommentsPanel && activeVideo" (click)="closeComments()"></div>
+
+  <section class="comment-sheet" *ngIf="showCommentsPanel && activeVideo">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3>Comments</h3>
-      <ion-icon name="close-circle" class="close-icon" (click)="closeComments()"></ion-icon>
+      <h3>Comments <span>{{ activeVideo.comments.length }}</span></h3>
+      <button type="button" class="sheet-close" (click)="closeComments()" aria-label="Close comments">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
     </div>
+
     <div class="sheet-body">
       <div *ngFor="let comment of activeVideo.comments" class="comment-row">
         <div class="comment-user">@{{ comment.username }}</div>
@@ -107,11 +174,12 @@
       </div>
       <div *ngIf="activeVideo.comments.length === 0" class="comment-empty">Be the first to comment.</div>
     </div>
+
     <div class="sheet-input">
       <ion-input [(ngModel)]="commentText" placeholder="Add a comment..."></ion-input>
       <ion-button fill="clear" (click)="postComment()" aria-label="Send comment">
         <ion-icon name="paper-plane-outline"></ion-icon>
       </ion-button>
     </div>
-  </div>
+  </section>
 </ion-content>

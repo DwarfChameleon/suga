@@ -28,6 +28,7 @@ import { ProfileUpdateComponent } from './components/profile-update/profile-upda
 import { FoodProfileComponent } from './components/food-profile/food-profile.component';
 import { OrderModalComponent } from './components/order-modal/order-modal.component';
 import { OrderInfoComponent } from './components/order-info/order-info.component';
+import { OrderChatComponent } from './components/order-chat/order-chat.component';
 import { ChefOrdersComponent } from './components/chef-orders/chef-orders.component';
 import { MediaCapture } from '@awesome-cordova-plugins/media-capture/ngx';
 import { NotificationsComponent } from './components/notifications/notifications.component';
@@ -58,7 +59,7 @@ import { GlobalErrorHandler } from './services/global-error-handler';
 import { ErrorLoggingInterceptor } from './services/error-logging.interceptor';
 import { FallbackServerInterceptor } from './services/fallback-server.interceptor';
 @NgModule({
-  declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,ChefDirectoryComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, PaymentSuccessSheetComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
+  declarations: [AppComponent,ExploreComponent,FoodProfileComponent,OrderModalComponent,ChefOrdersComponent,OrderInfoComponent,OrderChatComponent,ProfileUpdateComponent,ProfileModalComponent,StoryComponent,FoodstoryComponent,BackButtonComponent,LoaderComponent,FoodRegistrationComponent,FoodRegSuccessComponent,ChefComponent,ConsumerComponent,DispatchComponent,DispatchProfileComponent,ChefDirectoryComponent,LoginModalComponent,ChefRegistrationComponent,ConsumerRegistrationComponent,DispatchRegistrationComponent,UnauthorizedComponent, NotificationsComponent, SuggestedChefsComponent, CategoryModalComponent, SearchComponent, WalletComponent, PaymentModalComponent, PaymentSuccessSheetComponent, DraggableDirective, GoogleSigninComponent, CartComponent, OrderHistoryComponent, EditProfileComponent, RewardsComponent, LogsComponent, ProfileCompletenessCardComponent, LiveOrderMapComponent, OrderRatingComponent, AdSlotComponent, MoneyPipe, ConvertedMoneyPipe],
   imports: [BrowserModule, HttpClientModule, FormsModule, IonicModule.forRoot(), LoginPageModule, AppRoutingModule, ReactiveFormsModule],
 
   providers: [

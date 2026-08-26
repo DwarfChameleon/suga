@@ -122,6 +122,11 @@
       <h4>Live Route</h4>
       <app-live-order-map [order]="order" [mode]="role"></app-live-order-map>
     </div>
+
+    <button type="button" class="return-order-card-btn" (click)="returnToOrderCard()">
+      <ion-icon name="arrow-back-circle-outline"></ion-icon>
+      <span>Back to this order card</span>
+    </button>
   </div>
 </div>
 

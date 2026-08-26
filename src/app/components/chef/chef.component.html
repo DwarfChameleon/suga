@@ -110,6 +110,9 @@
           <button *ngIf="order.status === 'placed'" (click)="updateOrderStatus(order, 'confirmed')" class="orderAction accept">Accept</button>
           <button *ngIf="order.status === 'placed'" (click)="updateOrderStatus(order, 'declined')" class="orderAction decline">Decline</button>
           <button *ngIf="order.status !== 'placed' && order.status !== 'declined' && order.status !== 'completed'" (click)="openStatusSheet(order)" class="orderAction processing">Update Status</button>
+          <button *ngIf="canOpenOrderChat(order)" class="orderAction chat" (click)="openOrderChat(order, $event)" aria-label="Open order chat">
+            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+          </button>
           <button class="orderAction details" (click)="openModalOrder(order._id)">Details</button>
         </div>
       </div>

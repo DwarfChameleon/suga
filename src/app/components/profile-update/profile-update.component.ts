@@ -41,6 +41,10 @@ export class ProfileUpdateComponent implements OnInit {
   newPassword = '';
   oldPin = '';
   newPin = '';
+  showOldPassword = false;
+  showNewPassword = false;
+  showOldPin = false;
+  showNewPin = false;
   isSaving = false;
   isChef = false;
   hasExistingPin = false;

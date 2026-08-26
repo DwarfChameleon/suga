@@ -1,5 +1,9 @@
 <div class="map-wrap" *ngIf="order">
   <div #mapContainer class="map-container"></div>
+  <div class="map-warning" *ngIf="tileWarning">
+    <ion-icon name="map-outline"></ion-icon>
+    <span>{{ tileWarning }}</span>
+  </div>
   <div class="map-legend">
     <span *ngIf="order?.chefLocation">Chef</span>
     <span *ngIf="order?.dispatchRiderLocation">Dispatch</span>

@@ -9,6 +9,7 @@ import { ModalController } from '@ionic/angular';
 import { OrderInfoComponent } from '../order-info/order-info.component';
 import { humanizeHistoryLabel } from 'src/app/utils/history-formatters';
 import { Browser } from '@capacitor/browser';
+import { Router } from '@angular/router';
 
 type WalletSectionKey = 'balance' | 'rewards' | 'payout' | 'transactions';
 
@@ -73,7 +74,8 @@ export class WalletComponent implements OnInit {
     private uiFeedback: UiFeedbackService,
     private loading: LoadingService,
     private tokenStorage: TokenStorageService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -88,6 +90,69 @@ export class WalletComponent implements OnInit {
 
   toggleBalance(): void {
     this.wallet.isHidden = !this.wallet.isHidden;
+  }
+
+  goBack(): void {
+    history.back();
+  }
+
+  openRewardsActivity(): void {
+    this.router.navigate(['/components/rewards']);
+  }
+
+  openAllTransactions(): void {
+    this.sections.transactions = true;
+    setTimeout(() => {
+      document.querySelector('.transactions-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
+  getTransactionDirection(tx: WalletTx): 'credit' | 'debit' {
+    const type = String(tx?.type || '').toLowerCase();
+    return type.includes('debit')
+      || type.includes('withdraw')
+      || type.includes('payment')
+      || type.includes('transfer_out')
+      ? 'debit'
+      : 'credit';
+  }
+
+  getTransactionTypeClass(tx: WalletTx): string {
+    const type = String(tx?.type || '').toLowerCase();
+    if (type.includes('topup') || type.includes('deposit')) return 'topup';
+    if (type.includes('withdraw')) return 'withdrawal';
+    if (type.includes('reward') || type.includes('token')) return 'reward';
+    return 'order';
+  }
+
+  getTransactionIcon(tx: WalletTx): string {
+    const typeClass = this.getTransactionTypeClass(tx);
+    if (typeClass === 'topup') return 'arrow-down-outline';
+    if (typeClass === 'withdrawal') return 'arrow-up-outline';
+    if (typeClass === 'reward') return 'sparkles-outline';
+    return this.getTransactionDirection(tx) === 'debit' ? 'receipt-outline' : 'cash-outline';
+  }
+
+  get totalDeposits(): number {
+    return this.transactions
+      .filter((tx) => this.getTransactionDirection(tx) === 'credit')
+      .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+  }
+
+  get totalWithdrawn(): number {
+    return this.transactions
+      .filter((tx) => this.getTransactionDirection(tx) === 'debit')
+      .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+  }
+
+  get monthlyNet(): number {
+    const now = new Date();
+    return this.transactions.reduce((sum, tx) => {
+      const created = new Date(tx.createdAt || 0);
+      if (created.getMonth() !== now.getMonth() || created.getFullYear() !== now.getFullYear()) return sum;
+      const amount = Number(tx.amount || 0);
+      return this.getTransactionDirection(tx) === 'credit' ? sum + amount : sum - amount;
+    }, 0);
   }
 
   toggleSection(section: WalletSectionKey): void {

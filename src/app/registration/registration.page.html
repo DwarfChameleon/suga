@@ -1,58 +1,156 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/login"></ion-back-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-<ion-content class="intro-bg">
+<ion-content [fullscreen]="true" class="registration-page">
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
   </ion-refresher>
-  <div class="registration-hero">
-    <h2 class="hero-title">Create your Suga profile</h2>
-    <p class="hero-sub">Pick the role that matches how you want to use Suga.</p>
-  </div>
 
-  <div class="role-grid">
-    <div class="role-card consumer-card" role="button" tabindex="0" (click)="selectRole('consumer')" (keydown.enter)="selectRole('consumer')" (keydown.space)="selectRole('consumer'); $event.preventDefault()">
-      <button class="info-btn" type="button" aria-label="Consumer role information" [attr.aria-expanded]="activeInfoRole === 'consumer'" (click)="toggleRoleInfo('consumer', $event)">
-        <ion-icon name="information-circle-outline"></ion-icon>
-      </button>
-      <div class="role-icon">
-        <ion-icon name="fast-food-outline"></ion-icon>
-      </div>
-      <h3>Consumer</h3>
-      <div class="role-callout" *ngIf="activeInfoRole === 'consumer'" (click)="$event.stopPropagation()">
-        {{ roleInfo.consumer }}
-      </div>
-    </div>
+  <header class="registration-header">
+    <button type="button" class="back-btn" (click)="goBack()" aria-label="Go back">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+    <h1 class="header-title">Signup</h1>
+  </header>
 
-    <div class="role-card chef-card" role="button" tabindex="0" (click)="selectRole('chef')" (keydown.enter)="selectRole('chef')" (keydown.space)="selectRole('chef'); $event.preventDefault()">
-      <button class="info-btn" type="button" aria-label="Chef role information" [attr.aria-expanded]="activeInfoRole === 'chef'" (click)="toggleRoleInfo('chef', $event)">
-        <ion-icon name="information-circle-outline"></ion-icon>
-      </button>
-      <div class="role-icon">
-        <ion-icon name="restaurant-outline"></ion-icon>
-      </div>
-      <h3>Chef</h3>
-      <div class="role-callout" *ngIf="activeInfoRole === 'chef'" (click)="$event.stopPropagation()">
-        {{ roleInfo.chef }}
-      </div>
-    </div>
+  <main class="registration-content">
+    <section class="intro">
+      <h1>
+        Create your
+        <span>Suga profile</span>
+      </h1>
+      <div class="title-line"></div>
+      <p>Pick the role that matches how you want to use Suga.</p>
+    </section>
 
-    <div class="role-card dispatch-card" role="button" tabindex="0" (click)="selectRole('dispatch')" (keydown.enter)="selectRole('dispatch')" (keydown.space)="selectRole('dispatch'); $event.preventDefault()">
-      <button class="info-btn" type="button" aria-label="Dispatch role information" [attr.aria-expanded]="activeInfoRole === 'dispatch'" (click)="toggleRoleInfo('dispatch', $event)">
-        <ion-icon name="information-circle-outline"></ion-icon>
+    <section class="role-list">
+      <article
+        class="role-card consumer-card"
+        role="button"
+        tabindex="0"
+        (click)="selectRole('consumer')"
+        (keydown.enter)="selectRole('consumer')"
+        (keydown.space)="selectRole('consumer'); $event.preventDefault()"
+      >
+        <div class="role-icon consumer-icon">
+          <ion-icon name="fast-food-outline"></ion-icon>
+        </div>
+
+        <div class="role-content">
+          <h2>Consumer</h2>
+          <p>Discover dishes, follow chefs, place orders and more.</p>
+          <div class="role-benefit consumer-benefit">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>Join thousands of food lovers</span>
+          </div>
+          <div class="role-callout" *ngIf="activeInfoRole === 'consumer'" (click)="$event.stopPropagation()">
+            {{ roleInfo.consumer }}
+          </div>
+        </div>
+
+        <div class="role-side">
+          <button
+            type="button"
+            class="info-btn consumer-info"
+            aria-label="Consumer information"
+            [attr.aria-expanded]="activeInfoRole === 'consumer'"
+            (click)="showRoleInfo('consumer', $event)"
+          >
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </button>
+          <ion-icon class="role-arrow" name="chevron-forward-outline"></ion-icon>
+        </div>
+      </article>
+
+      <article
+        class="role-card chef-card"
+        role="button"
+        tabindex="0"
+        (click)="selectRole('chef')"
+        (keydown.enter)="selectRole('chef')"
+        (keydown.space)="selectRole('chef'); $event.preventDefault()"
+      >
+        <div class="role-icon chef-icon">
+          <ion-icon name="restaurant-outline"></ion-icon>
+        </div>
+
+        <div class="role-content">
+          <h2>Chef</h2>
+          <p>Share your dishes, grow your audience, receive orders and build your food brand.</p>
+          <div class="role-benefit chef-benefit">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>Build your culinary brand</span>
+          </div>
+          <div class="role-callout" *ngIf="activeInfoRole === 'chef'" (click)="$event.stopPropagation()">
+            {{ roleInfo.chef }}
+          </div>
+        </div>
+
+        <div class="role-side">
+          <button
+            type="button"
+            class="info-btn chef-info"
+            aria-label="Chef information"
+            [attr.aria-expanded]="activeInfoRole === 'chef'"
+            (click)="showRoleInfo('chef', $event)"
+          >
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </button>
+          <ion-icon class="role-arrow" name="chevron-forward-outline"></ion-icon>
+        </div>
+      </article>
+
+      <article
+        class="role-card rider-card"
+        role="button"
+        tabindex="0"
+        (click)="selectRole('dispatch')"
+        (keydown.enter)="selectRole('dispatch')"
+        (keydown.space)="selectRole('dispatch'); $event.preventDefault()"
+      >
+        <div class="role-icon rider-icon">
+          <ion-icon name="bicycle-outline"></ion-icon>
+        </div>
+
+        <div class="role-content">
+          <h2>Dispatch Rider</h2>
+          <p>Deliver orders, earn on every delivery and track your earnings.</p>
+          <div class="role-benefit rider-benefit">
+            <ion-icon name="cash-outline"></ion-icon>
+            <span>Flexible hours, steady earnings</span>
+          </div>
+          <div class="role-callout" *ngIf="activeInfoRole === 'dispatch'" (click)="$event.stopPropagation()">
+            {{ roleInfo.dispatch }}
+          </div>
+        </div>
+
+        <div class="role-side">
+          <button
+            type="button"
+            class="info-btn rider-info"
+            aria-label="Dispatch rider information"
+            [attr.aria-expanded]="activeInfoRole === 'dispatch'"
+            (click)="showRoleInfo('dispatch', $event)"
+          >
+            <ion-icon name="information-circle-outline"></ion-icon>
+          </button>
+          <ion-icon class="role-arrow" name="chevron-forward-outline"></ion-icon>
+        </div>
+      </article>
+    </section>
+
+    <section class="help-card">
+      <div class="help-icon">
+        <ion-icon name="headset-outline"></ion-icon>
+      </div>
+
+      <div class="help-copy">
+        <strong>Not sure which one to choose?</strong>
+        <span>We'll help you pick the best option.</span>
+      </div>
+
+      <button type="button" class="help-btn" (click)="openHelp()">
+        Need help?
+        <ion-icon name="chevron-forward-outline"></ion-icon>
       </button>
-      <div class="role-icon">
-        <ion-icon name="bicycle-outline"></ion-icon>
-      </div>
-      <h3>Dispatch Rider</h3>
-      <div class="role-callout" *ngIf="activeInfoRole === 'dispatch'" (click)="$event.stopPropagation()">
-        {{ roleInfo.dispatch }}
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
 </ion-content>

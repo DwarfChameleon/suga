@@ -102,6 +102,25 @@ ion-input, ion-select{
   min-height: 42px;
 }
 
+.password-toggle {
+  width: fit-content;
+  min-height: 24px;
+  margin: 4px 0 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ion-color-primary-food);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.password-toggle ion-icon {
+  font-size: 16px;
+}
+
 .regSubmitBTN{
   height: 42px;
   border-radius: 12px;

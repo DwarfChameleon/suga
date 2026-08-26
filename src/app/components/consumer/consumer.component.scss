@@ -117,6 +117,7 @@
   background: var(--suga-surface);
   text-align: left;
   display: block;
+  transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
 .orders-list {
@@ -139,6 +140,49 @@
   font-weight: 700;
 }
 
+.order-card-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.order-card-pending-chef {
+  background: #fe2c5538;
+  border-color: rgba(254, 44, 85, 0.2);
+}
+
+.order-card-chef-accepted {
+  background: #2e942352;
+  border-color: rgba(46, 148, 35, 0.22);
+}
+
+.order-card-focus {
+  animation: orderCardGlow 2.4s ease-in-out;
+  box-shadow: 0 0 0 2px rgba(254, 44, 85, 0.22), 0 18px 36px rgba(254, 44, 85, 0.18);
+}
+
+.completed-order-icon {
+  color: #16a34a;
+  font-size: 22px;
+  flex: 0 0 auto;
+}
+
+.order-chat-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #fe2c55;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 8px 18px rgba(254, 44, 85, 0.22);
+}
+
 .order-card-meta {
   margin-top: 8px;
   display: flex;
@@ -149,7 +193,8 @@
 }
 
 .order-card-completed {
-  opacity: 0.62;
+  background: rgba(46, 148, 35, 0.16);
+  border-color: rgba(46, 148, 35, 0.2);
 }
 
 .liveOrderTime {
@@ -229,4 +274,25 @@
 @keyframes iconPulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
+}
+
+@keyframes orderCardGlow {
+  0% {
+    background-color: #fe2c5538;
+    box-shadow: 0 0 0 0 rgba(254, 44, 85, 0);
+    transform: scale(1);
+  }
+  35% {
+    background-color: #fe2c5538;
+    box-shadow: 0 0 0 8px rgba(254, 44, 85, 0.14), 0 18px 36px rgba(254, 44, 85, 0.2);
+    transform: scale(1.01);
+  }
+  70% {
+    background-color: #fe2c5538;
+    box-shadow: 0 0 0 3px rgba(254, 44, 85, 0.1), 0 12px 26px rgba(254, 44, 85, 0.12);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(254, 44, 85, 0);
+  }
 }

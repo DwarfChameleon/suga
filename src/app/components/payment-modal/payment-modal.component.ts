@@ -23,6 +23,7 @@ export class PaymentModalComponent implements OnInit {
   @Input() totalAmount?: number;
 
   password = '';
+  showPassword = false;
   paystackEmail = '';
   paymentProvider: 'paystack' = 'paystack';
   transactionId?: string;

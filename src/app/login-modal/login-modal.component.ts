@@ -22,6 +22,7 @@ export class LoginModalComponent implements OnInit {
   loginForm!: FormGroup;
   loginError?: string;
   isSubmitting = false;
+  showPassword = false;
 
   constructor(
     private modalCtrl: ModalController,

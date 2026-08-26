@@ -87,7 +87,17 @@
     </div>
     <div class="reauth">
       <label>Confirm with password</label>
-      <input type="password" [(ngModel)]="password" placeholder="Enter password" />
+      <div class="password-input-wrap">
+        <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="Enter password" />
+      </div>
+      <button
+        type="button"
+        class="password-toggle under-input"
+        (click)="showPassword = !showPassword"
+        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+        <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        <span>{{ showPassword ? 'Hide password' : 'Show password' }}</span>
+      </button>
       <small class="hint">Use the same password you use to log in to this app.</small>
     </div>
     <div *ngIf="paymentHint" class="hint">{{ paymentHint }}</div>

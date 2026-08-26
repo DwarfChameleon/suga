@@ -13,6 +13,7 @@ export class LoginPage implements OnInit {
 
   private isModalOpen = false;
   private prefill?: { username?: string; password?: string; auto?: boolean };
+  showPassword = false;
 
   constructor(
     private modalController: ModalController,

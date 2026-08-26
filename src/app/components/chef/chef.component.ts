@@ -18,6 +18,7 @@ import { NetworkService } from 'src/app/services/network.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
 import { ProfileModalComponent } from '../profile-modal/profile-modal.component';
 import { OrderRatingComponent } from '../order-rating/order-rating.component';
+import { OrderChatComponent } from '../order-chat/order-chat.component';
 
 @Component({
   selector: 'app-chef',
@@ -333,6 +334,28 @@ export class ChefComponent implements OnInit, OnDestroy {
     });
     await modal.present();
 
+  }
+
+  canOpenOrderChat(order: Order): boolean {
+    return ['confirmed', 'approved', 'processing', 'delivered'].includes(order?.status);
+  }
+
+  async openOrderChat(order: Order, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    if (!order?._id || !this.canOpenOrderChat(order)) return;
+    const modal = await this.modalController.create({
+      component: OrderChatComponent,
+      componentProps: {
+        orderId: order._id,
+        dishName: order.dishName,
+        trackingNumber: order.trackingNumber || ''
+      },
+      cssClass: 'suga-order-chat-sheet',
+      initialBreakpoint: 0.78,
+      breakpoints: [0, 0.55, 0.78, 0.96],
+      handle: false
+    });
+    await modal.present();
   }
 
   // Fetch food details by ID

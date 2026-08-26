@@ -50,4 +50,14 @@ export class NotificationSocketService {
       this.socket = null;
     }
   }
+
+  emit(eventName: string, payload?: any): void {
+    this.socket?.emit(eventName, payload);
+  }
+
+  on<T = any>(eventName: string, handler: (payload: T) => void): () => void {
+    if (!this.socket) return () => {};
+    this.socket.on(eventName, handler as any);
+    return () => this.socket?.off(eventName, handler as any);
+  }
 }

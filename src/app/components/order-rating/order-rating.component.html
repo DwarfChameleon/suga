@@ -5,8 +5,14 @@
   </div>
   <p class="dish">{{ dishName }}</p>
   <div class="stars">
-    <button type="button" *ngFor="let s of [1,2,3,4,5]" (click)="setStars(s)" [class.active]="stars >= s">
-      <ion-icon name="star"></ion-icon>
+    <button
+      type="button"
+      *ngFor="let s of [1,2,3,4,5]"
+      (click)="setStars(s)"
+      [class.active]="stars >= s"
+      [attr.aria-label]="'Rate ' + s + ' star' + (s > 1 ? 's' : '')"
+    >
+      <span class="star-symbol">{{ stars >= s ? '★' : '☆' }}</span>
     </button>
   </div>
   <textarea rows="3" [(ngModel)]="comment" placeholder="Share your experience (optional)"></textarea>

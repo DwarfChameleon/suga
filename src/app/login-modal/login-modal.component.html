@@ -36,10 +36,19 @@
           <label class="field-label" for="login-password">Password</label>
           <ion-input
             id="login-password"
+            class="password-input"
             formControlName="password"
             [(ngModel)]="credentials.password"
-            type="password">
+            [type]="showPassword ? 'text' : 'password'">
           </ion-input>
+          <button
+            type="button"
+            class="password-toggle under-input"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            <span>{{ showPassword ? 'Hide password' : 'Show password' }}</span>
+          </button>
         </div>
 
         <ion-button

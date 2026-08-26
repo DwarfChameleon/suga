@@ -629,6 +629,22 @@ float:left;
     border:1.5px solid white;
 }
 
+.orderAction.chat {
+  min-width: 42px;
+  width: 42px;
+  padding: 0;
+  background: #fe2c55;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(254, 44, 85, 0.22);
+}
+
+.orderAction.chat ion-icon {
+  font-size: 17px;
+}
+
 .spcStyle ion-icon{
     font-size: 30px;
     color: #c6c6c7;

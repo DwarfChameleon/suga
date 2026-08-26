@@ -33,6 +33,18 @@ export class RegistrationPage implements OnInit {
     this.activeInfoRole = this.activeInfoRole === role ? null : role;
   }
 
+  showRoleInfo(role: 'consumer' | 'chef' | 'dispatch', event?: Event): void {
+    this.toggleRoleInfo(role, event);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/login']);
+  }
+
+  openHelp(): void {
+    this.activeInfoRole = this.activeInfoRole ? null : 'consumer';
+  }
+
   refresh(event: any): void {
     const refresher = event?.target as HTMLIonRefresherElement | null;
     setTimeout(() => {

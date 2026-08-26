@@ -89,12 +89,26 @@
           <button
             type="button"
             class="order-card"
+            [id]="getOrderCardId(order)"
+            [ngClass]="getOrderCardClasses(order)"
             *ngFor="let order of liveOrders; trackBy: trackByOrder"
             (click)="viewOrderDetails(order)"
           >
             <div class="order-card-top">
               <h4>{{ order.dishName | titlecase }}</h4>
-              <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
+              <div class="order-card-end">
+                <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
+                <button
+                  *ngIf="canOpenOrderChat(order)"
+                  type="button"
+                  class="order-chat-btn"
+                  (click)="openOrderChat(order, $event)"
+                  aria-label="Open order chat"
+                >
+                  <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                </button>
+                <ion-icon *ngIf="order.status === 'completed'" class="completed-order-icon" name="checkmark-circle"></ion-icon>
+              </div>
             </div>
             <div class="order-card-meta">
               <span class="liveOrderTime"><ion-icon name="timer-outline"></ion-icon> {{ order.preparationTime }} - {{ timeAgo(order.orderTime) }}</span>
@@ -129,13 +143,27 @@
         <div class="orders-list">
           <button
             type="button"
-            class="order-card order-card-completed"
+            class="order-card"
+            [id]="getOrderCardId(order)"
+            [ngClass]="getOrderCardClasses(order)"
             *ngFor="let order of completedOrders; trackBy: trackByOrder"
             (click)="viewOrderDetails(order)"
           >
             <div class="order-card-top">
               <h4>{{ order.dishName | titlecase }}</h4>
-              <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
+              <div class="order-card-end">
+                <span class="price">{{ order.price | money:order.currency:'1.0-0' }}</span>
+                <button
+                  *ngIf="canOpenOrderChat(order)"
+                  type="button"
+                  class="order-chat-btn"
+                  (click)="openOrderChat(order, $event)"
+                  aria-label="Open order chat"
+                >
+                  <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                </button>
+                <ion-icon class="completed-order-icon" name="checkmark-circle"></ion-icon>
+              </div>
             </div>
             <div class="order-card-meta">
               <span class="liveOrderTime"><ion-icon name="calendar-outline"></ion-icon> {{ timeAgo(order.orderTime) }}</span>

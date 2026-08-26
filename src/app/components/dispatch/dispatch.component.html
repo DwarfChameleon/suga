@@ -1,267 +1,348 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button fill="clear" (click)="goHome()" aria-label="Home">
-        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" (click)="openStoryPage()" aria-label="Story page">
-        <ion-icon slot="icon-only" name="play-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title>Dispatch</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="openNotifications()" aria-label="Notifications">
-        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" (click)="openProfileSettings()" aria-label="Settings">
-        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" (click)="logout()" aria-label="Logout">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="dispatch-page">
+  <header class="dispatch-header">
+    <button type="button" class="header-icon" (click)="goHome()" aria-label="Home">
+      <ion-icon name="home-outline"></ion-icon>
+    </button>
 
-<ion-content class="dispatch-page ion-padding">
-  <section class="dispatch-hero">
-    <div class="hero-copy">
-      <span class="eyebrow">Delivery control</span>
-      <h2>{{ profile?.dispatchProfile?.companyName || profile?.username || 'Dispatch rider' }}</h2>
-      <p>Review live jobs first, then manage earnings, route history and profile settings below.</p>
-    </div>
-    <div class="hero-actions">
-      <button class="availability-btn" [class.offline]="!stats.isAvailable" (click)="toggleAvailability()">
-        {{ stats.isAvailable ? 'Available' : 'Offline' }}
+    <button type="button" class="header-icon" (click)="openStory()" aria-label="Food Story">
+      <ion-icon name="play-circle-outline"></ion-icon>
+    </button>
+
+    <h1>Dispatch</h1>
+
+    <button type="button" class="header-icon notification-icon" (click)="openNotifications()" aria-label="Notifications">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <span class="notification-dot" *ngIf="hasDispatchNotifications"></span>
+    </button>
+
+    <button type="button" class="header-icon" (click)="openProfileSettings()" aria-label="Settings">
+      <ion-icon name="settings-outline"></ion-icon>
+    </button>
+
+    <button type="button" class="header-icon" (click)="logout()" aria-label="Logout">
+      <ion-icon name="log-out-outline"></ion-icon>
+    </button>
+  </header>
+
+  <main class="dispatch-content">
+    <section class="control-card">
+      <div class="control-top">
+        <div>
+          <span class="control-label">DELIVERY CONTROL</span>
+          <h2>{{ getDispatchName() }}</h2>
+          <p>Review live jobs first, then manage earnings, route history and profile settings below.</p>
+        </div>
+
+        <img class="rider-photo" [src]="getDispatchPhoto()" [alt]="getDispatchName()" />
+      </div>
+
+      <button
+        type="button"
+        class="availability-button"
+        [class.offline]="!stats.isAvailable"
+        (click)="toggleAvailability()"
+      >
+        <span>{{ stats.isAvailable ? 'Available' : 'Unavailable' }}</span>
+        <span class="availability-switch" [class.active]="stats.isAvailable">
+          <span></span>
+        </span>
       </button>
-      <button class="ghost-btn" (click)="openProfileSettings()">Edit profile</button>
-    </div>
-  </section>
 
-  <section class="summary-grid">
-    <div class="stat-card">
-      <div class="stat-label">Active deliveries</div>
-      <div class="stat-value">{{ stats.activeCount }}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Completed</div>
-      <div class="stat-value">{{ stats.completedCount }}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Open jobs</div>
-      <div class="stat-value">{{ stats.availableCount }}</div>
-    </div>
-    <div class="stat-card wallet">
-      <div class="stat-label">Wallet</div>
-      <div class="stat-value">{{ walletBalance | money:walletCurrency:'1.0-0' }}</div>
-    </div>
-  </section>
+      <button type="button" class="edit-profile-button" (click)="editProfile()">
+        Edit profile
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </section>
 
-  <app-profile-completeness-card [profile]="profile" role="dispatch"></app-profile-completeness-card>
+    <section class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-icon green">
+          <ion-icon name="bicycle-outline"></ion-icon>
+        </div>
+        <div>
+          <span>ACTIVE DELIVERIES</span>
+          <strong>{{ stats.activeCount }}</strong>
+        </div>
+      </article>
 
-  <section class="action-row">
-    <button class="action-btn" (click)="openWallet()">Wallet</button>
-    <button class="action-btn ghost" (click)="openRewards()">Rewards</button>
-  </section>
+      <article class="stat-card">
+        <div class="stat-icon blue">
+          <ion-icon name="bag-check-outline"></ion-icon>
+        </div>
+        <div>
+          <span>COMPLETED</span>
+          <strong>{{ stats.completedCount }}</strong>
+        </div>
+      </article>
 
-  <section class="orders-section">
-    <div class="section-header">
+      <article class="stat-card">
+        <div class="stat-icon orange">
+          <ion-icon name="briefcase-outline"></ion-icon>
+        </div>
+        <div>
+          <span>OPEN JOBS</span>
+          <strong>{{ stats.availableCount }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="wallet-card" (click)="openWallet()">
       <div>
-        <h3>Orders</h3>
-        <p>Accept or update deliveries from here first.</p>
+        <span>WALLET</span>
+        <strong>{{ walletBalance | money:walletCurrency:'1.0-0' }}</strong>
       </div>
-      <button class="collapse-toggle" type="button" (click)="toggleSection('orders')">
-        <ion-icon [name]="sections.orders ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
+
+      <button type="button" (click)="openWallet(); $event.stopPropagation()">
+        Wallet
+        <ion-icon name="chevron-forward-outline"></ion-icon>
       </button>
-    </div>
+    </section>
 
-    <div class="section-body" *ngIf="sections.orders">
-      <ion-segment [(ngModel)]="selectedTab" (ionChange)="selectTab(selectedTab)">
-        <ion-segment-button value="active">Active</ion-segment-button>
-        <ion-segment-button value="available">Available</ion-segment-button>
-        <ion-segment-button value="completed">Completed</ion-segment-button>
-      </ion-segment>
-
-      <div class="orders-list" *ngIf="selectedTab === 'active'">
-        <div *ngIf="activeOrders.length === 0" class="empty">No active deliveries.</div>
-        <div class="order-card" *ngFor="let order of activeOrders">
-          <div class="order-card-top">
-            <div>
-              <div class="order-title">{{ order.dishName }}</div>
-              <div class="order-subtitle">@{{ order.chefUsername }} to {{ order.username }}</div>
-            </div>
-            <span class="status-chip" [attr.data-tone]="getDispatchStatusTone(order)">{{ getDispatchHeadline(order) }}</span>
-          </div>
-
-          <div class="order-meta">
-            <span>{{ order.price | money:(order.currency || walletCurrency):'1.0-0' }}</span>
-            <span>{{ order.deliveryCity || order.deliveryState || 'Delivery route' }}</span>
-            <span>{{ order.orderTime | date:'short' }}</span>
-            <span *ngIf="order.deliveryQrReadableCode">Code: {{ order.deliveryQrReadableCode }}</span>
-          </div>
-
-          <div class="order-actions">
-            <button *ngIf="canAccept(order)" class="primary" (click)="acceptOrder(order._id)">Accept</button>
-            <button *ngIf="canDecline(order)" class="danger" (click)="declineOrder(order._id)">Decline</button>
-            <button *ngIf="canMarkPickedUp(order)" (click)="updateStatus(order._id, 'picked_up')">Picked up</button>
-            <button *ngIf="canMarkInTransit(order)" (click)="updateStatus(order._id, 'in_transit')">In transit</button>
-            <button *ngIf="canMarkDelivered(order)" class="success" (click)="updateStatus(order._id, 'delivered_to_customer')">Scan QR</button>
-            <button *ngIf="canMarkFailed(order)" class="ghost-alt" (click)="updateStatus(order._id, 'failed')">Not delivered</button>
-            <button class="ghost-alt" (click)="openOrderDetails(order._id)">Open order</button>
-            <button *ngIf="canShareLocation(order) && !isTracking" class="ghost-alt" (click)="startLocationTracking()">Share location</button>
-            <button *ngIf="canShareLocation(order) && isTracking" class="ghost-alt" (click)="stopLocationTracking()">Stop sharing</button>
-          </div>
+    <section class="profile-completeness-card">
+      <div class="profile-completeness-header">
+        <div>
+          <h3>Profile Completeness</h3>
+          <span>{{ profileCompleteness }}% complete</span>
         </div>
+
+        <button type="button" (click)="finishProfile()">Finish Now</button>
       </div>
 
-      <div class="orders-list" *ngIf="selectedTab === 'available'">
-        <div *ngIf="availableOrders.length === 0" class="empty">No open jobs right now.</div>
-        <div class="order-card" *ngFor="let order of availableOrders">
-          <div class="order-card-top">
-            <div>
-              <div class="order-title">{{ order.dishName }}</div>
-              <div class="order-subtitle">@{{ order.chefUsername }} to {{ order.username }}</div>
-            </div>
-            <span class="status-chip" data-tone="pending">Open job</span>
-          </div>
-
-          <div class="order-meta">
-            <span>{{ order.price | money:(order.currency || walletCurrency):'1.0-0' }}</span>
-            <span>{{ order.deliveryCity || order.deliveryState || 'Delivery route' }}</span>
-            <span>{{ order.orderTime | date:'short' }}</span>
-            <span *ngIf="order.deliveryQrReadableCode">Code: {{ order.deliveryQrReadableCode }}</span>
-          </div>
-
-          <div class="order-actions">
-            <button class="primary" (click)="acceptOrder(order._id)">Accept</button>
-            <button class="ghost-alt" (click)="openOrderDetails(order._id)">Open order</button>
-          </div>
-        </div>
+      <div class="progress-track">
+        <div class="progress-value" [style.width.%]="profileCompleteness"></div>
       </div>
 
-      <div class="orders-list" *ngIf="selectedTab === 'completed'">
-        <div *ngIf="completedOrders.length === 0" class="empty">No completed deliveries yet.</div>
-        <div class="order-card completed" *ngFor="let order of completedOrders">
-          <div class="order-card-top">
-            <div>
-              <div class="order-title">{{ order.dishName }}</div>
-              <div class="order-subtitle">@{{ order.chefUsername }} to {{ order.username }}</div>
-            </div>
-            <span class="status-chip" data-tone="success">Completed</span>
-          </div>
+      <div class="missing-fields">
+        <span *ngFor="let field of missingFields | slice:0:4">
+          <ion-icon [name]="field.icon"></ion-icon>
+          {{ field.label }}
+        </span>
 
-          <div class="order-meta">
-            <span>{{ order.deliveryFee | money:(order.currency || walletCurrency):'1.0-0' }}</span>
-            <span>{{ order.deliveryCity || order.deliveryState || 'Delivery route' }}</span>
-            <span>{{ order.deliveredAt | date:'short' }}</span>
-          </div>
-
-          <div class="order-actions">
-            <button class="ghost-alt" (click)="openOrderDetails(order._id)">Open order</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="profile-summary-card">
-    <div class="section-header">
-      <div>
-        <h3>Profile & fleet</h3>
-        <p>{{ profile?.dispatchProfile?.vehicleTypes?.join(', ') || 'Vehicle profile not completed yet.' }}</p>
-      </div>
-      <button class="collapse-toggle" type="button" (click)="toggleSection('profile')">
-        <ion-icon [name]="sections.profile ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
-      </button>
-    </div>
-    <div class="section-body" *ngIf="sections.profile">
-      <div class="profile-summary-actions">
-        <span class="status-pill">{{ profile?.dispatchProfile?.verificationStatus || 'pending' }}</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="analytics-card" *ngIf="analytics">
-    <div class="section-header">
-      <div>
-        <h3>Delivery Analytics</h3>
-        <p>Performance snapshot</p>
-      </div>
-      <button class="collapse-toggle" type="button" (click)="toggleSection('analytics')">
-        <ion-icon [name]="sections.analytics ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
-      </button>
-    </div>
-    <div class="section-body" *ngIf="sections.analytics">
-      <div class="analytics-grid">
-        <div class="analytics-item">
-          <span>Total Deliveries</span>
-          <strong>{{ analytics.totalDeliveries }}</strong>
-        </div>
-        <div class="analytics-item">
-          <span>Total Earnings</span>
-          <strong>{{ analytics.totalEarnings | money:walletCurrency:'1.0-0' }}</strong>
-        </div>
-        <div class="analytics-item">
-          <span>Avg Distance</span>
-          <strong>{{ analytics.avgDistanceKm }} km</strong>
-        </div>
-        <div class="analytics-item">
-          <span>Rider Score</span>
-          <strong>{{ analytics.avgRating }}</strong>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="history-card">
-    <div class="section-header">
-      <div>
-        <h3>Route History</h3>
-        <p>Completed deliveries</p>
-      </div>
-      <button class="collapse-toggle" type="button" (click)="toggleSection('history')">
-        <ion-icon [name]="sections.history ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
-      </button>
-    </div>
-    <div class="section-body" *ngIf="sections.history">
-      <div *ngIf="historyOrders.length === 0" class="payout-empty">No completed deliveries yet.</div>
-      <div class="history-list" *ngIf="historyOrders.length > 0">
-        <button class="history-item" type="button" *ngFor="let order of historyOrders" (click)="openOrderDetails(order._id)">
-          <div>
-            <div class="history-title">{{ order.dishName }}</div>
-            <div class="history-meta">@{{ order.chefUsername }} ? {{ order.deliveryCity || order.deliveryState || 'Delivery' }}</div>
-          </div>
-          <div class="history-right">
-            <div class="history-fee">{{ order.deliveryFee | money:(order.currency || walletCurrency):'1.0-0' }}</div>
-            <div class="history-date">{{ order.deliveredAt | date:'short' }}</div>
-          </div>
+        <button type="button" *ngIf="missingFields.length > 4" (click)="finishProfile()">
+          +{{ missingFields.length - 4 }} more
         </button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="payout-card">
-    <div class="section-header">
-      <div>
-        <h3>Payout History</h3>
-        <p>Recent wallet activity</p>
-      </div>
-      <button class="collapse-toggle" type="button" (click)="toggleSection('payout')">
-        <ion-icon [name]="sections.payout ? 'chevron-up-circle-outline' : 'chevron-down-circle-outline'"></ion-icon>
-      </button>
-    </div>
-    <div class="section-body" *ngIf="sections.payout">
-      <div *ngIf="walletTransactions.length === 0" class="payout-empty">No payouts yet.</div>
-      <div *ngIf="walletTransactions.length > 0" class="payout-list">
-        <div class="payout-item" *ngFor="let tx of walletTransactions">
-          <div>
-            <div class="payout-type">{{ displayWalletTxLabel(tx.type) }}</div>
-            <div class="payout-date">{{ tx.createdAt | date:'short' }}</div>
-          </div>
-          <div class="payout-amount">{{ tx.amount | money:(tx.currency || walletCurrency):'1.0-0' }}</div>
+    <section class="dashboard-section">
+      <header class="section-header">
+        <div>
+          <h2>Orders</h2>
+          <p>Accept or update deliveries from here first.</p>
         </div>
+
+        <button type="button" class="collapse-btn" (click)="toggleSection('orders')" aria-label="Expand or shrink orders">
+          <ion-icon [name]="sections.orders ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </header>
+
+      <div *ngIf="sections.orders">
+        <div class="order-tabs">
+          <button type="button" [class.active]="selectedTab === 'active'" (click)="setOrderTab('active')">ACTIVE</button>
+          <button type="button" [class.active]="selectedTab === 'available'" (click)="setOrderTab('available')">AVAILABLE</button>
+          <button type="button" [class.active]="selectedTab === 'completed'" (click)="setOrderTab('completed')">COMPLETED</button>
+        </div>
+
+        <div class="empty-orders" *ngIf="currentOrders.length === 0">
+          <div class="empty-orders-icon">
+            <ion-icon name="clipboard-outline"></ion-icon>
+          </div>
+          <div>
+            <strong>{{ getEmptyOrderTitle() }}</strong>
+            <span>{{ getEmptyOrderText() }}</span>
+          </div>
+        </div>
+
+        <article class="order-card" *ngFor="let order of currentOrders" (click)="openOrder(order)">
+          <div class="order-row-main">
+            <strong>{{ order.dishName || 'Delivery order' }}</strong>
+            <span>@{{ order.chefUsername || 'chef' }} to {{ getCustomerUsername(order) }}</span>
+          </div>
+
+          <div class="order-meta">
+            <span class="order-status" [attr.data-tone]="getDispatchStatusTone(order)">{{ getOrderStatusLabel(order) }}</span>
+            <strong>{{ getOrderFee(order) | money:(order.currency || walletCurrency):'1.0-0' }}</strong>
+          </div>
+
+          <div class="order-actions">
+            <button *ngIf="canAccept(order)" class="primary" (click)="acceptOrder(order._id); $event.stopPropagation()">Accept</button>
+            <button *ngIf="canDecline(order)" class="danger" (click)="declineOrder(order._id); $event.stopPropagation()">Decline</button>
+            <button *ngIf="canMarkPickedUp(order)" (click)="updateStatus(order._id, 'picked_up'); $event.stopPropagation()">Picked up</button>
+            <button *ngIf="canMarkInTransit(order)" (click)="updateStatus(order._id, 'in_transit'); $event.stopPropagation()">In transit</button>
+            <button *ngIf="canMarkDelivered(order)" class="success" (click)="updateStatus(order._id, 'delivered_to_customer'); $event.stopPropagation()">Scan QR</button>
+            <button *ngIf="canMarkFailed(order)" class="ghost-alt" (click)="updateStatus(order._id, 'failed'); $event.stopPropagation()">Not delivered</button>
+            <button *ngIf="canOpenOrderChat(order)" class="chat-btn" (click)="openOrderChat(order, $event)" aria-label="Open order chat">
+              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+            </button>
+            <button class="ghost-alt" (click)="openOrderDetails(order._id); $event.stopPropagation()">Open order</button>
+            <button *ngIf="canShareLocation(order) && !isTracking" class="ghost-alt" (click)="startLocationTracking(); $event.stopPropagation()">Share location</button>
+            <button *ngIf="canShareLocation(order) && isTracking" class="ghost-alt" (click)="stopLocationTracking(); $event.stopPropagation()">Stop sharing</button>
+          </div>
+        </article>
       </div>
-    </div>
-  </section>
-  <div class="page-end-spacer" aria-hidden="true"></div>
+    </section>
+
+    <section class="dashboard-section">
+      <header class="section-header">
+        <div>
+          <h2>Profile & fleet</h2>
+          <p>{{ getVehicleType() }}</p>
+        </div>
+
+        <button type="button" class="collapse-btn" (click)="toggleSection('profile')" aria-label="Expand or shrink profile">
+          <ion-icon [name]="sections.profile ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </header>
+
+      <div *ngIf="sections.profile" class="fleet-body">
+        <span class="verification-pill" [ngClass]="getVerificationStatus()">
+          {{ getVerificationStatus() }}
+        </span>
+
+        <div class="fleet-details">
+          <div>
+            <span>Vehicle</span>
+            <strong>{{ getVehicleType() }}</strong>
+          </div>
+          <div>
+            <span>Plate Number</span>
+            <strong>{{ getPlateNumber() }}</strong>
+          </div>
+          <div>
+            <span>Phone</span>
+            <strong>{{ getPhoneNumber() }}</strong>
+          </div>
+        </div>
+
+        <button type="button" class="secondary-action" (click)="editProfile()">Manage rider profile</button>
+      </div>
+    </section>
+
+    <section class="dashboard-section" *ngIf="analytics">
+      <header class="section-header">
+        <div>
+          <h2>Delivery Analytics</h2>
+          <p>Performance snapshot</p>
+        </div>
+
+        <button type="button" class="collapse-btn" (click)="toggleSection('analytics')" aria-label="Expand or shrink analytics">
+          <ion-icon [name]="sections.analytics ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </header>
+
+      <div class="analytics-grid" *ngIf="sections.analytics">
+        <article>
+          <div class="analytics-icon green"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+          <span>Total Deliveries</span>
+          <strong>{{ analytics.totalDeliveries || 0 }}</strong>
+        </article>
+
+        <article>
+          <div class="analytics-icon blue"><ion-icon name="wallet-outline"></ion-icon></div>
+          <span>Total Earnings</span>
+          <strong>{{ (analytics.totalEarnings || 0) | money:walletCurrency:'1.0-0' }}</strong>
+        </article>
+
+        <article>
+          <div class="analytics-icon purple"><ion-icon name="navigate-outline"></ion-icon></div>
+          <span>Avg Distance</span>
+          <strong>{{ analytics.avgDistanceKm || analytics.averageDistance || 0 }} km</strong>
+        </article>
+
+        <article>
+          <div class="analytics-icon yellow"><ion-icon name="star-outline"></ion-icon></div>
+          <span>Rider Score</span>
+          <strong>{{ analytics.avgRating || analytics.riderScore || 0 }}</strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <header class="section-header">
+        <div>
+          <h2>Route History</h2>
+          <p>Completed deliveries</p>
+        </div>
+
+        <button type="button" class="collapse-btn" (click)="toggleSection('history')" aria-label="Expand or shrink route history">
+          <ion-icon [name]="sections.history ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </header>
+
+      <div *ngIf="sections.history">
+        <div class="empty-orders" *ngIf="historyOrders.length === 0">
+          <div class="empty-orders-icon"><ion-icon name="map-outline"></ion-icon></div>
+          <div>
+            <strong>No completed deliveries yet</strong>
+            <span>Route history will appear here.</span>
+          </div>
+        </div>
+
+        <article class="history-row" *ngFor="let route of displayedRoutes" (click)="openRoute(route)">
+          <div class="history-status success">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </div>
+
+          <div class="history-main">
+            <strong>{{ route.dishName || 'Delivery' }}</strong>
+            <span>@{{ route.chefUsername || 'chef' }} • Delivery</span>
+          </div>
+
+          <div class="history-right">
+            <strong>{{ getOrderFee(route) | money:(route.currency || walletCurrency):'1.0-0' }}</strong>
+            <span>{{ (route.deliveredAt || route.completedAt || route.updatedAt) | date:'short' }}</span>
+          </div>
+
+          <ion-icon class="history-arrow" name="chevron-forward-outline"></ion-icon>
+        </article>
+
+        <button type="button" class="view-all" *ngIf="historyOrders.length > 4" (click)="toggleAllRoutes()">
+          {{ showAllRoutes ? 'Show less' : 'View all' }}
+          <ion-icon [name]="showAllRoutes ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </div>
+    </section>
+
+    <section class="dashboard-section payout-section">
+      <header class="section-header">
+        <div>
+          <h2>Payout History</h2>
+          <p>Recent wallet activity</p>
+        </div>
+
+        <button type="button" class="collapse-btn" (click)="toggleSection('payout')" aria-label="Expand or shrink payout history">
+          <ion-icon [name]="sections.payout ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </header>
+
+      <div *ngIf="sections.payout">
+        <div class="empty-orders" *ngIf="walletTransactions.length === 0">
+          <div class="empty-orders-icon"><ion-icon name="wallet-outline"></ion-icon></div>
+          <div>
+            <strong>No payouts yet</strong>
+            <span>Recent wallet activity will appear here.</span>
+          </div>
+        </div>
+
+        <article class="payout-row" *ngFor="let payout of displayedPayouts" (click)="openHistoryOrder(payout)">
+          <div class="payout-icon">
+            <ion-icon name="download-outline"></ion-icon>
+          </div>
+
+          <div class="payout-main">
+            <strong>{{ displayWalletTxLabel(payout.type) }}</strong>
+            <span>{{ payout.createdAt | date:'short' }}</span>
+          </div>
+
+          <strong class="payout-amount">{{ payout.amount | money:(payout.currency || walletCurrency):'1.0-0' }}</strong>
+          <ion-icon class="history-arrow" name="chevron-forward-outline"></ion-icon>
+        </article>
+
+        <button type="button" class="view-all" *ngIf="walletTransactions.length > 3" (click)="toggleAllPayouts()">
+          {{ showAllPayouts ? 'Show less' : 'View all' }}
+          <ion-icon [name]="showAllPayouts ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </button>
+      </div>
+    </section>
+  </main>
 </ion-content>

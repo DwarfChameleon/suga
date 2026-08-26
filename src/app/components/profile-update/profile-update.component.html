@@ -61,11 +61,23 @@
       <h2>Change Password</h2>
       <div class="row">
         <label>Current Password</label>
-        <input type="password" [(ngModel)]="oldPassword" placeholder="Enter current password" />
+        <div class="password-input-wrap">
+          <input [type]="showOldPassword ? 'text' : 'password'" [(ngModel)]="oldPassword" placeholder="Enter current password" />
+        </div>
+        <button type="button" class="password-toggle under-input" (click)="showOldPassword = !showOldPassword" [attr.aria-label]="showOldPassword ? 'Hide password' : 'Show password'">
+          <ion-icon [name]="showOldPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          <span>{{ showOldPassword ? 'Hide password' : 'Show password' }}</span>
+        </button>
       </div>
       <div class="row">
         <label>New Password</label>
-        <input type="password" [(ngModel)]="newPassword" placeholder="Enter new password" />
+        <div class="password-input-wrap">
+          <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newPassword" placeholder="Enter new password" />
+        </div>
+        <button type="button" class="password-toggle under-input" (click)="showNewPassword = !showNewPassword" [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
+          <ion-icon [name]="showNewPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          <span>{{ showNewPassword ? 'Hide password' : 'Show password' }}</span>
+        </button>
       </div>
       <button class="primary-btn" (click)="updatePassword()">Update Password</button>
     </div>
@@ -75,11 +87,23 @@
       <p class="subtitle">Use this 4-digit PIN for transfers and withdrawals.</p>
       <div class="row" *ngIf="hasExistingPin">
         <label>Old PIN</label>
-        <input type="password" maxlength="4" inputmode="numeric" [(ngModel)]="oldPin" placeholder="Old PIN" />
+        <div class="password-input-wrap">
+          <input [type]="showOldPin ? 'text' : 'password'" maxlength="4" inputmode="numeric" [(ngModel)]="oldPin" placeholder="Old PIN" />
+        </div>
+        <button type="button" class="password-toggle under-input" (click)="showOldPin = !showOldPin" [attr.aria-label]="showOldPin ? 'Hide PIN' : 'Show PIN'">
+          <ion-icon [name]="showOldPin ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          <span>{{ showOldPin ? 'Hide PIN' : 'Show PIN' }}</span>
+        </button>
       </div>
       <div class="row">
         <label>New PIN</label>
-        <input type="password" maxlength="4" inputmode="numeric" [(ngModel)]="newPin" placeholder="4-digit PIN" />
+        <div class="password-input-wrap">
+          <input [type]="showNewPin ? 'text' : 'password'" maxlength="4" inputmode="numeric" [(ngModel)]="newPin" placeholder="4-digit PIN" />
+        </div>
+        <button type="button" class="password-toggle under-input" (click)="showNewPin = !showNewPin" [attr.aria-label]="showNewPin ? 'Hide PIN' : 'Show PIN'">
+          <ion-icon [name]="showNewPin ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          <span>{{ showNewPin ? 'Hide PIN' : 'Show PIN' }}</span>
+        </button>
       </div>
       <button class="primary-btn" (click)="savePin()">Save PIN</button>
     </div>

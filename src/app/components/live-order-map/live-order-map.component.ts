@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { MapService } from 'src/app/services/map.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-live-order-map',
@@ -19,6 +20,9 @@ export class LiveOrderMapComponent implements AfterViewInit, OnChanges, OnDestro
   private movingMarker?: L.Marker;
   private moveTimer?: ReturnType<typeof setInterval>;
   private routeCoords: L.LatLngExpression[] = [];
+  tileWarning = '';
+  private activeTileLayer?: L.TileLayer;
+  private usingFallbackTiles = false;
 
   constructor(private readonly mapService: MapService) {}
 
@@ -53,12 +57,39 @@ export class LiveOrderMapComponent implements AfterViewInit, OnChanges, OnDestro
       attributionControl: false
     }).setView([6.5244, 3.3792], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(this.map);
+    this.addTileLayer();
 
     this.markers.addTo(this.map);
     this.renderMarkers();
+  }
+
+  private addTileLayer(): void {
+    if (!this.map) return;
+    const tileUrl = (environment as any).mapTileUrl || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    this.activeTileLayer = L.tileLayer(tileUrl, {
+      maxZoom: 19,
+      crossOrigin: true
+    }).addTo(this.map);
+
+    this.activeTileLayer.on('tileerror', () => {
+      if (this.usingFallbackTiles || !this.map) {
+        this.tileWarning = 'Map tiles are temporarily unavailable. Route markers are still shown.';
+        return;
+      }
+      this.usingFallbackTiles = true;
+      this.tileWarning = 'Switching map tiles...';
+      this.map.removeLayer(this.activeTileLayer!);
+      this.activeTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        crossOrigin: true
+      }).addTo(this.map);
+      this.activeTileLayer.on('tileload', () => {
+        this.tileWarning = '';
+      });
+      this.activeTileLayer.on('tileerror', () => {
+        this.tileWarning = 'Map tiles are temporarily unavailable. Route markers are still shown.';
+      });
+    });
   }
 
   private renderMarkers(): void {

@@ -402,6 +402,14 @@ export class OrderInfoComponent  implements OnInit, OnDestroy {
     this.modalController.dismiss({ changed: this.changed });
   }
 
+  returnToOrderCard(): void {
+    this.stopCameraScanner();
+    this.modalController.dismiss({
+      changed: this.changed,
+      focusOrderId: this.orderId
+    });
+  }
+
   private receiptBaseName(): string {
     return `suga-order-${this.orderId || 'receipt'}`;
   }

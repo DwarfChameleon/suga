@@ -48,6 +48,33 @@
   color: var(--ion-text-color);
 }
 
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap input {
+  padding-right: 12px;
+}
+
+.password-toggle {
+  width: fit-content;
+  min-height: 24px;
+  margin: -4px 0 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ion-color-primary-food);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.password-toggle ion-icon {
+  font-size: 16px;
+}
+
 .row ion-select {
   min-height: 44px;
   border: 1px solid var(--suga-border, #d9deea);

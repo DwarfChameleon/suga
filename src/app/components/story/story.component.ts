@@ -42,6 +42,10 @@ interface Video {
   userId: string;
   username: string;
   path: string;
+  avatar?: string;
+  profileImage?: string;
+  userAvatar?: string;
+  chefAvatar?: string;
   description: string;
   hashtags?: string[];
   mentions?: string[];
@@ -325,11 +329,31 @@ export class StoryComponent implements OnInit {
   getVideoUrl(path: string): string {
     const normalized = this.normalizeVideoPath(path);
     if (!normalized) return '';
-    if (/^https?:\/\//i.test(normalized)) return normalized;
+    if (/^https?:\/\//i.test(normalized)) return this.getOptimizedCloudinaryVideoUrl(normalized);
     if (normalized.startsWith('videos/') || normalized.startsWith('uploads/')) {
       return `${environment.baseUrl}/${normalized}`;
     }
     return `${environment.baseUrl}/videos/${normalized}`;
+  }
+
+  getVideoAvatar(video: Video): string {
+    return String(video.avatar || video.profileImage || video.userAvatar || video.chefAvatar || '').trim();
+  }
+
+  getVideoTitle(video: Video): string {
+    return String(video.linkedFood?.dishName || video.dishName || 'Food Story').trim();
+  }
+
+  private getOptimizedCloudinaryVideoUrl(url: string): string {
+    if (!/res\.cloudinary\.com/i.test(url) || !/\/video\/upload\//i.test(url)) {
+      return url;
+    }
+    const afterUpload = url.split('/video/upload/')[1] || '';
+    const firstSegment = afterUpload.split('/')[0] || '';
+    if (/^(q_auto|f_auto|vc_auto|w_|c_|h_|e_|so_|du_)/i.test(firstSegment)) {
+      return url;
+    }
+    return url.replace('/video/upload/', '/video/upload/q_auto:eco,f_auto,vc_auto,w_720,c_limit/');
   }
 
   getStoryLocationLabel(video: Video): string {

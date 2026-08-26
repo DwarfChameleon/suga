@@ -114,7 +114,16 @@
 
           <div class="form-group">
             <ion-label>Password</ion-label>
-            <ion-input type="password" formControlName="pin" placeholder="At least 6 characters"></ion-input>
+            <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="pin" placeholder="At least 6 characters">
+            </ion-input>
+            <button
+              type="button"
+              class="password-toggle under-input"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              <span>{{ showPassword ? 'Hide password' : 'Show password' }}</span>
+            </button>
           </div>
 
           <div class="action-row">

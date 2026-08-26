@@ -219,6 +219,36 @@ export class AddressDataService {
     return this.uniqueInOrder(suburbs);
   }
 
+  getCoverageTerms(country: string, stateOrRegion = '', city = ''): string[] {
+    const terms: string[] = [];
+    if (country) {
+      terms.push(country);
+    }
+
+    const states = country ? this.getStates(country) : [];
+    terms.push(...states);
+
+    const citySources = stateOrRegion ? [stateOrRegion] : states;
+    for (const stateName of citySources) {
+      const cities = this.getCities(country, stateName);
+      terms.push(...cities);
+
+      const suburbSources = city ? [city] : cities;
+      for (const cityName of suburbSources) {
+        terms.push(...this.getSuburbs(country, stateName, cityName));
+      }
+    }
+
+    return this.uniqueInOrder(terms);
+  }
+
+  isKnownCoverageTerm(term: string, country: string, stateOrRegion = '', city = ''): boolean {
+    const normalized = this.normalizeTerm(term);
+    if (!normalized) return false;
+    return this.getCoverageTerms(country, stateOrRegion, city)
+      .some((entry) => this.normalizeTerm(entry) === normalized);
+  }
+
   getLocalGovernments(_country: string, _stateOrRegion: string): string[] {
     return [];
   }
@@ -281,5 +311,9 @@ export class AddressDataService {
       output.push(value);
     }
     return output;
+  }
+
+  private normalizeTerm(value: string): string {
+    return String(value || '').trim().toLowerCase();
   }
 }
