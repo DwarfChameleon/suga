@@ -586,12 +586,11 @@ ion-modal.suga-comments-sheet::part(content) {
 
 ion-modal.suga-comments-sheet .comments-sheet-content {
   --background: var(--suga-surface, #ffffff);
+  background: var(--suga-surface, #ffffff);
   height: 100%;
-}
-
-ion-modal.suga-comments-sheet .comments-sheet-content::part(scroll) {
-  height: 100%;
+  min-height: 0;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 ion-modal.suga-comments-sheet .comments-sheet-shell {
@@ -600,7 +599,9 @@ ion-modal.suga-comments-sheet .comments-sheet-shell {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 12px 14px max(12px, env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 ion-modal.suga-comments-sheet .sheet-header {
@@ -615,11 +616,26 @@ ion-modal.suga-comments-sheet .sheet-body {
 }
 
 ion-modal.suga-comments-sheet .sheet-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
   margin-top: 0;
   padding-top: 8px;
   border-top: 1px solid rgba(148, 163, 184, 0.14);
   background: var(--suga-surface, #ffffff);
+  box-sizing: border-box;
+}
+
+ion-modal.suga-comments-sheet .sheet-input .commentInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+ion-modal.suga-comments-sheet .sheet-input .sendComment {
+  flex: 0 0 44px;
+  left: 0;
 }
 
 ion-modal.suga-comments-sheet .comment-row {

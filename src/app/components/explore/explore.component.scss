@@ -1778,6 +1778,11 @@ font-size: 18px;
 
 .comments-sheet-content {
   --background: var(--suga-surface);
+  background: var(--suga-surface);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .comments-sheet-shell {
@@ -1785,8 +1790,10 @@ font-size: 18px;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px 14px calc(16px + var(--suga-safe-bottom));
+  gap: 10px;
+  padding: 12px 14px max(12px, var(--suga-safe-bottom));
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .sheet-header {
@@ -1836,14 +1843,23 @@ font-size: 18px;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: auto;
   flex-shrink: 0;
+  margin-top: 0;
   padding-top: 8px;
   border-top: 1px solid rgba(148, 163, 184, 0.14);
+  background: var(--suga-surface);
+  box-sizing: border-box;
 }
 
 .sheet-input .commentInput {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+.sheet-input .sendComment {
+  flex: 0 0 44px;
+  left: 0;
 }
 
 .sheet-input .sendComment[disabled] {

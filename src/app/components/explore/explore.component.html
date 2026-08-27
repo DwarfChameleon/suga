@@ -323,7 +323,7 @@
     handle="true"
     (didDismiss)="closeCommentsModal()">
     <ng-template>
-      <ion-content class="comments-sheet-content">
+      <div class="comments-sheet-content">
         <div class="comments-sheet-shell" *ngIf="activeCommentFood as activeFood">
           <div class="sheet-header">
             <div class="sheet-meta">
@@ -365,7 +365,7 @@
             </button>
           </form>
         </div>
-      </ion-content>
+      </div>
     </ng-template>
   </ion-modal>
 
