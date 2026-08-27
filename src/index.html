@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Ionic App</title>
+  <title>SUGA</title>
 
   <base href="/" />
 
@@ -20,8 +20,12 @@
       position: fixed;
       inset: 0;
       z-index: 2147483647;
-      display: grid;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       place-items: center;
+      gap: 14px;
       background: #ffffff;
       transition: opacity 260ms ease, visibility 260ms ease;
     }
@@ -32,21 +36,42 @@
     }
 
     #suga-startup-overlay img {
-      width: 132px;
-      height: 132px;
+      width: 122px;
+      height: 122px;
       object-fit: contain;
       animation: sugaStartupPulse 1.05s ease-in-out infinite;
       transform-origin: center;
     }
 
+    .suga-startup-name {
+      margin-top: 4px;
+      color: #ff2854;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .suga-startup-credit {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: calc(34px + env(safe-area-inset-bottom, 0px));
+      color: #8b95a1;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+    }
+
     @keyframes sugaStartupPulse {
       0%, 100% {
-        width: 118px;
-        height: 118px;
+        transform: scale(0.92);
       }
       50% {
-        width: 154px;
-        height: 154px;
+        transform: scale(1.12);
       }
     }
 
@@ -71,6 +96,8 @@
 <body>
   <div id="suga-startup-overlay" aria-label="SUGA loading">
     <img src="assets/sugalogo.png" alt="SUGA" />
+    <div class="suga-startup-name">SUGA</div>
+    <div class="suga-startup-credit">by<br />oneKobo Technologies</div>
   </div>
   <app-root></app-root>
   <script>

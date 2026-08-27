@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FoodService } from 'src/app/services/food.service';
 import { Router } from '@angular/router';
 import { Food } from 'src/app/interface/food';
@@ -22,6 +22,7 @@ import { HttpClient } from '@angular/common/http';
 import { resolveUploadUrl } from 'src/app/utils/media-url';
 import { buildLocationLabel } from 'src/app/utils/location-label';
 import { StoryComponent } from '../story/story.component';
+import { DispatchService } from 'src/app/services/dispatch.service';
 
 interface StoryVideoItem {
   _id: string;
@@ -46,7 +47,7 @@ interface StoryChefGroup {
   templateUrl: './explore.component.html',
   styleUrls: ['./explore.component.scss'],
 })
-export class ExploreComponent implements OnInit {
+export class ExploreComponent implements OnInit, OnDestroy {
  
   allFoods: Food[] = [];
   public errorMessage: string = '';
@@ -68,6 +69,7 @@ export class ExploreComponent implements OnInit {
   isOnline = true;
   showCommentsModal = false;
   showImagePreview = false;
+  showCategoryListModal = false;
   isExploreModalOpen = false;
   activeCommentFood: Food | null = null;
   activePreviewFood: Food | null = null;
@@ -78,6 +80,8 @@ export class ExploreComponent implements OnInit {
   private exploreModalDepth = 0;
   unreadNotifications = 0;
   missedStoriesCount = 0;
+  liveOrderCount = 0;
+  quickStatsHidden = false;
   storyGroups: StoryChefGroup[] = [];
   showStoryViewer = false;
   activeStoryGroup: StoryChefGroup | null = null;
@@ -97,6 +101,7 @@ export class ExploreComponent implements OnInit {
   private loadedCategoryImages = new Set<string>();
   private loadedFoodImages = new Set<string>();
   private dietPreferences = { allergies: [] as string[], desiredIngredients: [] as string[] };
+  private quickStatsScrollTimer?: any;
 
   
   constructor(
@@ -110,7 +115,8 @@ export class ExploreComponent implements OnInit {
     private networkService: NetworkService,
     private likeEffects: LikeEffectsService,
     private notificationService: NotificationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private dispatchService: DispatchService
   ) {}
 
   ngOnInit() {
@@ -163,8 +169,13 @@ export class ExploreComponent implements OnInit {
     this.hydrateSeenStoryIds();
     this.loadUserPreferences();
     this.loadFollowingChefs();
+    this.loadLiveOrderCount();
     this.getAllFoods();
     this.loadStoryGroups();
+  }
+
+  ngOnDestroy(): void {
+    if (this.quickStatsScrollTimer) clearTimeout(this.quickStatsScrollTimer);
   }
 
   private get currentUserId(): string {
@@ -342,6 +353,19 @@ getBackgroundImageStyle(imageUrl:string): any{
     await this.presentExploreModal(modal);
   }
 
+  openCategoryListModal(): void {
+    this.showCategoryListModal = true;
+  }
+
+  closeCategoryListModal(): void {
+    this.showCategoryListModal = false;
+  }
+
+  async openCategoryFromList(category: FoodCategory): Promise<void> {
+    this.closeCategoryListModal();
+    await this.openCategoryModal(category);
+  }
+
   private async presentExploreModal(modal: any): Promise<void> {
     this.exploreModalDepth += 1;
     this.isExploreModalOpen = true;
@@ -368,8 +392,50 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.route.navigate(['/components/order-history']);
   }
 
+  openLiveOrdersDashboard(): void {
+    const token = this.tokenStorage.getAccessToken();
+    if (!token) {
+      this.openLoginModal();
+      return;
+    }
+
+    const roles = (this.tokenStorage.getRoles() || []).map((r) => String(r || '').toLowerCase());
+    if (roles.includes('chef')) {
+      this.route.navigate(['/components/chef'], { queryParams: { tab: 'orders' } });
+      return;
+    }
+
+    if (roles.includes('dispatch')) {
+      this.route.navigate(['/components/dispatch'], { queryParams: { tab: 'active' } });
+      return;
+    }
+
+    if (roles.includes('consumer')) {
+      this.route.navigate(['/components/consumer'], { queryParams: { tab: 'liveOrder' }, state: { selectedSegment: 'liveOrder' } });
+      return;
+    }
+
+    this.route.navigate(['/components/explore']);
+  }
+
   openRewards(): void {
     this.route.navigate(['/components/rewards']);
+  }
+
+  onExploreScroll(): void {
+    if (!this.shouldShowExploreBottomToolbar()) return;
+    this.quickStatsHidden = true;
+    if (this.quickStatsScrollTimer) clearTimeout(this.quickStatsScrollTimer);
+    this.quickStatsScrollTimer = setTimeout(() => {
+      this.quickStatsHidden = false;
+    }, 520);
+  }
+
+  onExploreScrollEnd(): void {
+    if (this.quickStatsScrollTimer) clearTimeout(this.quickStatsScrollTimer);
+    this.quickStatsScrollTimer = setTimeout(() => {
+      this.quickStatsHidden = false;
+    }, 180);
   }
 
   getCategoryCountLabel(category: FoodCategory): string {
@@ -390,6 +456,16 @@ getBackgroundImageStyle(imageUrl:string): any{
     return ['red', 'orange', 'green', 'purple', 'blue'][index % 5];
   }
 
+  shouldShowInlineCategories(index: number): boolean {
+    const position = index + 1;
+    return this.categories.length > 0 && position >= 6 && (position - 6) % 16 === 0;
+  }
+
+  shouldShowInlineStories(index: number): boolean {
+    const position = index + 1;
+    return this.storyGroups.length > 0 && position >= 14 && (position - 14) % 16 === 0;
+  }
+
   getPrepTimeLabel(food: Food): string {
     const raw = String(food?.preparationTime || '').trim();
     if (!raw) return 'Time not set';
@@ -401,7 +477,42 @@ getBackgroundImageStyle(imageUrl:string): any{
   }
 
   getFoodCommentsCount(food: Food | any): number {
-    return Array.isArray(food?.comments) ? food.comments.length : 0;
+    return this.getVisibleFoodComments(food).length;
+  }
+
+  getVisibleFoodComments(food: Food | any): Array<any> {
+    return Array.isArray(food?.comments) ? food.comments.filter((comment: any) => !comment?.hidden) : [];
+  }
+
+  canModerateFoodComments(food: Food | any): boolean {
+    const user = this.tokenStorage.getUser();
+    const userId = String(user?._id || '');
+    if (!userId || !food) return false;
+    return [food.chefID, food.chefId, food.createdBy].some((id) => String(id || '') === userId);
+  }
+
+  hideFoodComment(food: Food | any, comment: any): void {
+    if (!food?._id || !comment?._id || !this.canModerateFoodComments(food)) return;
+    this.foodService.hideComment(food._id, comment._id, true).subscribe({
+      next: (updatedFood) => this.applyUpdatedFoodComments(updatedFood),
+      error: (error) => this.uiFeedback.error(error?.error?.message || 'Unable to hide comment.')
+    });
+  }
+
+  deleteFoodComment(food: Food | any, comment: any): void {
+    if (!food?._id || !comment?._id || !this.canModerateFoodComments(food)) return;
+    this.foodService.deleteComment(food._id, comment._id).subscribe({
+      next: (updatedFood) => this.applyUpdatedFoodComments(updatedFood),
+      error: (error) => this.uiFeedback.error(error?.error?.message || 'Unable to delete comment.')
+    });
+  }
+
+  private applyUpdatedFoodComments(updatedFood: Food): void {
+    this.allFoods = this.allFoods.map((food) => food._id === updatedFood._id ? updatedFood : food);
+    this.foods = this.foods.map((food) => food._id === updatedFood._id ? updatedFood : food);
+    if (this.activeCommentFood?._id === updatedFood._id) {
+      this.activeCommentFood = updatedFood;
+    }
   }
 
   openChefDirectory(): void {
@@ -968,6 +1079,36 @@ getBackgroundImageStyle(imageUrl:string): any{
     this.activeStoryPaused = false;
     this.showStoryViewer = true;
     this.markStorySeen(this.currentStory?._id || '');
+  }
+
+  private loadLiveOrderCount(): void {
+    if (!this.tokenStorage.getAccessToken()) {
+      this.liveOrderCount = 0;
+      return;
+    }
+
+    const roles = (this.tokenStorage.getRoles() || []).map((r) => String(r || '').toLowerCase());
+    if (roles.includes('dispatch')) {
+      this.dispatchService.getDashboard().subscribe({
+        next: (res) => {
+          this.liveOrderCount = Array.isArray(res?.activeOrders) ? res.activeOrders.length : Number(res?.stats?.activeCount || 0);
+        },
+        error: () => this.liveOrderCount = 0
+      });
+      return;
+    }
+
+    const source$ = roles.includes('chef') ? this.orderService.getChefOrders() : this.orderService.getUserOrders();
+    source$.subscribe({
+      next: (orders) => {
+        this.liveOrderCount = (orders || []).filter((order) => this.isLiveOrderStatus(order?.status)).length;
+      },
+      error: () => this.liveOrderCount = 0
+    });
+  }
+
+  private isLiveOrderStatus(status?: string): boolean {
+    return ['placed', 'confirmed', 'approved', 'processing', 'delivered'].includes(String(status || '').toLowerCase());
   }
 
   private preloadCategoryImages(): void {

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DispatchService } from 'src/app/services/dispatch.service';
 import { UiFeedbackService } from 'src/app/services/ui-feedback.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ModalController } from '@ionic/angular';
@@ -62,6 +62,7 @@ export class DispatchComponent implements OnInit, OnDestroy {
     private readonly dispatchService: DispatchService,
     private readonly uiFeedback: UiFeedbackService,
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
     private readonly tokenStorage: TokenStorageService,
     private readonly sanitizer: DomSanitizer,
     private readonly modalController: ModalController,
@@ -69,6 +70,10 @@ export class DispatchComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const requestedTab = String(this.route.snapshot.queryParamMap.get('tab') || '');
+    if (['active', 'available', 'completed'].includes(requestedTab)) {
+      this.selectedTab = requestedTab as 'active' | 'available' | 'completed';
+    }
     this.loadAll();
     this.refreshMap();
     this.liveRefreshTimer = setInterval(() => {

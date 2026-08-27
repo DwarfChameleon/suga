@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/authservice.service';
 import { TokenStorageService } from 'src/app/services/token-storage.service';
 import { UserInfo } from 'src/app/interface/user-details';
@@ -41,6 +41,7 @@ export class ConsumerComponent implements OnInit {
     private authService: AuthService,
     private tokenStorage: TokenStorageService,
     private router: Router,
+    private route: ActivatedRoute,
     private userDashboardService: UserDashboardService,
     private networkService: NetworkService,
     private uiFeedback: UiFeedbackService,
@@ -55,6 +56,10 @@ export class ConsumerComponent implements OnInit {
   }
   ngOnInit(): void {
     const stateOrderId = String(history?.state?.activeOrderId || '');
+    const requestedTab = String(this.route.snapshot.queryParamMap.get('tab') || history?.state?.selectedSegment || '');
+    if (['liveOrder', 'completedOrders'].includes(requestedTab)) {
+      this.selectedSegment = requestedTab;
+    }
     if (stateOrderId) {
       this.pendingOpenOrderId = stateOrderId;
       this.selectedSegment = 'liveOrder';

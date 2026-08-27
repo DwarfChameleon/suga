@@ -114,7 +114,7 @@
             <span class="action-icon-wrap">
               <ion-icon name="chatbubble-outline"></ion-icon>
             </span>
-            <span>{{ video.comments.length }}</span>
+            <span>{{ getVisibleVideoComments(video).length }}</span>
           </button>
         </aside>
 
@@ -161,18 +161,24 @@
   <section class="comment-sheet" *ngIf="showCommentsPanel && activeVideo">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
-      <h3>Comments <span>{{ activeVideo.comments.length }}</span></h3>
+      <h3>Comments <span>{{ getVisibleVideoComments(activeVideo).length }}</span></h3>
       <button type="button" class="sheet-close" (click)="closeComments()" aria-label="Close comments">
         <ion-icon name="close-outline"></ion-icon>
       </button>
     </div>
 
     <div class="sheet-body">
-      <div *ngFor="let comment of activeVideo.comments" class="comment-row">
-        <div class="comment-user">@{{ comment.username }}</div>
-        <div class="comment-text">{{ comment.text }}</div>
+      <div *ngFor="let comment of getVisibleVideoComments(activeVideo)" class="comment-row">
+        <div class="comment-copy">
+          <div class="comment-user">@{{ comment.username }}</div>
+          <div class="comment-text">{{ comment.text }}</div>
+        </div>
+        <div class="comment-actions" *ngIf="canModerateVideoComments(activeVideo)">
+          <button type="button" (click)="hideVideoComment(activeVideo, comment)">Hide</button>
+          <button type="button" class="danger" (click)="deleteVideoComment(activeVideo, comment)">Delete</button>
+        </div>
       </div>
-      <div *ngIf="activeVideo.comments.length === 0" class="comment-empty">Be the first to comment.</div>
+      <div *ngIf="getVisibleVideoComments(activeVideo).length === 0" class="comment-empty">Be the first to comment.</div>
     </div>
 
     <div class="sheet-input">

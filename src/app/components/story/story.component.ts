@@ -16,6 +16,7 @@ import { FoodService } from 'src/app/services/food.service';
 import { Food } from 'src/app/interface/food';
 import { OrderModalComponent } from '../order-modal/order-modal.component';
 import { buildLocationLabel } from 'src/app/utils/location-label';
+import { resolveUploadUrl } from 'src/app/utils/media-url';
 
 interface LinkedFoodSnapshot {
   dishName?: string;
@@ -79,9 +80,11 @@ interface Video {
 }
 
 interface Comment {
+  _id?: string;
   userId: string;
   username: string;
   text: string;
+  hidden?: boolean;
   createdAt: string;
 }
 
@@ -138,6 +141,7 @@ export class StoryComponent implements OnInit {
   private followingVideos: Video[] = [];
   private forYouVideos: Video[] = [];
   private dietPreferences: DietPreferences = { allergies: [], desiredIngredients: [] };
+  private creatorAvatarMap = new Map<string, string>();
 
   constructor(
     private http: HttpClient,
@@ -166,6 +170,7 @@ export class StoryComponent implements OnInit {
       this.hydrateSeenStories();
     }
     this.loadStoryFeeds();
+    this.loadCreatorAvatars();
     this.userService.followChanged$.subscribe(() => {
       this.reloadVideos();
     });
@@ -214,7 +219,7 @@ export class StoryComponent implements OnInit {
       .filter((v) => !!v?._id && !!v?.path)
       .map((v: Video) => ({
         ...v,
-        comments: Array.isArray(v.comments) ? v.comments : [],
+        comments: Array.isArray(v.comments) ? v.comments.filter((comment: Comment) => !comment.hidden) : [],
         likedByMe: currentUser?._id ? (v.likedBy || []).includes(currentUser._id) : false,
         showComments: false,
         showCommentForm: false
@@ -337,7 +342,9 @@ export class StoryComponent implements OnInit {
   }
 
   getVideoAvatar(video: Video): string {
-    return String(video.avatar || video.profileImage || video.userAvatar || video.chefAvatar || '').trim();
+    const direct = String(video.avatar || video.profileImage || video.userAvatar || video.chefAvatar || '').trim();
+    const mapped = this.creatorAvatarMap.get(String(video.userId || '')) || this.creatorAvatarMap.get(String(video.username || '').toLowerCase()) || '';
+    return resolveUploadUrl(direct || mapped, '');
   }
 
   getVideoTitle(video: Video): string {
@@ -623,9 +630,62 @@ export class StoryComponent implements OnInit {
     });
   }
 
+  getVisibleVideoComments(video: Video | undefined): Comment[] {
+    const comments = video?.comments;
+    return Array.isArray(comments) ? comments.filter((comment) => !comment.hidden) : [];
+  }
+
+  canModerateVideoComments(video: Video | undefined): boolean {
+    const userId = String(this.tokenStorage.getUser()?._id || '');
+    return !!userId && !!video?.userId && String(video.userId) === userId;
+  }
+
+  hideVideoComment(video: Video, comment: Comment): void {
+    if (!video?._id || !comment?._id || !this.canModerateVideoComments(video)) return;
+    this.http.patch<Video>(`${environment.apiUrl}/videos/${video._id}/comments/${comment._id}`, { hidden: true }).subscribe({
+      next: (updatedVideo) => this.applyUpdatedVideoComments(updatedVideo),
+      error: (error) => this.uiFeedback.error(error?.error?.message || 'Unable to hide comment.')
+    });
+  }
+
+  deleteVideoComment(video: Video, comment: Comment): void {
+    if (!video?._id || !comment?._id || !this.canModerateVideoComments(video)) return;
+    this.http.delete<Video>(`${environment.apiUrl}/videos/${video._id}/comments/${comment._id}`).subscribe({
+      next: (updatedVideo) => this.applyUpdatedVideoComments(updatedVideo),
+      error: (error) => this.uiFeedback.error(error?.error?.message || 'Unable to delete comment.')
+    });
+  }
+
+  private applyUpdatedVideoComments(updatedVideo: Video): void {
+    const apply = (items: Video[]) => items.map((video) => video._id === updatedVideo._id ? { ...video, comments: updatedVideo.comments || [] } : video);
+    this.videos = apply(this.videos);
+    this.exploreVideos = apply(this.exploreVideos);
+    this.followingVideos = apply(this.followingVideos);
+    this.forYouVideos = apply(this.forYouVideos);
+    if (this.activeVideo?._id === updatedVideo._id) {
+      this.activeVideo = this.videos.find((video) => video._id === updatedVideo._id) || { ...this.activeVideo, comments: updatedVideo.comments || [] };
+    }
+  }
+
+  private loadCreatorAvatars(): void {
+    this.userService.getChefSummaries().subscribe({
+      next: (chefs) => {
+        this.creatorAvatarMap.clear();
+        (chefs || []).forEach((chef: any) => {
+          const avatar = String(chef?.profilePicture || chef?.avatar || '').trim();
+          if (!avatar) return;
+          if (chef?._id) this.creatorAvatarMap.set(String(chef._id), avatar);
+          if (chef?.username) this.creatorAvatarMap.set(String(chef.username).toLowerCase(), avatar);
+        });
+      },
+      error: () => {}
+    });
+  }
+
   private reloadVideos(): void {
     this.dietPreferences = this.getDietPreferences(this.tokenStorage.getUser());
     this.loadStoryFeeds();
+    this.loadCreatorAvatars();
   }
 
   private scrollToTarget(): void {

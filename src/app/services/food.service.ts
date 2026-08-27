@@ -88,4 +88,12 @@ export class FoodService {
   addComment(foodId: string, text: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/${foodId}/comment`, { text });
   }
+
+  hideComment(foodId: string, commentId: string, hidden = true): Observable<Food> {
+    return this.http.patch<Food>(`${this.apiUrl}/${foodId}/comments/${commentId}`, { hidden });
+  }
+
+  deleteComment(foodId: string, commentId: string): Observable<Food> {
+    return this.http.delete<Food>(`${this.apiUrl}/${foodId}/comments/${commentId}`);
+  }
 }

@@ -49,9 +49,11 @@ export interface Food {
   updatedAt: Date;
   chefName?: string; // Optional field to hold chef's name
   comments?: Array<{
+    _id?: string;
     userId: string;
     username: string;
     text: string;
+    hidden?: boolean;
     createdAt: string;
   }>;
   likes?: number;

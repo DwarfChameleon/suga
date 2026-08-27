@@ -1,4 +1,10 @@
-<ion-content [fullscreen]="true" class="explore-page">
+<ion-content
+  [fullscreen]="true"
+  class="explore-page"
+  [scrollEvents]="true"
+  (ionScroll)="onExploreScroll()"
+  (ionScrollEnd)="onExploreScrollEnd()"
+>
   <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
     <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
   </ion-refresher>
@@ -33,7 +39,7 @@
     <section class="section-block">
       <div class="section-header">
         <h2>Food Categories</h2>
-        <button class="see-all-btn" type="button" (click)="goToSearch()">
+        <button class="see-all-btn" type="button" (click)="openCategoryListModal()">
           See all
           <ion-icon name="chevron-forward-outline"></ion-icon>
         </button>
@@ -124,10 +130,6 @@
     <section class="section-block dishes-section">
       <div class="section-header">
         <h2>Available Dishes</h2>
-        <button class="see-all-btn" type="button" (click)="goToSearch()">
-          View all
-          <ion-icon name="chevron-forward-outline"></ion-icon>
-        </button>
       </div>
 
       <div *ngIf="isLoading || !isOnline" class="skeleton-grid">
@@ -139,77 +141,166 @@
 
       <p *ngIf="emptyFollowMessage" class="empty-follow">{{ emptyFollowMessage }}</p>
 
-      <article class="dish-card" *ngFor="let food of allFoods">
-        <div class="dish-info">
-          <button class="chef-name" type="button" (click)="openChefProfile(food.chef)">
-            @{{ food.chef | titlecase }}
-          </button>
+      <ng-container *ngFor="let food of allFoods; let i = index">
+        <article class="dish-card">
+          <div class="dish-info">
+            <button class="chef-name" type="button" (click)="openChefProfile(food.chef)">
+              @{{ food.chef | titlecase }}
+            </button>
 
-          <div class="dish-title-line">
-            <h3 (click)="openModalFood(food._id)">{{ food.dishName | titlecase }}</h3>
-            <span class="food-reco-badge suggested" *ngIf="getFoodRecommendationTag(food) === 'suggested'">Suggested</span>
-            <span class="food-reco-badge warning" *ngIf="getFoodRecommendationTag(food) === 'not_recommended'">Not recommended</span>
-          </div>
+            <div class="dish-title-line">
+              <h3 (click)="openModalFood(food._id)">{{ food.dishName | titlecase }}</h3>
+              <span class="food-reco-badge suggested" *ngIf="getFoodRecommendationTag(food) === 'suggested'">Suggested</span>
+              <span class="food-reco-badge warning" *ngIf="getFoodRecommendationTag(food) === 'not_recommended'">Not recommended</span>
+            </div>
 
-          <div class="prep-time">
-            <ion-icon name="time-outline"></ion-icon>
-            <span>{{ getPrepTimeLabel(food) }}</span>
-          </div>
+            <div class="prep-time">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>{{ getPrepTimeLabel(food) }}</span>
+            </div>
 
-          <div class="dish-location" *ngIf="getFoodLocationLabel(food)">
-            <ion-icon name="location-outline"></ion-icon>
-            <span>{{ getFoodLocationLabel(food) }}</span>
-          </div>
+            <div class="dish-location" *ngIf="getFoodLocationLabel(food)">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ getFoodLocationLabel(food) }}</span>
+            </div>
 
-          <p class="dish-description">{{ getFoodDescription(food) }}</p>
+            <p class="dish-description">{{ getFoodDescription(food) }}</p>
 
-          <div class="dish-bottom">
-            <strong class="price">{{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</strong>
-            <div class="engagement">
-              <button type="button" [class.liked]="isFoodLiked(food._id)" (click)="likeFood(food._id)">
-                <ion-icon [name]="isFoodLiked(food._id) ? 'heart' : 'heart-outline'"></ion-icon>
-                {{ food.likes || 0 }}
-                <span *ngFor="let burst of (foodHeartBursts[food._id] || [])" class="float-heart" [style.--i]="burst % 5">❤</span>
-              </button>
-              <button type="button" (click)="openComments(food)">
-                <ion-icon name="chatbubble-outline"></ion-icon>
-                {{ getFoodCommentsCount(food) }}
-              </button>
+            <div class="dish-bottom">
+              <strong class="price">{{ food.price | convertedMoney:food.priceCurrency:'1.0-0' }}</strong>
+              <div class="engagement">
+                <button type="button" [class.liked]="isFoodLiked(food._id)" (click)="likeFood(food._id)">
+                  <ion-icon [name]="isFoodLiked(food._id) ? 'heart' : 'heart-outline'"></ion-icon>
+                  {{ food.likes || 0 }}
+                  <span *ngFor="let burst of (foodHeartBursts[food._id] || [])" class="float-heart" [style.--i]="burst % 5">❤</span>
+                </button>
+                <button type="button" (click)="openComments(food)">
+                  <ion-icon name="chatbubble-outline"></ion-icon>
+                  {{ getFoodCommentsCount(food) }}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="dish-image" [class.image-loading]="isFoodImageLoading(food.image)" (click)="openImagePreview(food, $event)">
-          <div class="image-shimmer" *ngIf="isFoodImageLoading(food.image)"></div>
-          <img
-            [src]="getImageUrl(food.image)"
-            [alt]="food.dishName"
-            loading="lazy"
-            decoding="async"
-            (load)="onFoodImageLoad(food.image)"
-            (error)="onFoodImageError(food.image)"
-          />
-          <button class="heart-btn" type="button" [class.liked]="isFoodLiked(food._id)" (click)="likeFood(food._id); $event.stopPropagation()">
-            <ion-icon [name]="isFoodLiked(food._id) ? 'heart' : 'heart-outline'"></ion-icon>
-          </button>
-          <button class="view-food-btn" type="button" (click)="openModalFood(food._id); $event.stopPropagation()">
-            View
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </button>
-        </div>
-      </article>
+          <div class="dish-image" [class.image-loading]="isFoodImageLoading(food.image)" (click)="openImagePreview(food, $event)">
+            <div class="image-shimmer" *ngIf="isFoodImageLoading(food.image)"></div>
+            <img
+              [src]="getImageUrl(food.image)"
+              [alt]="food.dishName"
+              loading="lazy"
+              decoding="async"
+              (load)="onFoodImageLoad(food.image)"
+              (error)="onFoodImageError(food.image)"
+            />
+            <button class="heart-btn" type="button" [class.liked]="isFoodLiked(food._id)" (click)="likeFood(food._id); $event.stopPropagation()">
+              <ion-icon [name]="isFoodLiked(food._id) ? 'heart' : 'heart-outline'"></ion-icon>
+            </button>
+            <button class="view-food-btn" type="button" (click)="openModalFood(food._id); $event.stopPropagation()">
+              View
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+          </div>
+        </article>
+
+        <section class="section-block inline-feed-section" *ngIf="shouldShowInlineCategories(i)">
+          <div class="section-header">
+            <h2>Food Categories</h2>
+            <button class="see-all-btn" type="button" (click)="openCategoryListModal()">
+              See all
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="horizontal-scroll categories compact-feed-strip">
+            <button
+              class="category-card"
+              type="button"
+              *ngFor="let category of categories; let categoryIndex = index"
+              (click)="openCategoryModal(category)"
+            >
+              <div class="category-image" [class.image-loading]="isCategoryImageLoading(category.image)">
+                <div class="image-shimmer" *ngIf="isCategoryImageLoading(category.image)"></div>
+                <img
+                  [src]="getCategoryImage(category.image)"
+                  [alt]="category.name"
+                  loading="lazy"
+                  decoding="async"
+                  (load)="onCategoryImageLoad(category.image)"
+                  (error)="onCategoryImageError(category.image)"
+                />
+                <div class="category-icon" [ngClass]="getCategoryColor(categoryIndex)">
+                  <ion-icon [name]="getCategoryIcon(category)"></ion-icon>
+                </div>
+              </div>
+              <div class="category-info">
+                <strong>{{ category.name }}</strong>
+                <span>{{ getCategoryCountLabel(category) }}</span>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <section class="section-block inline-feed-section" *ngIf="shouldShowInlineStories(i)">
+          <div class="section-header">
+            <h2>Food Story</h2>
+            <button class="see-all-btn" type="button" (click)="openStoryPage()">
+              See all
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="horizontal-scroll stories compact-feed-strip">
+            <button
+              class="story-card"
+              type="button"
+              *ngFor="let group of storyGroups"
+              (click)="openStoryViewer(group)"
+            >
+              <video
+                *ngIf="!isStoryThumbBroken(group)"
+                class="story-background"
+                [src]="getStoryVideoUrl(group.latestThumb)"
+                muted
+                autoplay
+                loop
+                playsinline
+                preload="metadata"
+                (error)="onStoryThumbError(group)"
+              ></video>
+              <div *ngIf="isStoryThumbBroken(group)" class="story-unavailable">
+                <ion-icon name="videocam-outline"></ion-icon>
+                <span>Story preview<br>unavailable</span>
+              </div>
+
+              <div class="story-overlay"></div>
+              <div class="story-user">
+                <div class="story-avatar">
+                  <img [src]="getChefImage(group.profilePicture)" [alt]="group.username" />
+                </div>
+                <div class="story-details">
+                  <div class="username">@{{ group.username }}</div>
+                  <span [class.has-new]="group.unseenCount > 0">{{ group.unseenCount }} new</span>
+                </div>
+              </div>
+              <div class="play-btn">
+                <ion-icon name="play"></ion-icon>
+              </div>
+            </button>
+          </div>
+        </section>
+      </ng-container>
     </section>
 
-    <section class="quick-stats">
+    <section class="quick-stats" [class.is-hidden]="quickStatsHidden || !shouldShowExploreBottomToolbar()">
       <button class="quick-card" type="button" (click)="openWallet()">
         <div class="quick-icon red"><ion-icon name="wallet-outline"></ion-icon></div>
         <strong>Wallet</strong>
         <span>My Balance</span>
       </button>
-      <button class="quick-card" type="button" (click)="openOrderHistory()">
+      <button class="quick-card" type="button" (click)="openLiveOrdersDashboard()">
         <div class="quick-icon orange"><ion-icon name="receipt-outline"></ion-icon></div>
-        <strong>{{ allFoods.length }}</strong>
-        <span>Dishes</span>
+        <strong>{{ liveOrderCount }}</strong>
+        <span>My Orders</span>
       </button>
       <button class="quick-card" type="button" (click)="openRewards()">
         <div class="quick-icon green"><ion-icon name="sparkles-outline"></ion-icon></div>
@@ -227,8 +318,8 @@
   <ion-modal
     [isOpen]="showCommentsModal"
     cssClass="suga-comments-sheet"
-    [initialBreakpoint]="0.72"
-    [breakpoints]="[0, 0.72, 0.92]"
+    [initialBreakpoint]="0.5"
+    [breakpoints]="[0, 0.5, 0.78]"
     handle="true"
     (didDismiss)="closeCommentsModal()">
     <ng-template>
@@ -237,7 +328,7 @@
           <div class="sheet-header">
             <div class="sheet-meta">
               <h3>{{ activeFood.dishName | titlecase }}</h3>
-              <p>@{{ activeFood.chef | titlecase }} · {{ activeFood.comments?.length || 0 }} comments</p>
+              <p>@{{ activeFood.chef | titlecase }} · {{ getVisibleFoodComments(activeFood).length }} comments</p>
             </div>
             <button type="button" class="sheet-close-btn" (click)="closeCommentsModal()" aria-label="Close comments">
               <ion-icon name="close-outline"></ion-icon>
@@ -245,13 +336,19 @@
           </div>
 
           <div class="sheet-body">
-            <div class="comment-list" *ngIf="(activeFood.comments?.length || 0) > 0">
-              <div class="comment-row" *ngFor="let c of activeFood.comments">
-                <span class="comment-user">@{{ c.username }}</span>
-                <span class="comment-text">{{ c.text }}</span>
+            <div class="comment-list" *ngIf="getVisibleFoodComments(activeFood).length > 0">
+              <div class="comment-row" *ngFor="let c of getVisibleFoodComments(activeFood)">
+                <div class="comment-copy">
+                  <span class="comment-user">@{{ c.username }}</span>
+                  <span class="comment-text">{{ c.text }}</span>
+                </div>
+                <div class="comment-actions" *ngIf="canModerateFoodComments(activeFood)">
+                  <button type="button" (click)="hideFoodComment(activeFood, c)">Hide</button>
+                  <button type="button" class="danger" (click)="deleteFoodComment(activeFood, c)">Delete</button>
+                </div>
               </div>
             </div>
-            <div class="comment-empty" *ngIf="(activeFood.comments?.length || 0) === 0">
+            <div class="comment-empty" *ngIf="getVisibleFoodComments(activeFood).length === 0">
               Be the first to comment on this dish.
             </div>
           </div>
@@ -268,6 +365,58 @@
             </button>
           </form>
         </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal
+    [isOpen]="showCategoryListModal"
+    cssClass="category-list-sheet"
+    [initialBreakpoint]="0.62"
+    [breakpoints]="[0, 0.62, 0.9]"
+    handle="true"
+    (didDismiss)="closeCategoryListModal()">
+    <ng-template>
+      <ion-content class="category-list-content">
+        <section class="category-list-shell">
+          <div class="sheet-header">
+            <div class="sheet-meta">
+              <h3>Food Categories</h3>
+              <p>{{ categories.length }} available categories</p>
+            </div>
+            <button type="button" class="sheet-close-btn" (click)="closeCategoryListModal()" aria-label="Close categories">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="category-list">
+            <button
+              type="button"
+              class="category-list-item"
+              *ngFor="let category of categories; let i = index"
+              (click)="openCategoryFromList(category)"
+            >
+              <div class="category-list-image" [class.image-loading]="isCategoryImageLoading(category.image)">
+                <div class="image-shimmer" *ngIf="isCategoryImageLoading(category.image)"></div>
+                <img
+                  [src]="getCategoryImage(category.image)"
+                  [alt]="category.name"
+                  loading="lazy"
+                  decoding="async"
+                  (load)="onCategoryImageLoad(category.image)"
+                  (error)="onCategoryImageError(category.image)"
+                />
+              </div>
+              <div class="category-list-copy">
+                <strong>{{ category.name }}</strong>
+                <span>{{ getCategoryCountLabel(category) }}</span>
+              </div>
+              <div class="category-icon" [ngClass]="getCategoryColor(i)">
+                <ion-icon [name]="getCategoryIcon(category)"></ion-icon>
+              </div>
+            </button>
+          </div>
+        </section>
       </ion-content>
     </ng-template>
   </ion-modal>

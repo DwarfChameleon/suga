@@ -575,6 +575,13 @@
 .comment-row {
   padding: 9px 2px;
   border-bottom: 1px solid var(--suga-border, #eaecf0);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.comment-copy {
+  min-width: 0;
 }
 
 .comment-user {
@@ -585,9 +592,31 @@
 
 .comment-text {
   margin-top: 2px;
-  color: var(--ion-text-color);
+  color: var(--story-muted);
   font-size: 13px;
   line-height: 1.35;
+}
+
+.comment-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.comment-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--story-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.comment-actions button.danger {
+  background: rgba(255, 40, 84, 0.1);
+  color: var(--suga-pink);
 }
 
 .comment-empty {

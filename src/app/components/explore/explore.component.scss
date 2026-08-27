@@ -11,7 +11,7 @@
 
 ion-content.explore-page {
   --background: var(--ion-background-color);
-  --padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  --padding-bottom: calc(188px + env(safe-area-inset-bottom, 0px));
 }
 
 .explore-top-header {
@@ -77,7 +77,7 @@ ion-content.explore-page {
 }
 
 .page-content {
-  padding: 18px 14px calc(104px + env(safe-area-inset-bottom, 0px));
+  padding: 18px 14px calc(188px + env(safe-area-inset-bottom, 0px));
   display: grid;
   gap: 18px;
 }
@@ -533,33 +533,52 @@ ion-content.explore-page {
 }
 
 .quick-stats {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  z-index: 38;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 9px;
+  transition: transform 180ms ease, opacity 180ms ease, visibility 180ms ease;
+  pointer-events: auto;
+}
+
+.quick-stats.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px) scale(0.98);
+  pointer-events: none;
 }
 
 .quick-card {
   min-width: 0;
-  min-height: 86px;
+  min-height: 74px;
   border: 0;
-  border-radius: 18px;
-  padding: 9px 6px;
+  border-radius: 16px;
+  padding: 8px 6px;
   display: grid;
   justify-items: center;
   align-content: center;
   gap: 5px;
-  background: var(--suga-surface);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--ion-text-color);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.13);
+  backdrop-filter: blur(16px);
 }
 
 .quick-icon {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   color: #fff;
+}
+
+.quick-icon ion-icon {
+  font-size: 17px;
 }
 
 .quick-card strong {
@@ -582,6 +601,31 @@ ion-content.explore-page {
   white-space: nowrap;
 }
 
+.inline-feed-section {
+  margin: 4px 0 6px;
+  padding: 13px 0;
+  border-block: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.compact-feed-strip {
+  padding-bottom: 2px;
+}
+
+.compact-feed-strip .category-card {
+  min-width: 132px;
+  max-width: 132px;
+}
+
+.compact-feed-strip .category-image {
+  height: 82px;
+}
+
+.compact-feed-strip .story-card {
+  min-width: 116px;
+  max-width: 116px;
+  height: 152px;
+}
+
 @media (max-width: 390px) {
   .page-content {
     padding-inline: 10px;
@@ -599,6 +643,8 @@ ion-content.explore-page {
 
   .quick-stats {
     gap: 7px;
+    left: 10px;
+    right: 10px;
   }
 }
 
@@ -1671,16 +1717,47 @@ ion-content {
 }
 .comment-row{
   display: flex;
-  gap: 6px;
-  font-size: 18px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  font-size: 14px;
   color: var(--ion-color-primary-text);
+}
+.comment-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
 }
 .comment-user{
   font-weight: 600;
   color: var(--ion-color-primary);
 }
+.comment-text {
+  color: var(--suga-muted);
+  line-height: 1.35;
+}
+.comment-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.comment-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--suga-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.comment-actions button.danger {
+  background: rgba(254, 44, 85, 0.1);
+  color: var(--suga-pink);
+}
 .comment-empty{
-  font-size: 18px;
+  font-size: 14px;
   opacity: 0.7;
   margin-bottom: 8px;
   padding-left: 4px;
@@ -1692,11 +1769,10 @@ font-size: 18px;
 }
 
 :host ::ng-deep ion-modal.suga-comments-sheet::part(content) {
-  height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 72px);
-  max-height: calc(100vh - var(--suga-safe-top) - var(--suga-safe-bottom) - 72px);
-  margin-top: calc(var(--suga-safe-top) + 36px);
-  margin-bottom: calc(var(--suga-safe-bottom) + 12px);
-  border-radius: 24px;
+  height: 50vh;
+  max-height: 78vh;
+  margin-top: auto;
+  border-radius: 24px 24px 0 0;
   overflow: hidden;
 }
 
@@ -1705,7 +1781,8 @@ font-size: 18px;
 }
 
 .comments-sheet-shell {
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1750,6 +1827,7 @@ font-size: 18px;
 
 .sheet-body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding-right: 2px;
 }
@@ -1759,6 +1837,9 @@ font-size: 18px;
   align-items: center;
   gap: 8px;
   margin-top: auto;
+  flex-shrink: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
 }
 
 .sheet-input .commentInput {
@@ -1767,6 +1848,86 @@ font-size: 18px;
 
 .sheet-input .sendComment[disabled] {
   opacity: 0.45;
+}
+
+:host ::ng-deep ion-modal.category-list-sheet::part(content) {
+  height: 62vh;
+  max-height: 90vh;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+}
+
+.category-list-content {
+  --background: var(--suga-surface);
+}
+
+.category-list-shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 14px calc(16px + var(--suga-safe-bottom));
+}
+
+.category-list {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+}
+
+.category-list-item {
+  width: 100%;
+  min-height: 74px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 16px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 10px;
+  background: var(--suga-surface);
+  color: var(--ion-text-color);
+  text-align: left;
+}
+
+.category-list-image {
+  position: relative;
+  width: 62px;
+  height: 58px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--suga-surface-muted);
+}
+
+.category-list-image img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-list-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.category-list-copy strong {
+  color: var(--ion-text-color);
+  font-size: 14px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-list-copy span {
+  color: var(--suga-muted);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 @media (max-width: 480px) {
