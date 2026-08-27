@@ -28,6 +28,33 @@
   cursor: pointer;
 }
 
+.admob-card {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px dashed rgba(254, 44, 85, 0.18);
+  border-radius: 16px;
+  background: rgba(255, 246, 248, 0.92);
+}
+
+.admob-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #fe2c55;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admob-icon ion-icon {
+  font-size: 22px;
+}
+
 .ad-slot-image {
   width: 72px;
   height: 72px;

@@ -1,33 +1,66 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Success</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="success-page">
+  <header class="success-header">
+    <button type="button" class="back-btn" (click)="goBack()" aria-label="Go back">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
 
-<ion-content class="ion-padding">
-  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
-    <ion-refresher-content pullingIcon="chevron-down-circle-outline" refreshingSpinner="dots"></ion-refresher-content>
-  </ion-refresher>
+    <h1>Success</h1>
+  </header>
 
-  <div *ngIf="registrationSuccess">
+  <main class="success-content" *ngIf="registrationSuccess">
+    <span class="confetti c1"></span>
+    <span class="confetti c2"></span>
+    <span class="confetti c3"></span>
+    <span class="confetti c4"></span>
+    <span class="confetti c5"></span>
+    <span class="confetti c6"></span>
+    <span class="confetti c7"></span>
+    <span class="confetti c8"></span>
 
-    <div class="success-icon">
-      <img src="/assets/img/success.gif" alt="Success">
-    </div>
+    <section class="success-visual">
+      <div class="success-glow">
+        <div class="success-circle">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </div>
+      </div>
 
-    <div class="successinstructions">
-      <h2>Account ready</h2>
-      <p>Your Suga account has been created successfully.</p>
+      <div class="success-pill">
+        <span class="pill-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </span>
+        <span>Account created successfully</span>
+      </div>
+    </section>
 
-      <ion-button
-        expand="block"
-        class="successBTN"
-        [disabled]="isContinuing"
-        (click)="continue()">
-        {{ ctaLabel || 'Continue to My Profile' }}
-      </ion-button>
-    </div>
+    <section class="success-message">
+      <h2>All set!</h2>
+      <p>
+        Your Suga account has been created successfully.
+        Your table is set. Let's find you something tasty.
+      </p>
+    </section>
 
-  </div>
+    <section class="welcome-card">
+      <div class="welcome-icon">
+        <ion-icon name="gift-outline"></ion-icon>
+      </div>
 
+      <div class="welcome-copy">
+        <strong>Welcome to Suga!</strong>
+        <span>Let's make every meal amazing.</span>
+      </div>
+
+      <ion-icon class="welcome-heart" name="heart-outline"></ion-icon>
+    </section>
+
+    <button
+      type="button"
+      class="continue-btn"
+      [disabled]="isContinuing"
+      (click)="continueToProfile()"
+    >
+      <span>{{ ctaLabel || 'Continue to My Profile' }}</span>
+      <ion-icon name="arrow-forward-outline"></ion-icon>
+    </button>
+  </main>
 </ion-content>

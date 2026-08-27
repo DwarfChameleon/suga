@@ -1,5 +1,5 @@
 <div class="ad-slot" *ngIf="visible && ad">
-  <div class="ad-slot-label">Featured</div>
+  <div class="ad-slot-label">{{ label }}</div>
   <button type="button" class="ad-slot-card" (click)="openAd()">
     <img *ngIf="ad.imageUrl" [src]="ad.imageUrl" [alt]="ad.title" class="ad-slot-image" />
     <div class="ad-slot-copy">
@@ -8,4 +8,18 @@
       <div class="ad-slot-body" *ngIf="ad.body">{{ ad.body }}</div>
     </div>
   </button>
+</div>
+
+<div class="ad-slot admob-slot" *ngIf="!visible && adMobVisible">
+  <div class="ad-slot-label">Advertisement</div>
+  <div class="admob-card">
+    <div class="admob-icon">
+      <ion-icon name="megaphone-outline"></ion-icon>
+    </div>
+    <div class="ad-slot-copy">
+      <div class="ad-slot-sponsor">AdMob</div>
+      <div class="ad-slot-title">Sponsored message</div>
+      <div class="ad-slot-body">An ad may appear on your screen based on availability.</div>
+    </div>
+  </div>
 </div>

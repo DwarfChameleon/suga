@@ -42,6 +42,16 @@ export interface AdConfig {
   network: Record<string, unknown>;
 }
 
+export interface AdMobNetworkConfig {
+  appIdAndroid?: string;
+  appIdIos?: string;
+  bannerUnitIdAndroid?: string;
+  interstitialUnitIdAndroid?: string;
+  rewardedUnitIdAndroid?: string;
+  nativeUnitIdAndroid?: string;
+  testMode?: boolean;
+}
+
 const defaultConfig: AdConfig = {
   version: 1,
   enabled: false,
@@ -110,6 +120,14 @@ export class AdConfigService {
 
   getConfig(): AdConfig {
     return this.config;
+  }
+
+  getPlacement(placementKey: string): AdPlacementRule | null {
+    return this.config.placements[placementKey] || null;
+  }
+
+  getAdMobNetworkConfig(): AdMobNetworkConfig {
+    return (this.config.network?.['admob'] || {}) as AdMobNetworkConfig;
   }
 
   canShowPlacement(placementKey: string, context: {

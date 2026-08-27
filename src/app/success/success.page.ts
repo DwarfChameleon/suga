@@ -52,8 +52,14 @@ export class SuccessPage implements OnInit, OnDestroy {
       return;
     }
 
+    this.isContinuing = true;
+    if (this.redirectTimer) {
+      window.clearTimeout(this.redirectTimer);
+      this.redirectTimer = undefined;
+    }
+    await this.dismissSelf();
+
     if (this.autoLoginPrefill?.username && this.autoLoginPrefill?.password) {
-      this.isContinuing = true;
       await this.loadingService.show('Signing you in...');
       try {
         const response = await firstValueFrom(
@@ -61,12 +67,12 @@ export class SuccessPage implements OnInit, OnDestroy {
         );
         await this.loadingService.hide();
         this.accountReadiness.promptIfNeeded(response?.user, 'registration');
-        await this.dismissSelf();
         this.redirectAfterLogin(response);
       } catch (error) {
         await this.loadingService.hide();
         this.isContinuing = false;
         this.uiFeedback.error('Account created, but automatic sign-in failed. Please sign in manually.');
+        this.router.navigateByUrl('/login', { replaceUrl: true });
       }
       return;
     }
@@ -78,9 +84,17 @@ export class SuccessPage implements OnInit, OnDestroy {
     await this.navigateTo('/components/explore');
   }
 
+  async continueToProfile(): Promise<void> {
+    await this.continue();
+  }
+
+  async goBack(): Promise<void> {
+    await this.dismissSelf();
+  }
+
   private async navigateTo(url: string): Promise<void> {
     await this.dismissSelf();
-    this.router.navigateByUrl(url, { replaceUrl: true });
+    await this.router.navigateByUrl(url, { replaceUrl: true });
   }
 
   private async dismissSelf(): Promise<void> {
