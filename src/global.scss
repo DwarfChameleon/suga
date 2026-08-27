@@ -547,7 +547,7 @@ border: 1px solid #2c6bc240;
     box-shadow: none;
     z-index:0;
   }
-    .form-group   select{
+  .form-group   select{
     border: 2px solid #dcdcdc;
     margin-top: 6px;
     width: 100%;
@@ -562,8 +562,111 @@ border: 1px solid #2c6bc240;
         justify-self: end;
         margin-right: 25px;
     }
-    .close ion-icon{
+     .close ion-icon{
         font-size: 35px;
         color:#c6c6c7;
     }
+
+ion-modal.suga-comments-sheet {
+  --height: 50vh;
+  --max-height: 78vh;
+  --width: 100%;
+  --border-radius: 24px 24px 0 0;
+  align-items: flex-end;
+}
+
+ion-modal.suga-comments-sheet::part(content) {
+  height: 50vh !important;
+  max-height: 78vh !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  border-radius: 24px 24px 0 0 !important;
+  overflow: hidden !important;
+}
+
+ion-modal.suga-comments-sheet .comments-sheet-content {
+  --background: var(--suga-surface, #ffffff);
+  height: 100%;
+}
+
+ion-modal.suga-comments-sheet .comments-sheet-content::part(scroll) {
+  height: 100%;
+  overflow: hidden;
+}
+
+ion-modal.suga-comments-sheet .comments-sheet-shell {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+ion-modal.suga-comments-sheet .sheet-header {
+  flex-shrink: 0;
+}
+
+ion-modal.suga-comments-sheet .sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+ion-modal.suga-comments-sheet .sheet-input {
+  flex-shrink: 0;
+  margin-top: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  background: var(--suga-surface, #ffffff);
+}
+
+ion-modal.suga-comments-sheet .comment-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  font-size: 14px;
+}
+
+ion-modal.suga-comments-sheet .comment-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+ion-modal.suga-comments-sheet .comment-user {
+  color: var(--ion-color-primary, #ff2854);
+  font-weight: 800;
+}
+
+ion-modal.suga-comments-sheet .comment-text {
+  color: var(--suga-muted, #667085);
+  line-height: 1.35;
+}
+
+ion-modal.suga-comments-sheet .comment-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+ion-modal.suga-comments-sheet .comment-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--suga-muted, #667085);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+ion-modal.suga-comments-sheet .comment-actions button.danger {
+  background: rgba(254, 44, 85, 0.1);
+  color: #ff2854;
+}
+
 @import "~leaflet/dist/leaflet.css";
