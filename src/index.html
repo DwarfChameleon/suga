@@ -100,28 +100,6 @@
     <div class="suga-startup-credit">by<br />oneKobo Technologies</div>
   </div>
   <app-root></app-root>
-  <script>
-    (function () {
-      var startedAt = Date.now();
-      function dismiss() {
-        var overlay = document.getElementById('suga-startup-overlay');
-        if (!overlay) return;
-        overlay.classList.add('is-hidden');
-        window.setTimeout(function () { overlay.remove(); }, 280);
-      }
-      function waitForApp() {
-        var pageReady = document.querySelector('ion-router-outlet .ion-page, ion-router-outlet > *');
-        if (pageReady || Date.now() - startedAt > 8000) {
-          dismiss();
-          return;
-        }
-        window.setTimeout(waitForApp, 120);
-      }
-      window.addEventListener('load', function () {
-        window.setTimeout(waitForApp, 250);
-      });
-    })();
-  </script>
 </body>
 
 </html>

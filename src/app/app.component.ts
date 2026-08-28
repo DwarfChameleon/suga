@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { UserService } from './services/user.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { TokenStorageService } from './services/token-storage.service';
 import { MenuController, ModalController, ToastController } from '@ionic/angular';
 import { LoginModalComponent } from './login-modal/login-modal.component';
@@ -44,6 +44,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   private networkSub?: Subscription;
   private internetSub?: Subscription;
   private authSub?: Subscription;
+  private startupRouteSub?: Subscription;
+  private startupFallbackTimer?: number;
+  private startupOverlayDismissed = false;
   private suggestedChefsModalOpen = false;
   private suggestedChefsShownForUserId?: string;
 
@@ -93,28 +96,54 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     window.setTimeout(() => {
       window.requestAnimationFrame(() => {
         void this.nativeUi.hideSplashScreen();
-        this.dismissStartupOverlayWhenReady();
+        this.armStartupOverlayDismissal();
       });
       this.warmStartupData();
     }, 150);
   }
 
-  private dismissStartupOverlayWhenReady(): void {
+  private armStartupOverlayDismissal(): void {
     const startedAt = Date.now();
-    const removeOverlay = () => {
-      const overlay = document.getElementById('suga-startup-overlay');
-      overlay?.classList.add('is-hidden');
-      window.setTimeout(() => overlay?.remove(), 280);
-    };
+
     const waitForPage = () => {
-      const pageReady = !!document.querySelector('ion-router-outlet .ion-page, ion-router-outlet > *');
-      if (pageReady || Date.now() - startedAt > 8000) {
-        removeOverlay();
+      if (this.startupOverlayDismissed) return;
+      if (this.hasVisibleRoutedPage() || Date.now() - startedAt > 12000) {
+        this.dismissStartupOverlayAfterPaint();
         return;
       }
       window.setTimeout(waitForPage, 120);
     };
-    window.setTimeout(waitForPage, 250);
+
+    this.startupRouteSub = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        window.setTimeout(waitForPage, 180);
+      }
+    });
+    this.startupFallbackTimer = window.setTimeout(waitForPage, 700);
+  }
+
+  private hasVisibleRoutedPage(): boolean {
+    const page = document.querySelector('ion-router-outlet .ion-page:not(.ion-page-hidden), ion-router-outlet > .ion-page:not(.ion-page-hidden)');
+    if (!page) return false;
+    const rect = page.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  private dismissStartupOverlayAfterPaint(): void {
+    if (this.startupOverlayDismissed) return;
+    this.startupOverlayDismissed = true;
+    this.startupRouteSub?.unsubscribe();
+    if (this.startupFallbackTimer) {
+      clearTimeout(this.startupFallbackTimer);
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const overlay = document.getElementById('suga-startup-overlay');
+        overlay?.classList.add('is-hidden');
+        window.setTimeout(() => overlay?.remove(), 280);
+      });
+    });
   }
 
   private warmStartupData(): void {
@@ -301,6 +330,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.internetSub?.unsubscribe();
     this.socketSub?.unsubscribe();
     this.unreadSub?.unsubscribe();
+    this.startupRouteSub?.unsubscribe();
+    if (this.startupFallbackTimer) {
+      clearTimeout(this.startupFallbackTimer);
+    }
   }
 
   isDispatch(): boolean {
