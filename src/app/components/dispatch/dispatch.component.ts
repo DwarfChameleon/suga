@@ -47,6 +47,7 @@ export class DispatchComponent implements OnInit, OnDestroy {
   private notificationSub?: Subscription;
   private seenNotificationIds = new Set<string>();
   private liveRefreshTimer?: ReturnType<typeof setInterval>;
+  verifyingCodeOrderIds = new Set<string>();
   sections = {
     orders: true,
     profile: true,
@@ -305,6 +306,36 @@ export class DispatchComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.uiFeedback.error(error?.error?.message || 'Status update failed.');
+      }
+    });
+  }
+
+  getSharedDeliveryCode(order: any): string {
+    if (!order || !order.deliveryQrVisibleToRider) return '';
+    return String(order.deliveryQrReadableCode || order.readableCode || '').trim();
+  }
+
+  isVerifyingCode(order: any): boolean {
+    const orderId = String(order?._id || order?.id || '');
+    return !!orderId && this.verifyingCodeOrderIds.has(orderId);
+  }
+
+  verifySharedDeliveryCode(order: any, event?: Event): void {
+    event?.stopPropagation();
+    const orderId = String(order?._id || order?.id || '');
+    const deliveryCode = this.getSharedDeliveryCode(order);
+    if (!orderId || !deliveryCode || this.verifyingCodeOrderIds.has(orderId)) return;
+
+    this.verifyingCodeOrderIds.add(orderId);
+    this.dispatchService.verifyDeliveryQr(orderId, deliveryCode).subscribe({
+      next: () => {
+        this.verifyingCodeOrderIds.delete(orderId);
+        this.uiFeedback.success('Delivery code verified.');
+        this.loadAll();
+      },
+      error: (error) => {
+        this.verifyingCodeOrderIds.delete(orderId);
+        this.uiFeedback.error(error?.error?.error || error?.error?.message || 'Could not verify delivery code.');
       }
     });
   }

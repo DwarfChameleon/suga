@@ -539,6 +539,50 @@
   background: #ffe8e8;
 }
 
+.delivery-code-panel {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(254, 44, 85, 0.18);
+  border-radius: 15px;
+  background: #fff0f4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.delivery-code-panel span {
+  display: block;
+  color: #8a4555;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.delivery-code-panel strong {
+  display: block;
+  margin-top: 2px;
+  color: #101828;
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.delivery-code-panel button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--suga-pink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 850;
+  flex-shrink: 0;
+}
+
+.delivery-code-panel button:disabled {
+  opacity: 0.65;
+}
+
 .order-actions {
   display: flex;
   flex-wrap: wrap;

@@ -164,12 +164,24 @@
             <strong>{{ getOrderFee(order) | money:(order.currency || walletCurrency):'1.0-0' }}</strong>
           </div>
 
+          <div class="delivery-code-panel" *ngIf="getSharedDeliveryCode(order) as deliveryCode">
+            <div>
+              <span>Delivery code</span>
+              <strong>{{ deliveryCode }}</strong>
+            </div>
+            <button type="button" (click)="verifySharedDeliveryCode(order, $event)" [disabled]="isVerifyingCode(order)">
+              {{ isVerifyingCode(order) ? 'Verifying...' : 'Verify' }}
+            </button>
+          </div>
+
           <div class="order-actions">
             <button *ngIf="canAccept(order)" class="primary" (click)="acceptOrder(order._id); $event.stopPropagation()">Accept</button>
             <button *ngIf="canDecline(order)" class="danger" (click)="declineOrder(order._id); $event.stopPropagation()">Decline</button>
             <button *ngIf="canMarkPickedUp(order)" (click)="updateStatus(order._id, 'picked_up'); $event.stopPropagation()">Picked up</button>
             <button *ngIf="canMarkInTransit(order)" (click)="updateStatus(order._id, 'in_transit'); $event.stopPropagation()">In transit</button>
-            <button *ngIf="canMarkDelivered(order)" class="success" (click)="updateStatus(order._id, 'delivered_to_customer'); $event.stopPropagation()">Scan QR</button>
+            <button *ngIf="canMarkDelivered(order)" class="success" (click)="updateStatus(order._id, 'delivered_to_customer'); $event.stopPropagation()">
+              {{ getSharedDeliveryCode(order) ? 'Scan instead' : 'Scan QR' }}
+            </button>
             <button *ngIf="canMarkFailed(order)" class="ghost-alt" (click)="updateStatus(order._id, 'failed'); $event.stopPropagation()">Not delivered</button>
             <button *ngIf="canOpenOrderChat(order)" class="chat-btn" (click)="openOrderChat(order, $event)" aria-label="Open order chat">
               <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
