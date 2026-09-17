@@ -373,6 +373,29 @@ ion-modal.suga-order-fullsheet::part(content) {
   border-radius: 18px 18px 0 0;
 }
 
+/* Keep support dialogs readable in light mode. Ionic overlays render outside
+   page component scopes, so these variables must be global. */
+ion-alert,
+ion-action-sheet,
+ion-popover {
+  --background: #f3f4f6;
+  --color: #4b5563;
+  --ion-text-color: #4b5563;
+}
+
+ion-alert .alert-message,
+ion-alert .alert-head,
+ion-action-sheet .action-sheet-button,
+ion-popover ion-item {
+  color: #4b5563 !important;
+}
+
+ion-alert ion-icon,
+ion-action-sheet ion-icon,
+ion-popover ion-icon {
+  color: #6b7280 !important;
+}
+
 ion-modal.suga-receipt-sheet::part(content) {
   border-radius: 20px 20px 0 0;
   overflow: hidden;
