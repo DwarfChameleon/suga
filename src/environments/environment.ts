@@ -18,7 +18,7 @@ const resolveBackendBaseUrl = (): string => {
     return renderBackendBase;
   }
 
-  // Browser localhost frontend -> use the live backend first during development.
+  // Browser localhost frontend uses the live backend during development.
   if (isLocalHost) {
     return renderBackendBase;
   }
