@@ -8,7 +8,7 @@ import { CustomerSupportService } from '../services/customer-support.service';
 import { SupportSocketService } from '../services/support-socket.service';
 
 type Sender = 'CUSTOMER' | 'AGENT' | 'SYSTEM';
-interface SupportMessage { id: string; sender: Sender; text: string; time: string; read?: boolean; image?: string; }
+interface SupportMessage { id: string; sender: Sender; senderName?: string; text: string; time: string; read?: boolean; image?: string; }
 
 @Component({ selector: 'app-ticket-details', standalone: true, imports: [CommonModule, FormsModule, IonicModule], templateUrl: './ticket-details.page.html', styleUrls: ['./ticket-details.page.scss'] })
 export class TicketDetailsPage implements OnInit, OnDestroy {
@@ -27,7 +27,7 @@ export class TicketDetailsPage implements OnInit, OnDestroy {
     this.socket.read$.subscribe((m: any) => { if (m.ticketNumber === number && m.userType === 'SUPPORT_AGENT') this.messages.forEach(message => message.read = true); });
   }
   ngOnDestroy(): void { if (this.typingTimer) clearTimeout(this.typingTimer); this.socket.leaveTicket(this.ticket.ticketNumber); }
-  private mapMessage(m: any): SupportMessage { return { id: m._id || m.id || m.clientMessageId || `${Date.now()}-${Math.random()}`, sender: m.senderType === 'CUSTOMER' ? 'CUSTOMER' : m.senderType === 'SYSTEM' ? 'SYSTEM' : 'AGENT', text: m.text || '', time: m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : this.time(), read: !!m.read }; }
+  private mapMessage(m: any): SupportMessage { return { id: m._id || m.id || m.clientMessageId || `${Date.now()}-${Math.random()}`, sender: m.senderType === 'CUSTOMER' ? 'CUSTOMER' : m.senderType === 'SYSTEM' ? 'SYSTEM' : 'AGENT', senderName: m.senderName || undefined, text: m.text || '', time: m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : this.time(), read: !!m.read }; }
   time(): string { return new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
   get statusClass(): string { return `status-${this.ticket.status.toLowerCase().replace(/_/g, '-')}`; }
   getStatusLabel(status: string): string { return ({ OPEN: 'Open', IN_PROGRESS: 'In Progress', WAITING_FOR_CUSTOMER: 'Waiting for You', RESOLVED: 'Resolved', CLOSED: 'Closed' } as Record<string, string>)[status] || status; }
